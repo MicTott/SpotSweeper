@@ -20,7 +20,7 @@ usethis::git_default_branch_rename(to = "devel")
 
 ## Next we continue by connecting your local git repository to
 ## GitHub. You might want to use the `organisation` and `private` arguments
-args(usethis::use_github)
+args(usethis::use_github(private = TRUE))
 
 ## If this is your first time running use_github(), you might have to also run:
 usethis::gh_token_help()

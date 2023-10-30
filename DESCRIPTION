@@ -1,14 +1,15 @@
 Package: SpotSweeper
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: SpotSweeper
+Version: 0.99.0
+Date: 2023-10-30
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Michael", "Totty", ,"mictott@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9292-8556"))
+Description: Spatially-aware quality control software for detecting and removing low quality spots in spot-based spatial transcritpomics methods, such as 10x Visium.
+License: Artistic-2.0
+URL: https://github.com/MicTott/SpotSweeper
+BugReports: https://support.bioconductor.org/tag/SpotSweeper
+biocViews: Software
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-URL: https://github.com/MicTott/SpotSweeper
-BugReports: https://github.com/MicTott/SpotSweeper/issues
