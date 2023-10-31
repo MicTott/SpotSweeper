@@ -20,5 +20,5 @@ SpatialExperiment object with update z_umi_outlier columns
 This function does detects local outliers based on k-nearest neighbors.
 }
 \examples{
-localOutliers(spe_example, k=15, threshold=2)
+localOutliers(spe_example, k = 15, threshold = 2)
 }
