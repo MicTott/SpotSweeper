@@ -10,6 +10,7 @@
 #' @examples
 #' localOutliers(spe_example, k = 15, threshold = 2)
 localOutliers <- function(spe, k = 15, threshold = 3) {
+
     # log2 transform the sum_umi and sum_gene features
     colData(spe)$sum_umi_log2 <- log2(spe$sum_umi)
     colData(spe)$sum_gene_log2 <- log2(spe$sum_gene)
@@ -41,14 +42,12 @@ localOutliers <- function(spe, k = 15, threshold = 3) {
         var.umi[[sample_id]] <- rep(NA, nrow(spaQC))
         z.umi[[sample_id]] <- rep(NA, nrow(spaQC))
 
-        # calculate variance and z-score
-        var.umi[[sample_id]] <- apply(dnn, 1, function(dnn.idx) {
-            var(spaQC[c(dnn.idx[dnn.idx != 0]), ]$sum_umi_log2, na.rm = TRUE)
-        })
-
-        z.umi[[sample_id]] <- apply(dnn, 1, function(dnn.idx) {
-            modified_z(spaQC[c(dnn.idx[dnn.idx != 0]), ]$sum_umi_log2)[1]
-        })
+        # Loop through each row in the nearest neighbor index matrix
+        for(i in 1:nrow(dnn)) {
+          dnn.idx <- dnn[i,]
+          var.umi[[sample_id]][i] <- var(spaQC[c(i, dnn.idx[dnn.idx != 0]),]$sum_umi_log2, na.rm=TRUE)
+          z.umi[[sample_id]][i] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]),]$sum_umi_log2)[1]
+        }
 
         # Handle non-finite values
         z.umi[[sample_id]][!is.finite(z.umi[[sample_id]])] <- 0
