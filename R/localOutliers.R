@@ -9,7 +9,7 @@
 #' @export localOutliers
 #' @examples
 #' localOutliers(spe_example, k = 15, threshold = 2)
-localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', log2=TRUE, z_threshold = 3) {
+localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', log2=TRUE, z_threshold = 3, output_z=FALSE) {
 
     # log2 transform the sum_umi and sum_gene features
     if (log2) {
@@ -45,7 +45,7 @@ localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', l
         # Loop through each row in the nearest neighbor index matrix
         for(i in 1:nrow(dnn)) {
           dnn.idx <- dnn[i,]
-          mod_z[[sample_id]][i] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]),][[feature]])
+          mod_z[[sample_id]][i] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]),][[feature]])[1]
         }
 
         # Handle non-finite values
@@ -53,6 +53,12 @@ localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', l
 
         # Save stats to the spaQC dataframe
         spaQC$local_outliers <- ifelse(mod_z[[sample_id]] > z_threshold | mod_z[[sample_id]] < -z_threshold, TRUE, FALSE)
+
+        # output z features if desired
+        if (output_z) {
+          feature_z <- paste0(feature, '_z')
+          spaQC[feature_z] <- mod_z[[sample_id]]
+        }
 
         # Store the modified spaQC dataframe in the list
         spaQC_list[[sample_id]] <- spaQC
