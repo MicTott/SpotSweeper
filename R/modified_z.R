@@ -2,8 +2,8 @@
 #'
 #' This function calculates and returns standardized (z-score like) values based on the
 #' Median Absolute Deviation (MAD) method. It is a robust method to detect outliers in
-#' data that might not be normally distributed. The function is a replication of the outliers()
-#' that was once available in the spatialEco package.
+#' data that might not be normally distributed. The function is a replication of the spatialEco::outliers()
+#' package that is no longer available in CRAN as of October 2023.
 #'
 #' @param x A numeric vector for which outliers need to be detected.
 #' @param s A constant used in the MAD calculation, default is 1.4826.

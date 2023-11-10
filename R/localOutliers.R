@@ -9,18 +9,19 @@
 #' @export localOutliers
 #' @examples
 #' localOutliers(spe_example, k = 15, threshold = 2)
-localOutliers <- function(spe, k = 15, threshold = 3) {
+localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', log2=TRUE, z_threshold = 3) {
 
     # log2 transform the sum_umi and sum_gene features
-    colData(spe)$sum_umi_log2 <- log2(spe$sum_umi)
-    colData(spe)$sum_gene_log2 <- log2(spe$sum_gene)
+    if (log2) {
+      feature_log2 <- paste0(feature, '_log2')
+      colData(spe)[feature_log2] <- log2(colData(spe)[[feature]])
+    }
 
     # Get a list of unique sample IDs
-    unique_sample_ids <- unique(spe$sample_id)
+    unique_sample_ids <- unique(colData(spe)[[samples]])
 
     # Initialize list variables to store the results
-    var.umi <- vector("list", length(unique_sample_ids))
-    z.umi <- vector("list", length(unique_sample_ids))
+    mod_z <- vector("list", length(unique_sample_ids))
 
     # Initialize a list to store each spaQC dataframe
     spaQC_list <- vector("list", length(unique_sample_ids))
@@ -39,23 +40,19 @@ localOutliers <- function(spe, k = 15, threshold = 3) {
         dnn <- findKNN(spatialCoords(spe_subset), k = k)$index
 
         # Initialize variables for the current sample
-        var.umi[[sample_id]] <- rep(NA, nrow(spaQC))
-        z.umi[[sample_id]] <- rep(NA, nrow(spaQC))
+        mod_z[[sample_id]] <- rep(NA, nrow(spaQC))
 
         # Loop through each row in the nearest neighbor index matrix
         for(i in 1:nrow(dnn)) {
           dnn.idx <- dnn[i,]
-          var.umi[[sample_id]][i] <- var(spaQC[c(i, dnn.idx[dnn.idx != 0]),]$sum_umi_log2, na.rm=TRUE)
-          z.umi[[sample_id]][i] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]),]$sum_umi_log2)[1]
+          mod_z[[sample_id]][i] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]),][[feature]])
         }
 
         # Handle non-finite values
-        z.umi[[sample_id]][!is.finite(z.umi[[sample_id]])] <- 0
+        mod_z[[sample_id]][!is.finite(mod_z[[sample_id]])] <- 0
 
         # Save stats to the spaQC dataframe
-        spaQC$var.umi <- var.umi[[sample_id]]
-        spaQC$z.umi <- z.umi[[sample_id]]
-        spaQC$z_umi_outlier <- ifelse(spaQC$z.umi > threshold | spaQC$z.umi < -threshold, TRUE, FALSE)
+        spaQC$local_outliers <- ifelse(mod_z[[sample_id]] > z_threshold | mod_z[[sample_id]] < -z_threshold, TRUE, FALSE)
 
         # Store the modified spaQC dataframe in the list
         spaQC_list[[sample_id]] <- spaQC
