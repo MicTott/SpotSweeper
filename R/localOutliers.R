@@ -9,12 +9,12 @@
 #' @export localOutliers
 #' @examples
 #' localOutliers(spe_example, k = 15, threshold = 2)
-localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', log2=TRUE, z_threshold = 3, output_z=FALSE) {
+localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', log10=TRUE, z_threshold = 3, output_z=FALSE) {
 
-    # log2 transform the sum_umi and sum_gene features
-    if (log2) {
-      feature_log2 <- paste0(feature, '_log2')
-      colData(spe)[feature_log2] <- log2(colData(spe)[[feature]])
+    # log10 transform the sum_umi and sum_gene features
+    if (log10) {
+      feature_log10 <- paste0(feature, '_log10')
+      colData(spe)[feature_log10] <- log10(colData(spe)[[feature]])
     }
 
     # Get a list of unique sample IDs
