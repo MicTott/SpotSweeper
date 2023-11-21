@@ -9,17 +9,19 @@
 #' @export localOutliers
 #' @examples
 #' localOutliers(spe_example, k = 15, threshold = 2)
-localOutliers <- function(spe, k = 36, features = c("sum_umi"), samples = "sample_id", log2 = TRUE, z_threshold = 3, output_z = FALSE) {
-    # log2 transform specified features
-    features_log2 <- character()
+localOutliers <- function(spe, n_neighbors = 36, features = c("sum_umi"), method = "univariate", samples = "sample_id", log2 = TRUE, cutoff = 3,
+                          scale=TRUE, minPts=20, data_output = FALSE) {
+
+   # log2 transform specified features
+    features_to_use <- character()
     if (log2) {
         for (feature in features) {
             feature_log2 <- paste0(feature, "_log2")
             colData(spe)[feature_log2] <- log2(colData(spe)[[feature]])
-            features_log2 <- c(features_log2, feature_log2)
+            features_to_use <- c(features_to_use, feature_log2)
         }
     } else {
-        features_log2 <- features
+        features_to_use <- features
     }
 
     # Get a list of unique sample IDs
@@ -39,32 +41,51 @@ localOutliers <- function(spe, k = 36, features = c("sum_umi"), samples = "sampl
         spaQC$coords <- spatialCoords(spe_subset)
 
         # Find nearest neighbors
-        dnn <- findKNN(spatialCoords(spe_subset), k = k)$index
+        dnn <- findKNN(spatialCoords(spe_subset), k = n_neighbors)$index
 
         # Initialize a matrix to store z-scores for each feature
-        mod_z_matrix <- matrix(NA, nrow(spaQC), length(features_log2))
-        colnames(mod_z_matrix) <- features_log2
+        mod_z_matrix <- matrix(NA, nrow(spaQC), length(features_to_use))
+        colnames(mod_z_matrix) <- features_to_use
 
         # Loop through each row in the nearest neighbor index matrix
         for (i in 1:nrow(dnn)) {
             dnn.idx <- dnn[i, ]
-            for (j in seq_along(features_log2)) {
-                mod_z_matrix[i, j] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]), ][[features_log2[j]]])[1]
+            for (j in seq_along(features_to_use)) {
+                mod_z_matrix[i, j] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]), ][[features_to_use[j]]])[1]
             }
         }
 
         # Handle non-finite values
         mod_z_matrix[!is.finite(mod_z_matrix)] <- 0
 
-        # Determine local outliers across all features
-        spaQC$local_outliers <- as.factor(apply(mod_z_matrix, 1, function(x) any(x > z_threshold | x < -z_threshold)))
+        # Determine local outliers
+        if (method == "univariate") {
+             # Determine local outliers across all features using z threshold
+             spaQC$local_outliers <- as.factor(apply(mod_z_matrix, 1, function(x) any(x > cutoff | x < -cutoff)))
+        } else if (method == "multivariate") {
+             # convert matrix to df and set column names
+             df <- as.data.frame(mod_z_matrix)
+             colnames(df) <- features_to_use
+
+             # calculate local outlier factor
+             if (scale) {
+                 LOF_outs <- lof(scale(df), minPts=minPts)
+             } else {
+                 LOF_outs <- lof(df, minPts=minPts)
+             }
+
+              spaQC$local_outliers <- ifelse(LOF_outs > cutoff, TRUE, FALSE)
+        }
 
         # output z features if desired
-        if (output_z) {
-            for (j in seq_along(features_log2)) {
+        if (data_output) {
+            for (j in seq_along(features_to_use)) {
                 feature_z <- paste0(features[j], "_z")
                 spaQC[feature_z] <- mod_z_matrix[, j]
             }
+          if (method == "multivariate") {
+              spaQC$LOF <- LOF_outs
+          }
         }
 
         # Store the modified spaQC dataframe in the list
