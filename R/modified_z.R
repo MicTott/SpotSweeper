@@ -15,8 +15,9 @@
 modified_z <- function(x, s = 1.4826) {
     e <- (length(x) - 1) / sqrt(length(x))
 
-    mad <- function(x, center = stats::median(x), constant = s,
-    low = FALSE, high = FALSE) {
+    mad <- function(
+        x, center = stats::median(x), constant = s,
+        low = FALSE, high = FALSE) {
         n <- length(x)
         constant * if ((low || high) && n %% 2 == 0) {
             if (low && high) {

@@ -18,6 +18,16 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![GitHub issues](https://img.shields.io/github/issues/MicTott/SpotSweeper)](https://github.com/MicTott/SpotSweeper/issues)
 [![GitHub pulls](https://img.shields.io/github/issues-pr/MicTott/SpotSweeper)](https://github.com/MicTott/SpotSweeper/pulls)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Bioc release status](http://www.bioconductor.org/shields/build/release/bioc/SpotSweeper.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/SpotSweeper)
+[![Bioc devel status](http://www.bioconductor.org/shields/build/devel/bioc/SpotSweeper.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/SpotSweeper)
+[![Bioc downloads rank](https://bioconductor.org/shields/downloads/release/SpotSweeper.svg)](http://bioconductor.org/packages/stats/bioc/SpotSweeper/)
+[![Bioc support](https://bioconductor.org/shields/posts/SpotSweeper.svg)](https://support.bioconductor.org/tag/SpotSweeper)
+[![Bioc history](https://bioconductor.org/shields/years-in-bioc/SpotSweeper.svg)](https://bioconductor.org/packages/release/bioc/html/SpotSweeper.html#since)
+[![Bioc last commit](https://bioconductor.org/shields/lastcommit/devel/bioc/SpotSweeper.svg)](http://bioconductor.org/checkResults/devel/bioc-LATEST/SpotSweeper/)
+[![Bioc dependencies](https://bioconductor.org/shields/dependencies/release/SpotSweeper.svg)](https://bioconductor.org/packages/release/bioc/html/SpotSweeper.html#since)
+[![check-bioc](https://github.com/MicTott/SpotSweeper/actions/workflows/check-bioc.yml/badge.svg)](https://github.com/MicTott/SpotSweeper/actions/workflows/check-bioc.yml)
+[![Codecov test coverage](https://codecov.io/gh/MicTott/SpotSweeper/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/MicTott/SpotSweeper?branch=devel)
 <!-- badges: end -->
 
 The goal of `SpotSweeper` is to ...

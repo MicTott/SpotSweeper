@@ -4,7 +4,15 @@
 \alias{localOutliers}
 \title{localOutliers Function}
 \usage{
-localOutliers(spe, k = 15, threshold = 3)
+localOutliers(
+  spe,
+  k = 36,
+  features = c("sum_umi"),
+  samples = "sample_id",
+  log2 = TRUE,
+  z_threshold = 3,
+  output_z = FALSE
+)
 }
 \arguments{
 \item{spe}{SpatialExperiment object with the following columns in colData: sample_id, sum_umi, sum_gene}

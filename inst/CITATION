@@ -1,0 +1,29 @@
+pkgVer <- function(pkg) {
+    if (!exists("meta") || is.null(meta)) meta <- packageDescription(pkg)
+    ver <- meta$Version
+    paste0('https://github.com/MicTott/SpotSweeper/', pkg, ' - R package version ', ver)
+}
+
+c(
+
+    bibentry(bibtype="manual",
+        title = "SpotSweeper: an R package for the automated removal of spot artifacts from spatially-resolved transcriptomics data",
+        author = personList(
+            as.person("MicTott")
+        ),
+        year = format(Sys.Date(), "%Y"),
+        url = "http://www.bioconductor.org/packages/SpotSweeper",
+        note = pkgVer('SpotSweeper'),
+        doi = '10.18129/B9.bioc.SpotSweeper'
+    ),
+    bibentry(bibtype="article",
+        title = "SpotSweeper: an R package for the automated removal of spot artifacts from spatially-resolved transcriptomics data",
+        author = personList(
+            as.person("MicTott")
+        ),
+        year = format(Sys.Date(), "%Y"),
+        journal = "bioRxiv",
+        doi = "10.1101/TODO",
+        url = "https://www.biorxiv.org/content/10.1101/TODO"
+    )
+)
