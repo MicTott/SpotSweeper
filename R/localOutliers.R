@@ -9,12 +9,15 @@
 #' @export localOutliers
 #' @examples
 #' localOutliers(spe_example, k = 15, threshold = 2)
-localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', log10=TRUE, z_threshold = 3, output_z=FALSE) {
+localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', log2=TRUE, z_threshold = 3, output_z=FALSE) {
 
-    # log10 transform the sum_umi and sum_gene features
-    if (log10) {
-      feature_log10 <- paste0(feature, '_log10')
-      colData(spe)[feature_log10] <- log10(colData(spe)[[feature]])
+    # log2 transform the sum_umi and sum_gene features
+    if (log2) {
+      feature_log2 <- paste0(feature, '_log2')
+      colData(spe)[feature_log2] <- log2(colData(spe)[[feature]])
+      feature2use <- feature_log2
+    } else {
+      feature2use <- feature
     }
 
     # Get a list of unique sample IDs
@@ -45,14 +48,14 @@ localOutliers <- function(spe, k = 36, feature='sum_umi', samples='sample_id', l
         # Loop through each row in the nearest neighbor index matrix
         for(i in 1:nrow(dnn)) {
           dnn.idx <- dnn[i,]
-          mod_z[[sample_id]][i] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]),][[feature]])[1]
+          mod_z[[sample_id]][i] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]),][[feature_log2]])[1]
         }
 
         # Handle non-finite values
         mod_z[[sample_id]][!is.finite(mod_z[[sample_id]])] <- 0
 
         # Save stats to the spaQC dataframe
-        spaQC$local_outliers <- ifelse(mod_z[[sample_id]] > z_threshold | mod_z[[sample_id]] < -z_threshold, TRUE, FALSE)
+        spaQC$local_outliers <- as.factor(ifelse(mod_z[[sample_id]] > z_threshold | mod_z[[sample_id]] < -z_threshold, TRUE, FALSE))
 
         # output z features if desired
         if (output_z) {
