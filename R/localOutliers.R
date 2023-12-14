@@ -1,18 +1,40 @@
 #' localOutliers Function
 #'
-#' This function does detects local outliers based on k-nearest neighbors.
+#' This function detects local outliers based on k-nearest neighbors based on either a univariate
+#' (z-score thresholds per QC metrics) or multivariate approach (Local Outlier Factor).
 #'
 #' @param spe SpatialExperiment object with the following columns in colData: sample_id, sum_umi, sum_gene
-#' @param k Number of nearest neighbors to use for outlier detection
+#' @param n_neighbors Number of nearest neighbors to use for outlier detection
 #' @param threshold Threshold for outlier detection
-#' @return SpatialExperiment object with update z_umi_outlier columns
+#' @param features Vector of features to use for outlier detection
+#' @param method Method to use for outlier detection (univariate or multivariate)
+#' @param samples Column name in colData to use for sample IDs
+#' @param log2 Logical indicating whether to log2 transform the features
+#' @param cutoff Cutoff for outlier detection
+#' @param scale Logical indicating whether to scale the features for LOF calculation (recommended)
+#' @param minPts Minimum number of points (nearest neighbors) to use for LOF calculation
+#' @param data_output Logical indicating whether to output the z-scores for each feature
+#' @param n_cores Number of cores to use for parallelization in the findKNN function
+#'
+#' @return SpatialExperiment object with updated colData
+#'
+#' @importFrom dbscan lof
+#' @importFrom SummarizedExperiment colData
+#' @importFrom BiocNeighbors findKNN
+#' @importFrom BiocParallel MulticoreParam
+#'
 #' @export localOutliers
+#'
 #' @examples
-#' localOutliers(spe_example, k = 15, threshold = 2)
-localOutliers <- function(spe, n_neighbors = 36, features = c("sum_umi"), method = "univariate", samples = "sample_id", log2 = TRUE, cutoff = 3,
-                          scale=TRUE, minPts=20, data_output = FALSE) {
-
-   # log2 transform specified features
+#' library(SpotSweeper)
+#' library(spatialLIBD)
+#'
+#' spe <- fetch_data(type = "spe")
+#'
+#' spe <- localOutliers(spe, n_neighbors=36)
+localOutliers <- function(spe, n_neighbors = 36, features = c("sum_umi","sum_gene", "expr_chrM_ratio"), method = "multivariate", samples = "sample_id", log2 = TRUE, cutoff = 2.58,
+    scale = TRUE, minPts = 20, data_output = FALSE, n_cores = 1) {
+    # log2 transform specified features
     features_to_use <- character()
     if (log2) {
         for (feature in features) {
@@ -41,11 +63,19 @@ localOutliers <- function(spe, n_neighbors = 36, features = c("sum_umi"), method
         spaQC$coords <- spatialCoords(spe_subset)
 
         # Find nearest neighbors
-        dnn <- findKNN(spatialCoords(spe_subset), k = n_neighbors)$index
+        suppressWarnings(
+        dnn <- BiocNeighbors::findKNN(spatialCoords(spe_subset),
+                                      k = n_neighbors,
+                                      BPPARAM=MulticoreParam(n_cores))$index
+        )
 
         # Initialize a matrix to store z-scores for each feature
         mod_z_matrix <- matrix(NA, nrow(spaQC), length(features_to_use))
         colnames(mod_z_matrix) <- features_to_use
+
+        # Initialize a matrix to store variance for each feature
+        var_matrix <- matrix(NA, nrow(spaQC), length(features_to_use))
+        colnames(var_matrix) <- features_to_use
 
         # Loop through each row in the nearest neighbor index matrix
         for (i in 1:nrow(dnn)) {
@@ -60,21 +90,21 @@ localOutliers <- function(spe, n_neighbors = 36, features = c("sum_umi"), method
 
         # Determine local outliers
         if (method == "univariate") {
-             # Determine local outliers across all features using z threshold
-             spaQC$local_outliers <- as.factor(apply(mod_z_matrix, 1, function(x) any(x > cutoff | x < -cutoff)))
+            # Determine local outliers across all features using z threshold
+            spaQC$local_outliers <- as.factor(apply(mod_z_matrix, 1, function(x) any(x > cutoff | x < -cutoff)))
         } else if (method == "multivariate") {
-             # convert matrix to df and set column names
-             df <- as.data.frame(mod_z_matrix)
-             colnames(df) <- features_to_use
+            # convert matrix to df and set column names
+            df <- as.data.frame(mod_z_matrix)
+            colnames(df) <- features_to_use
 
-             # calculate local outlier factor
-             if (scale) {
-                 LOF_outs <- lof(scale(df), minPts=minPts)
-             } else {
-                 LOF_outs <- lof(df, minPts=minPts)
-             }
+            # calculate local outlier factor
+            if (scale) {
+                LOF_outs <- lof(scale(df), minPts = minPts)
+            } else {
+                LOF_outs <- lof(df, minPts = minPts)
+            }
 
-              spaQC$local_outliers <- ifelse(LOF_outs > cutoff, TRUE, FALSE)
+            spaQC$local_outliers <- as.factor(ifelse(LOF_outs > cutoff, TRUE, FALSE))
         }
 
         # output z features if desired
@@ -83,9 +113,9 @@ localOutliers <- function(spe, n_neighbors = 36, features = c("sum_umi"), method
                 feature_z <- paste0(features[j], "_z")
                 spaQC[feature_z] <- mod_z_matrix[, j]
             }
-          if (method == "multivariate") {
-              spaQC$LOF <- LOF_outs
-          }
+            if (method == "multivariate") {
+                spaQC$LOF <- LOF_outs
+            }
         }
 
         # Store the modified spaQC dataframe in the list

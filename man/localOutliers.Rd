@@ -6,27 +6,55 @@
 \usage{
 localOutliers(
   spe,
-  k = 36,
-  features = c("sum_umi"),
+  n_neighbors = 36,
+  features = c("sum_umi", "sum_gene", "expr_chrM_ratio"),
+  method = "multivariate",
   samples = "sample_id",
   log2 = TRUE,
-  z_threshold = 3,
-  output_z = FALSE
+  cutoff = 2.58,
+  scale = TRUE,
+  minPts = 20,
+  data_output = FALSE,
+  n_cores = 1
 )
 }
 \arguments{
 \item{spe}{SpatialExperiment object with the following columns in colData: sample_id, sum_umi, sum_gene}
 
-\item{k}{Number of nearest neighbors to use for outlier detection}
+\item{n_neighbors}{Number of nearest neighbors to use for outlier detection}
+
+\item{features}{Vector of features to use for outlier detection}
+
+\item{method}{Method to use for outlier detection (univariate or multivariate)}
+
+\item{samples}{Column name in colData to use for sample IDs}
+
+\item{log2}{Logical indicating whether to log2 transform the features}
+
+\item{cutoff}{Cutoff for outlier detection}
+
+\item{scale}{Logical indicating whether to scale the features for LOF calculation (recommended)}
+
+\item{minPts}{Minimum number of points (nearest neighbors) to use for LOF calculation}
+
+\item{data_output}{Logical indicating whether to output the z-scores for each feature}
+
+\item{n_cores}{Number of cores to use for parallelization in the findKNN function}
 
 \item{threshold}{Threshold for outlier detection}
 }
 \value{
-SpatialExperiment object with update z_umi_outlier columns
+SpatialExperiment object with updated colData
 }
 \description{
-This function does detects local outliers based on k-nearest neighbors.
+This function detects local outliers based on k-nearest neighbors based on either a univariate
+(z-score thresholds per QC metrics) or multivariate approach (Local Outlier Factor).
 }
 \examples{
-localOutliers(spe_example, k = 15, threshold = 2)
+library(SpotSweeper)
+library(spatialLIBD)
+
+spe <- fetch_data(type = "spe")
+
+spe <- localOutliers(spe, n_neighbors=36)
 }

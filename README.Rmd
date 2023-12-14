@@ -13,26 +13,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-# SpotSweeper
+# SpotSweeper (under development)
 
 <!-- badges: start -->
-[![GitHub issues](https://img.shields.io/github/issues/MicTott/SpotSweeper)](https://github.com/MicTott/SpotSweeper/issues)
-[![GitHub pulls](https://img.shields.io/github/issues-pr/MicTott/SpotSweeper)](https://github.com/MicTott/SpotSweeper/pulls)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![Bioc release status](http://www.bioconductor.org/shields/build/release/bioc/SpotSweeper.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/SpotSweeper)
-[![Bioc devel status](http://www.bioconductor.org/shields/build/devel/bioc/SpotSweeper.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/SpotSweeper)
-[![Bioc downloads rank](https://bioconductor.org/shields/downloads/release/SpotSweeper.svg)](http://bioconductor.org/packages/stats/bioc/SpotSweeper/)
-[![Bioc support](https://bioconductor.org/shields/posts/SpotSweeper.svg)](https://support.bioconductor.org/tag/SpotSweeper)
-[![Bioc history](https://bioconductor.org/shields/years-in-bioc/SpotSweeper.svg)](https://bioconductor.org/packages/release/bioc/html/SpotSweeper.html#since)
-[![Bioc last commit](https://bioconductor.org/shields/lastcommit/devel/bioc/SpotSweeper.svg)](http://bioconductor.org/checkResults/devel/bioc-LATEST/SpotSweeper/)
-[![Bioc dependencies](https://bioconductor.org/shields/dependencies/release/SpotSweeper.svg)](https://bioconductor.org/packages/release/bioc/html/SpotSweeper.html#since)
 [![check-bioc](https://github.com/MicTott/SpotSweeper/actions/workflows/check-bioc.yml/badge.svg)](https://github.com/MicTott/SpotSweeper/actions/workflows/check-bioc.yml)
-[![Codecov test coverage](https://codecov.io/gh/MicTott/SpotSweeper/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/MicTott/SpotSweeper?branch=devel)
 <!-- badges: end -->
 
-The goal of `SpotSweeper` is to ...
+`SpotSweeper` is a BioConductor package for spatially-aware quality control (QC) methods for the detection, visualization, and removal of local outliers in spot-based spatial transcriptomics data, such as 10x Genomics `Visium`, using standard QC metrics. 
 
-## Installation instructions
+## Installation instructions (in progress)
 
 Get the latest stable `R` release from [CRAN](http://cran.r-project.org/). Then install `SpotSweeper` from [Bioconductor](http://bioconductor.org/) using the following code:
 
@@ -49,30 +39,100 @@ And the development version from [GitHub](https://github.com/MicTott/SpotSweeper
 ```{r 'install_dev', eval = FALSE}
 BiocManager::install("MicTott/SpotSweeper")
 ```
-## Example
 
-This is a basic example which shows you how to solve a common problem:
+## Tutorial (in progress)
 
-```{r example, eval = requireNamespace('SpotSweeper')}
-library("SpotSweeper")
-## basic example code
+A detailed tutorial is available in the package vignette from Bioconductor. A direct link to the tutorial / package vignette is available here.
+
+## Input data format
+In the examples below, we assume the input data are provided as a SpatialExperiment (SPE) object. The outputs for spot-level outliers are stored in the colData of the SPE object.
+
+(FUTURE TODO)
+Alternatively, the inputs can also be provided as a numeric matrix of normalized and transformed counts (e.g. log-transformed normalized counts, also known as logcounts) and a numeric matrix of spatial coordinates.
+
+## Spot-level local outlier detection
+
+This is an exmaple workflow showing how to detect and visualize local outliers in 10X Genomics Visium data. 
+
+```{r example_spe, eval = requireNamespace('SpotSweeper')}
+library(SpotSweeper)
+suppressPackageStartupMessages({
+  library(SpatialExperiment)
+})
+
+
+
+# load  Maynard et al DLPFC daatset
+spe.dlpfc <- example_SPE()
+
+# subset to single sample for example
+spe.subset <- subset(spe.dlpfc, ,sample_id == spe.dlpfc$sample_id[1])
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+SpotSweeper can be run on an SPE object with the following code. This outputs the `local_outliers` in the colData of the SPE object. Selecting `data_output=TRUE` exports z-transformed QC metrics as well.
 
-```{r cars}
-summary(cars)
+```{r example_localOutliers, eval = requireNamespace('SpotSweeper')}
+
+features <- c('sum_umi' ,'sum_gene', "expr_chrM_ratio")
+spe.subset <- localOutliers(spe.subset, 
+                           features=features,
+                           n_neighbors=36, 
+                           data_output=TRUE,
+                           method="multivariate"
+                           )
+
+spe.subset
+
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
+Below we can visualize `local_outliers` vs one of the Qc metrics, `sum_umi_log2`, using the `escheR` package.
 
-You can also embed plots, for example:
+```{r local_outlier_plot}
+library(escheR)
 
-```{r pressure, echo = FALSE}
-plot(pressure)
+# plotting using escheR
+make_escheR(spe.subset) |> 
+  add_fill(var = "sum_umi_log2") |>
+  add_ground(var = "local_outliers", stroke = 1) +
+  scale_color_manual(
+    name = "", # turn off legend name for ground_truth
+    values = c(
+      "TRUE" = "red",
+      "FALSE" = "transparent")
+  ) +
+  scale_fill_gradient(low ="white",high =  "darkgreen")
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
+## Region-level artifact detection (in progress)
+
+Regional artifacts, such as "smears" and tissue tears, can be visualized and detected by calculating the local variance of mitochondrial percent or ratio. 
+
+```{r example_localVariance, eval = requireNamespace('SpotSweeper')}
+
+features = c("expr_chrM_ratio")
+
+spe.subset <- localVariance(spe.subset, 
+                           features=features,
+                           n_neighbors=18, 
+                           name="local_mito_variance_k18"
+                           )
+
+```
+
+```{r local_variance_plot}
+library(patchwork)
+
+# plotting using escheR
+p1 <- make_escheR(spe.subset) |> 
+  add_fill(var = "expr_chrM_ratio") +
+  scale_fill_gradient(low ="white",high =  "darkgreen")
+
+p2 <- make_escheR(spe.subset) |> 
+  add_fill(var = "local_mito_variance_k18") +
+  scale_fill_gradient(low ="white",high =  "darkgreen")
+
+p1+p2
+```
 
 ## Citation
 

@@ -19,8 +19,14 @@ styler::style_dir(
     transformers = biocthis::bioc_style(),
     filetype = "Rmd"
 )
-styler::style_file(usethis::proj_path("README.Rmd"), transformers = biocthis::bioc_style())
 
+
+
+
+
+# TOTTY NOTES --- Might just need to run from here?
+
+styler::style_file(usethis::proj_path("README.Rmd"), transformers = biocthis::bioc_style())
 ## Re-make the documentation files
 devtools::document()
 
