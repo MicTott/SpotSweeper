@@ -18,9 +18,11 @@ Depends:
 Imports:
     SpatialExperiment,
     SummarizedExperiment,
-    BiocNeighbors
+    BiocNeighbors,
+    SingleCellExperiment,
+    stats
 Suggests: 
-    testthat (>= 3.0.0)
-    BiocParallel,
-    escheR
+    escheR,
+    knitr,
+    scuttle
 Config/testthat/edition: 3
