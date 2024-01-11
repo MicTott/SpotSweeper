@@ -67,24 +67,35 @@ localVariance <- function(spe, n_neighbors = 36, features = c("expr_chrM_ratio")
     var_matrix <- matrix(NA, nrow(spaQC), length(features_to_use))
     colnames(var_matrix) <- features_to_use
 
+    mean_matrix <- matrix(NA, nrow(spaQC), length(features_to_use))
+    colnames(mean_matrix) <- features_to_use
+
     # Loop through each row in the nearest neighbor index matrix
     for (i in 1:nrow(dnn)) {
       dnn.idx <- dnn[i, ]
       for (j in seq_along(features_to_use)) {
         var_matrix[i, j] <- var(spaQC[c(i, dnn.idx[dnn.idx != 0]), ][[features_to_use[j]]], na.rm=TRUE)[1]
+        mean_matrix[i, j] <- mean(spaQC[c(i, dnn.idx[dnn.idx != 0]), ][[features_to_use[j]]], na.rm=TRUE)[1]
       }
     }
 
     # Handle non-finite values
     var_matrix[!is.finite(var_matrix)] <- 0
+    mean_matrix[!is.finite(mean_matrix)] <- 0
 
     # add local variance to spaQC dataframe
     if (!is.null(name)) {
       spaQC[name] <- var_matrix[, j]
 
+      feature_mean <- paste0(name, "_mean")
+      spaQC[feature_mean] <- mean_matrix[, j]
+
     } else {
       feature_var <- paste0(features[j], "_var")
       spaQC[feature_var] <- var_matrix[, j]
+
+      feature_mean <- paste0(features[j], "_mean")
+      spaQC[feature_mean] <- mean_matrix[, j]
     }
 
     # Store the modified spaQC dataframe in the list
