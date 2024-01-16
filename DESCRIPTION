@@ -20,7 +20,11 @@ Imports:
     SummarizedExperiment,
     BiocNeighbors,
     SingleCellExperiment,
-    stats
+    stats,
+    BiocParallel,
+    MASS,
+    dbscan,
+    spatialLIBD
 Suggests: 
     escheR,
     knitr,
