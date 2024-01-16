@@ -62,37 +62,54 @@ suppressPackageStartupMessages({
 
 
 
-# load  Maynard et al DLPFC daatset
-spe.dlpfc <- example_SPE()
 
-# subset to single sample for example
-spe.subset <- subset(spe.dlpfc, ,sample_id == spe.dlpfc$sample_id[1])
+# load  Maynard et al DLPFC daatset
+spe <- STexampleData::Visium_humanDLPFC()
+
+# change from gene id to gene names
+rownames(spe) <- rowData(spe)$gene_name
+
+# show column data before SpotSweepR
+colnames(colData(spe))
+
+# drop out-of-tissue spots
+spe <- spe[, spe$in_tissue == 1]
+spe <- spe[, !is.na(spe$ground_truth)]
 ```
 
 SpotSweeper can be run on an SPE object with the following code. This outputs the `local_outliers` in the colData of the SPE object. Selecting `data_output=TRUE` exports z-transformed QC metrics as well.
 
 ```{r example_localOutliers, eval = requireNamespace('SpotSweeper')}
 
-features <- c('sum_umi' ,'sum_gene', "expr_chrM_ratio")
-spe.subset <- localOutliers(spe.subset, 
-                           features=features,
-                           n_neighbors=36, 
-                           data_output=TRUE,
-                           method="multivariate"
-                           )
+# Identifying the mitochondrial transcripts in our SpatialExperiment.
+is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
 
-spe.subset
+# Calculating QC metrics for each spot using scuttle
+spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
+colnames(colData(spe))
+
+# Identifying local outliers suing SpotSweepR
+features <- c('sum' ,'detected', "subsets_Mito_percent")
+spe<- localOutliers(spe, 
+                    features=features,
+                    n_neighbors=36, 
+                    data_output=TRUE,
+                    method="multivariate"
+                    )
+
+# show column data before SpotSweepR
+colnames(colData(spe))
 
 ```
 
-Below we can visualize `local_outliers` vs one of the Qc metrics, `sum_umi_log2`, using the `escheR` package.
+Below we can visualize `local_outliers` vs one of the QC metrics, `sum_log2`, using the `escheR` package.
 
 ```{r local_outlier_plot}
 library(escheR)
 
 # plotting using escheR
-make_escheR(spe.subset) |> 
-  add_fill(var = "sum_umi_log2") |>
+make_escheR(spe) |> 
+  add_fill(var = "sum_log2") |>
   add_ground(var = "local_outliers", stroke = 1) +
   scale_color_manual(
     name = "", # turn off legend name for ground_truth
@@ -107,31 +124,38 @@ make_escheR(spe.subset) |>
 
 Regional artifacts, such as "smears" and tissue tears, can be visualized and detected by calculating the local variance of mitochondrial percent or ratio. 
 
+TODO: add example with regional artifact. 
+
 ```{r example_localVariance, eval = requireNamespace('SpotSweeper')}
 
-features = c("expr_chrM_ratio")
+features = c("subsets_Mito_percent")
 
-spe.subset <- localVariance(spe.subset, 
-                           features=features,
-                           n_neighbors=18, 
-                           name="local_mito_variance_k18"
-                           )
+spe <- localVariance(spe, 
+                     features=features,
+                     n_neighbors=18, 
+                     name="local_mito_variance_k18"
+                     )
+
+# show column data after calculating local variance
+colnames(colData(spe))
 
 ```
 
 ```{r local_variance_plot}
-library(patchwork)
+library(ggpubr)
 
 # plotting using escheR
-p1 <- make_escheR(spe.subset) |> 
-  add_fill(var = "expr_chrM_ratio") +
-  scale_fill_gradient(low ="white",high =  "darkgreen")
+p1 <- make_escheR(spe) |> 
+  add_fill(var = "subsets_Mito_percent", point_size=1)
 
-p2 <- make_escheR(spe.subset) |> 
-  add_fill(var = "local_mito_variance_k18") +
-  scale_fill_gradient(low ="white",high =  "darkgreen")
+p2 <- make_escheR(spe) |> 
+  add_fill(var = "local_mito_variance_k18", point_size=1)
 
-p1+p2
+plot_list <- list(p1, p2)
+ggarrange(
+  plotlist = plot_list,
+  ncol = 2, nrow = 1,
+  common.legend = FALSE)
 ```
 
 ## Citation
