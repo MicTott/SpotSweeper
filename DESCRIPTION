@@ -23,10 +23,10 @@ Imports:
     stats,
     BiocParallel,
     MASS,
-    dbscan,
-    spatialLIBD
+    dbscan
 Suggests: 
     escheR,
     knitr,
-    scuttle
+    scuttle,
+    STexampleData
 Config/testthat/edition: 3
