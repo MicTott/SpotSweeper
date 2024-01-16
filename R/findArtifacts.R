@@ -68,6 +68,7 @@ findArtifacts <- function(spe, mito_ratio="expr_chrM_ratio",
 
     # get residuals
     resid.irls <- resid(fit.irls)
+    colData(spe.temp)[[name]] <- resid.irls
 
     # add to resid_matrix
     resid_matrix<- cbind(resid_matrix, resid.irls)

@@ -6,7 +6,7 @@ Authors@R:
     person("Michael", "Totty", ,"mictott@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9292-8556"))
 Description: Spatially-aware quality control software for detecting and removing low quality spots in spot-based spatial transcritpomics methods, such as 10x Visium.
-License: Artistic-2.0
+License: MIT + file LICENSE
 URL: https://github.com/MicTott/SpotSweeper
 BugReports: https://support.bioconductor.org/tag/SpotSweeper
 biocViews: Software
