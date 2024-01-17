@@ -5,7 +5,6 @@
 #'
 #' @param spe SpatialExperiment object with the following columns in colData: sample_id, sum_umi, sum_gene
 #' @param n_neighbors Number of nearest neighbors to use for outlier detection
-#' @param threshold Threshold for outlier detection
 #' @param features Vector of features to use for outlier detection
 #' @param method Method to use for outlier detection (univariate or multivariate)
 #' @param samples Column name in colData to use for sample IDs
@@ -27,11 +26,37 @@
 #'
 #' @examples
 #' library(SpotSweeper)
-#' library(spatialLIBD)
+#' library(SpatialExperiment)
 #'
-#' spe <- fetch_data(type = "spe")
+#' # load example data
+#' spe <- STexampleData::Visium_humanDLPFC()
 #'
-#' spe <- localOutliers(spe, n_neighbors=36)
+#' # change from gene id to gene names
+#' rownames(spe) <- rowData(spe)$gene_name
+#'
+#' # show column data before SpotSweepR
+#' colnames(colData(spe))
+#'
+#' # drop out-of-tissue spots
+#' spe <- spe[, spe$in_tissue == 1]
+#' spe <- spe[, !is.na(spe$ground_truth)]
+#'
+#' # Identifying the mitochondrial transcripts in our SpatialExperiment.
+#' is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
+#'
+#' # Calculating QC metrics for each spot using scuttle
+#' spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
+#' colnames(colData(spe))
+#'
+#'
+# Identifying local outliers suing SpotSweepR
+#' features <- c('sum' ,'detected', "subsets_Mito_percent")
+#' spe<- localOutliers(spe,
+#'                     features=features,
+#'                     n_neighbors=36,
+#'                     data_output=TRUE,
+#'                     method="multivariate"
+#'                     )
 localOutliers <- function(spe, n_neighbors = 36, features = c("sum_umi","sum_gene", "expr_chrM_ratio"), method = "multivariate", samples = "sample_id", log2 = TRUE, cutoff = 2.58,
     scale = TRUE, minPts = 20, data_output = FALSE, n_cores = 1) {
     # log2 transform specified features

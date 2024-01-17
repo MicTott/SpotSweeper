@@ -40,8 +40,6 @@ localOutliers(
 \item{data_output}{Logical indicating whether to output the z-scores for each feature}
 
 \item{n_cores}{Number of cores to use for parallelization in the findKNN function}
-
-\item{threshold}{Threshold for outlier detection}
 }
 \value{
 SpatialExperiment object with updated colData
@@ -52,9 +50,34 @@ This function detects local outliers based on k-nearest neighbors based on eithe
 }
 \examples{
 library(SpotSweeper)
-library(spatialLIBD)
+library(SpatialExperiment)
 
-spe <- fetch_data(type = "spe")
+# load example data
+spe <- STexampleData::Visium_humanDLPFC()
 
-spe <- localOutliers(spe, n_neighbors=36)
+# change from gene id to gene names
+rownames(spe) <- rowData(spe)$gene_name
+
+# show column data before SpotSweepR
+colnames(colData(spe))
+
+# drop out-of-tissue spots
+spe <- spe[, spe$in_tissue == 1]
+spe <- spe[, !is.na(spe$ground_truth)]
+
+# Identifying the mitochondrial transcripts in our SpatialExperiment.
+is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
+
+# Calculating QC metrics for each spot using scuttle
+spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
+colnames(colData(spe))
+
+
+features <- c('sum' ,'detected', "subsets_Mito_percent")
+spe<- localOutliers(spe,
+                    features=features,
+                    n_neighbors=36,
+                    data_output=TRUE,
+                    method="multivariate"
+                    )
 }

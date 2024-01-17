@@ -2,12 +2,12 @@
 % Please edit documentation in R/findArtifacts.R
 \name{findArtifacts}
 \alias{findArtifacts}
-\title{findArtifacts Function}
+\title{Identify and annotate artifacts in spatial transcriptomics data}
 \usage{
 findArtifacts(
   spe,
-  mito_ratio = "expr_chrM_ratio",
-  mito_expr = "expr_chrM",
+  mito_percent = "expr_chrM_ratio",
+  mito_sum = "expr_chrM",
   samples = "sample_id",
   n_rings = 5,
   n_cores = 1,
@@ -16,18 +16,66 @@ findArtifacts(
   var_output = TRUE
 )
 }
+\arguments{
+\item{spe}{A SingleCellExperiment object.}
+
+\item{mito_percent}{The column name representing the mitochondrial percent. Default is "expr_chrM_ratio".}
+
+\item{mito_sum}{The column name representing sum mitochondrial expression. Default is "expr_chrM".}
+
+\item{samples}{The column name representing sample IDs. Default is "sample_id".}
+
+\item{n_rings}{The number of rings for local mito variance calculation. Default is 5.}
+
+\item{n_cores}{Number of cores to use for parallel processing. Default is 1.}
+
+\item{log2}{Logical, indicating whether to log2 transform specified features. Default is TRUE.}
+
+\item{name}{Prefix for the local variance column names. Default is "artifact".}
+
+\item{var_output}{Logical, indicating whether to include local variances in the output. Default is TRUE.}
+}
 \value{
-SpatialExperiment object with feature variance added to colData
+Returns the modified SingleCellExperiment object with artifact annotations.
 }
 \description{
-This function uses the local variance of mitochondrial ratio to detect large artifacts
-such as tissue hangnails.
+This function identifies and annotates potential artifacts in spatial transcriptomics data.
+Artifacts are detected based on local mito variance, and the results are added to the original
+SpatialExperiment (sce) object.
 }
 \examples{
+library(SpotSweeper)
+library(SpatialExperiment)
+
+# load example data
+spe <- STexampleData::Visium_humanDLPFC()
+
+# change from gene id to gene names
+rownames(spe) <- rowData(spe)$gene_name
+
+# show column data before SpotSweepR
+colnames(colData(spe))
+
+# drop out-of-tissue spots
+spe <- spe[, spe$in_tissue == 1]
+spe <- spe[, !is.na(spe$ground_truth)]
+
+# Identifying the mitochondrial transcripts in our SpatialExperiment.
+is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
+
+# Calculating QC metrics for each spot using scuttle
+spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
+colnames(colData(spe))
+
+# find rtifacts
 spe <- findArtifacts(spe,
-                     mito_ratio="expr_chrM_ratio",
-                     mito_expr="expr_chrM",
+                     mito_percent="subsets_Mito_percent",
+                     mito_sum="subsets_Mito_sum",
+                     n_rings=5,
                      name="artifact"
                    )
 
+}
+\seealso{
+\code{\link{localVariance}}
 }

@@ -67,8 +67,6 @@ suppressPackageStartupMessages({
 #> Warning: package 'GenomeInfoDb' was built under R version 4.3.2
 
 
-
-
 # load  Maynard et al DLPFC daatset
 spe <- STexampleData::Visium_humanDLPFC()
 #> see ?STexampleData and browseVignettes('STexampleData') for documentation

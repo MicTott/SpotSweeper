@@ -1,33 +1,71 @@
-#' findArtifacts Function
+#' Identify and annotate artifacts in spatial transcriptomics data
 #'
-#' This function uses the local variance of mitochondrial ratio to detect large artifacts
-#' such as tissue hangnails.
+#' This function identifies and annotates potential artifacts in spatial transcriptomics data.
+#' Artifacts are detected based on local mito variance, and the results are added to the original
+#' SpatialExperiment (sce) object.
 #'
-#' @return SpatialExperiment object with feature variance added to colData
+#' @param spe A SingleCellExperiment object.
+#' @param mito_percent The column name representing the mitochondrial percent. Default is "expr_chrM_ratio".
+#' @param mito_sum The column name representing sum mitochondrial expression. Default is "expr_chrM".
+#' @param samples The column name representing sample IDs. Default is "sample_id".
+#' @param n_rings The number of rings for local mito variance calculation. Default is 5.
+#' @param n_cores Number of cores to use for parallel processing. Default is 1.
+#' @param log2 Logical, indicating whether to log2 transform specified features. Default is TRUE.
+#' @param name Prefix for the local variance column names. Default is "artifact".
+#' @param var_output Logical, indicating whether to include local variances in the output. Default is TRUE.
 #'
+#' @return Returns the modified SingleCellExperiment object with artifact annotations.
+#'
+#' @seealso
+#' \code{\link{localVariance}}
+#'
+#' @import MASS
+#' @import SingleCellExperiment
+#' @import SpatialExperiment
 #' @importFrom SummarizedExperiment colData
-#' @importFrom SingleCellExperiment reducedDim
-#' @importFrom MASS rlm
+#' @importFrom stats prcomp kmeans resid var
 #'
-#'
-#' @export findArtifacts
 #'
 #' @examples
+#' library(SpotSweeper)
+#' library(SpatialExperiment)
+#'
+#' # load example data
+#' spe <- STexampleData::Visium_humanDLPFC()
+#'
+#' # change from gene id to gene names
+#' rownames(spe) <- rowData(spe)$gene_name
+#'
+#' # show column data before SpotSweepR
+#' colnames(colData(spe))
+#'
+#' # drop out-of-tissue spots
+#' spe <- spe[, spe$in_tissue == 1]
+#' spe <- spe[, !is.na(spe$ground_truth)]
+#'
+#' # Identifying the mitochondrial transcripts in our SpatialExperiment.
+#' is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
+#'
+#' # Calculating QC metrics for each spot using scuttle
+#' spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
+#' colnames(colData(spe))
+#'
+#' # find rtifacts
 #' spe <- findArtifacts(spe,
-#'                      mito_ratio="expr_chrM_ratio",
-#'                      mito_expr="expr_chrM",
+#'                      mito_percent="subsets_Mito_percent",
+#'                      mito_sum="subsets_Mito_sum",
+#'                      n_rings=5,
 #'                      name="artifact"
 #'                    )
 #'
-
-
-findArtifacts <- function(spe, mito_ratio="expr_chrM_ratio",
-                          mito_expr="expr_chrM", samples="sample_id",
+#' @export
+findArtifacts <- function(spe, mito_percent="expr_chrM_ratio",
+                          mito_sum="expr_chrM", samples="sample_id",
                           n_rings=5, n_cores=1,
                           log2=TRUE, name="artifact", var_output=TRUE) {
 
   # log2 transform specified features
-  features <- c(mito_ratio, mito_expr)
+  features <- c(mito_percent, mito_sum)
   features_to_use <- character()
   if (log2) {
     for (feature in features) {
@@ -53,6 +91,7 @@ findArtifacts <- function(spe, mito_ratio="expr_chrM_ratio",
 
     # get local variance of mito ratio
     spe.temp <- localVariance(spe.temp,
+                         features=features_to_use,
                          n_neighbors=n_neighbors,
                          n_cores=n_cores,
                          name=name)
@@ -76,10 +115,10 @@ findArtifacts <- function(spe, mito_ratio="expr_chrM_ratio",
 
 
   # ========== PCA and clustering ==========
-  # add mito and mito_ratio to resid dataframe
+  # add mito and mito_percent to resid dataframe
   resid_matrix <- cbind(resid_matrix,
-                     colData(spe)[[mito_ratio]],
-                     colData(spe)[[mito_expr]]
+                     colData(spe)[[mito_percent]],
+                     colData(spe)[[mito_sum]]
                      )
 
   resid_df <- data.frame(resid_matrix)

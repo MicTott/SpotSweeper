@@ -17,6 +17,8 @@ localVariance(
 \arguments{
 \item{spe}{SpatialExperiment object with the following columns in colData: sample_id, sum_umi, sum_gene}
 
+\item{n_neighbors}{Number of nearest neighbors to use for variance calculation}
+
 \item{features}{Features to use for variance calculation}
 
 \item{samples}{Column in colData to use for sample ID}
@@ -26,8 +28,6 @@ localVariance(
 \item{n_cores}{Number of cores to use for parallelization}
 
 \item{name}{Name of the new column to add to colData}
-
-\item{n_neighbor}{Number of nearest neighbors to use for variance calculation}
 }
 \value{
 SpatialExperiment object with feature variance added to colData
@@ -37,9 +37,31 @@ This function does calculates the local variance based on kNN.
 }
 \examples{
 library(SpotSweeper)
-library(spatialLIBD)
+library(SpatialExperiment)
 
-spe <- fetch_data(type = "spe")
+# load example data
+spe <- STexampleData::Visium_humanDLPFC()
 
-spe <- localVariance(spe, n_neighbors=36, n_cores=4, name="local_mito_variance_k36")
+# change from gene id to gene names
+rownames(spe) <- rowData(spe)$gene_name
+
+# show column data before SpotSweepR
+colnames(colData(spe))
+
+# drop out-of-tissue spots
+spe <- spe[, spe$in_tissue == 1]
+spe <- spe[, !is.na(spe$ground_truth)]
+
+# Identifying the mitochondrial transcripts in our SpatialExperiment.
+is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
+
+# Calculating QC metrics for each spot using scuttle
+spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
+colnames(colData(spe))
+
+spe <- localVariance(spe,
+                     features = "subsets_Mito_percent",
+                     n_neighbors=36,
+                     name="local_mito_variance_k36"
+                     )
 }

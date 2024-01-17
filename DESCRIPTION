@@ -29,5 +29,6 @@ Suggests:
     knitr,
     scuttle,
     STexampleData,
-    ggpubr
+    ggpubr,
+    testthat
 Config/testthat/edition: 3
