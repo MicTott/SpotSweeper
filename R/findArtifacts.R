@@ -91,7 +91,7 @@ findArtifacts <- function(spe, mito_percent="expr_chrM_ratio",
 
     # get local variance of mito ratio
     spe.temp <- localVariance(spe.temp,
-                         features=features_to_use,
+                         features=mito_percent,
                          n_neighbors=n_neighbors,
                          n_cores=n_cores,
                          name=name)
@@ -132,8 +132,6 @@ findArtifacts <- function(spe, mito_percent="expr_chrM_ratio",
   spe.temp$Kmeans <- clus$cluster
 
   # =========== Artifact annotation ===========
-  print(unique(colnames(colData(spe.temp))))
-  print(unique(spe.temp$Kmeans))
 
   # calculate average local variance of the two clusters
   clus1_mean <- mean(colData(spe.temp)[[paste0("k", 18)]][spe.temp$Kmeans==1])
@@ -157,6 +155,7 @@ findArtifacts <- function(spe, mito_percent="expr_chrM_ratio",
     for (i in 1:n_rings) {
       name <- paste0("k", 3*i*(i+1))
       colData(spe)[[name]] <- colData(spe.temp)[[name]]
+      reducedDim(spe, "PCA_artifact") <- pc$x
     }
   }
 
