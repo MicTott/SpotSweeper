@@ -77,92 +77,91 @@ findArtifacts <- function(spe, mito_percent="expr_chrM_ratio",
     features_to_use <- features
   }
 
-  # make spe.temp
-  spe.temp <- spe
+  # get unique sample IDs
+  sample_ids <- unique(colData(spe)[[samples]])
 
-  # ======= Calculate local mito variance ========
-  resid_matrix <- c()
-  for (i in 1:n_rings) {
+  # Initialize a list to store spe for each sample
+  colData_list <- list()
 
-    # ==== local mito variance ====
-    # get n neighbors for i rings
-    n_neighbors <- 3*i*(i+1)
-    name <- paste0("k", n_neighbors)
+  for (sample in sample_ids) {
 
-    # get local variance of mito ratio
-    spe.temp <- localVariance(spe.temp,
-                         features=mito_percent,
-                         n_neighbors=n_neighbors,
-                         n_cores=n_cores,
-                         name=name)
+    # subset by sample
+    spe.temp <- spe[, colData(spe)[[samples]] == sample]
 
-    # ==== Regress out mean-variance bias ====
-    # data.frame containing all local var k
-    mito_var_df <- data.frame(mito_var = log2(colData(spe.temp)[[name]]),
-                              mito_mean = log2(colData(spe.temp)[[paste0(name,"_mean")]])
+    # ======= Calculate local mito variance ========
+    resid_matrix <- c()
+    for (i in 1:n_rings) {
+
+      # ==== local mito variance ====
+      # get n neighbors for i rings
+      n_neighbors <- 3*i*(i+1)
+      name <- paste0("k", n_neighbors)
+
+      # get local variance of mito ratio
+      spe.temp <- localVariance(spe.temp,
+                                features=mito_percent,
+                                n_neighbors=n_neighbors,
+                                n_cores=n_cores,
+                                name=name)
+
+      # ==== Regress out mean-variance bias ====
+      # data.frame containing all local var k
+      mito_var_df <- data.frame(mito_var = log2(colData(spe.temp)[[name]]),
+                                mito_mean = log2(colData(spe.temp)[[paste0(name,"_mean")]])
+      )
+
+      #  (Robust) Linear regression of mito varaince vs mean using IRLS
+      fit.irls <- MASS::rlm(mito_var~mito_mean, mito_var_df)
+
+      # get residuals
+      resid.irls <- resid(fit.irls)
+      colData(spe.temp)[[name]] <- resid.irls
+
+      # add to resid_matrix
+      resid_matrix<- cbind(resid_matrix, resid.irls)
+    }
+
+
+    # ========== PCA and clustering ==========
+    # add mito and mito_percent to resid dataframe
+    resid_matrix <- cbind(resid_matrix,
+                          colData(spe.temp)[[mito_percent]],
+                          colData(spe.temp)[[mito_sum]]
     )
 
-    #  (Robust) Linear regression of mito varaince vs mean using IRLS
-    fit.irls <- MASS::rlm(mito_var~mito_mean, mito_var_df)
+    resid_df <- data.frame(resid_matrix)
 
-    # get residuals
-    resid.irls <- resid(fit.irls)
-    colData(spe.temp)[[name]] <- resid.irls
+    # Run PCA and add to reduced dims
+    pc <- prcomp(resid_df, center = TRUE, scale. = TRUE)
+    reducedDim(spe.temp, "PCA_artifacts") <- pc$x
 
-    # add to resid_matrix
-    resid_matrix<- cbind(resid_matrix, resid.irls)
+    # Cluster using kmeans and add to temp sce
+    clus <- kmeans(pc$x, centers = 2, nstart = 25)
+    spe.temp$Kmeans <- clus$cluster
+
+    # =========== Artifact annotation ===========
+
+    # calculate average local variance of the two clusters
+    clus1_mean <- mean(colData(spe.temp)[[paste0("k", 18)]][spe.temp$Kmeans==1])
+    clus2_mean <- mean(colData(spe.temp)[[paste0("k", 18)]][spe.temp$Kmeans==2])
+
+    artifact_clus <- which.min(c(clus1_mean, clus2_mean))
+
+    # create a new $artifact column; if clus1 mean < clus2 - rename Kmeans 1 to "TRUE"
+    spe.temp$artifact <- FALSE
+    spe.temp$artifact[spe.temp$Kmeans==artifact_clus] <- TRUE
+
+    # add to sample list
+    colData_list[[sample]] <- colData(spe.temp)
   }
 
+  # rbind the list of dataframes
+  colData_aggregated <- do.call(rbind, colData_list)
 
-  # ========== PCA and clustering ==========
-  # add mito and mito_percent to resid dataframe
-  resid_matrix <- cbind(resid_matrix,
-                     colData(spe)[[mito_percent]],
-                     colData(spe)[[mito_sum]]
-                     )
-
-  resid_df <- data.frame(resid_matrix)
-
-  # Run PCA and add to reduced dims
-  pc <- prcomp(resid_df, center = TRUE, scale. = TRUE)
-  reducedDim(spe.temp, "PCA_artifacts") <- pc$x
-
-  # Cluster using kmeans and add to temp sce
-  clus <- kmeans(pc$x, centers = 2, nstart = 25)
-  spe.temp$Kmeans <- clus$cluster
-
-  # =========== Artifact annotation ===========
-
-  # calculate average local variance of the two clusters
-  clus1_mean <- mean(colData(spe.temp)[[paste0("k", 18)]][spe.temp$Kmeans==1])
-  print(clus1_mean)
-
-  clus2_mean <- mean(colData(spe.temp)[[paste0("k", 18)]][spe.temp$Kmeans==2])
-  clus2_mean
-
-  artifact_clus <- which.min(c(clus1_mean, clus2_mean))
-
-  # create a new $artifact column; if clus1 mean < clus2 - rename Kmeans 1 to "TRUE"
-  spe.temp$artifact <- FALSE
-  spe.temp$artifact[spe.temp$Kmeans==artifact_clus] <- TRUE
-
-  # =========== Add to sce ===========
-  # add artifact to sce
-  colData(spe)$artifact <- spe.temp$artifact
-
-  # add residuals to sce if desired
-  if (var_output) {
-    for (i in 1:n_rings) {
-      name <- paste0("k", 3*i*(i+1))
-      colData(spe)[[name]] <- colData(spe.temp)[[name]]
-      reducedDim(spe, "PCA_artifact") <- pc$x
-    }
-  }
+  # replace SPE column data with aggregated data
+  colData(spe) <- colData_aggregated
 
   # return sce
   return(spe)
 }
-
-
-
 
