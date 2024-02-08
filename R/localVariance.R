@@ -47,7 +47,8 @@
 #'                      n_neighbors=36,
 #'                      name="local_mito_variance_k36"
 #'                      )
-localVariance <- function(spe, n_neighbors = 36, features = c("expr_chrM_ratio"), samples = "sample_id", log2 = FALSE, n_cores = 1, name=NULL) {
+localVariance <- function(spe, n_neighbors = 36, features = c("expr_chrM_ratio"),
+                          samples = "sample_id", log2 = FALSE, n_cores = 1, name=NULL) {
 
   # log2 transform specified features
   features_to_use <- character()
@@ -105,19 +106,34 @@ localVariance <- function(spe, n_neighbors = 36, features = c("expr_chrM_ratio")
     var_matrix[!is.finite(var_matrix)] <- 0
     mean_matrix[!is.finite(mean_matrix)] <- 0
 
+    # ==== If remove.bias == TRUE, regress out mean-variance bias for each feature ====
+    for (feature_idx in seq_along(features_to_use)) {
+
+      # Prepare data.frame for current feature
+      mito_var_df <- data.frame(
+        mito_var = log2(var_matrix[, feature_idx]),  # log2 variance of the current feature
+        mito_mean = log2(mean_matrix[, feature_idx])  # log2 mean of the current feature
+      )
+
+      # Perform robust linear regression (IRLS) of variance vs mean for the current feature
+      fit.irls <- MASS::rlm(mito_var ~ mito_mean, data = mito_var_df)
+
+      # Get residuals and update the variance matrix for the current feature
+      resid.irls <- resid(fit.irls)
+
+      # Replace original variance values with residuals for the current feature
+      # Note: You might need to back-transform the residuals if you want to maintain the original scale
+      var_matrix[, feature_idx] <- resid.irls  # Back-transform if necessary
+
+    }
+
     # add local variance to spaQC dataframe
     if (!is.null(name)) {
       spaQC[name] <- var_matrix[, j]
 
-      feature_mean <- paste0(name, "_mean")
-      spaQC[feature_mean] <- mean_matrix[, j]
-
     } else {
       feature_var <- paste0(features[j], "_var")
       spaQC[feature_var] <- var_matrix[, j]
-
-      feature_mean <- paste0(features[j], "_mean")
-      spaQC[feature_mean] <- mean_matrix[, j]
     }
 
     # Store the modified spaQC dataframe in the list
