@@ -12,13 +12,15 @@ modified_z(x, s = 1.4826)
 \item{s}{A constant used in the MAD calculation, default is 1.4826.}
 }
 \value{
-A numeric vector of standardized values. Outliers typically have values far from zero.
+A numeric vector of standardized values. Outliers typically have
+values far from zero.
 }
 \description{
-This function calculates and returns standardized (z-score like) values based on the
-Median Absolute Deviation (MAD) method. It is a robust method to detect outliers in
-data that might not be normally distributed. The function is a replication of the spatialEco::outliers()
-package that is no longer available on CRAN as of October 2023.
+This function calculates and returns standardized (z-score like) values
+based on the Median Absolute Deviation (MAD) method. It is a robust method to
+detect outliers in data that might not be normally distributed. The function
+is a replication of the spatialEco::outliers() package that is no longer
+available on CRAN as of October 2023.
 }
 \examples{
 data <- c(1, 2, 3, 4, 5, 100)

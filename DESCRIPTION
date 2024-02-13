@@ -9,7 +9,12 @@ Description: Spatially-aware quality control software for detecting and removing
 License: MIT + file LICENSE
 URL: https://github.com/MicTott/SpotSweeper
 BugReports: https://support.bioconductor.org/tag/SpotSweeper
-biocViews: Software
+biocViews: 
+    Software,
+    Spatial,
+    Transcriptomics, 
+    QualityControl,
+    GeneExpression, 
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
@@ -23,7 +28,8 @@ Imports:
     stats,
     BiocParallel,
     MASS,
-    dbscan
+    dbscan,
+    LaplacesDemon
 Suggests:
     escheR,
     knitr,
@@ -32,3 +38,4 @@ Suggests:
     ggpubr,
     testthat
 Config/testthat/edition: 3
+VignetteBuilder: knitr

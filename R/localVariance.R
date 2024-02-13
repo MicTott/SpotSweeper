@@ -2,8 +2,10 @@
 #'
 #' This function does calculates the local variance based on kNN.
 #'
-#' @param spe SpatialExperiment object with the following columns in colData: sample_id, sum_umi, sum_gene
-#' @param n_neighbors Number of nearest neighbors to use for variance calculation
+#' @param spe SpatialExperiment object with the following columns in colData:
+#'        sample_id, sum_umi, sum_gene
+#' @param n_neighbors Number of nearest neighbors to use for variance
+#'        calculation
 #' @param features Features to use for variance calculation
 #' @param samples Column in colData to use for sample ID
 #' @param log2 Whether to log2 transform the features
@@ -48,7 +50,8 @@
 #'                      name="local_mito_variance_k36"
 #'                      )
 localVariance <- function(spe, n_neighbors = 36, features = c("expr_chrM_ratio"),
-                          samples = "sample_id", log2 = FALSE, n_cores = 1, name=NULL) {
+                          samples = "sample_id", log2 = FALSE, n_cores = 1,
+                          name=NULL) {
 
   # log2 transform specified features
   features_to_use <- character()

@@ -15,9 +15,11 @@ localVariance(
 )
 }
 \arguments{
-\item{spe}{SpatialExperiment object with the following columns in colData: sample_id, sum_umi, sum_gene}
+\item{spe}{SpatialExperiment object with the following columns in colData:
+sample_id, sum_umi, sum_gene}
 
-\item{n_neighbors}{Number of nearest neighbors to use for variance calculation}
+\item{n_neighbors}{Number of nearest neighbors to use for variance
+calculation}
 
 \item{features}{Features to use for variance calculation}
 
