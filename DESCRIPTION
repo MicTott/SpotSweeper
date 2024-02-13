@@ -38,3 +38,5 @@ Suggests:
     testthat
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+LazyData: true
+

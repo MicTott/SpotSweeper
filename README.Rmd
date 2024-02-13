@@ -102,10 +102,15 @@ We can now visualize `local_outliers` vs one of the QC metrics, `sum_log2`, with
 
 ```{r local_outlier_plot}
 library(escheR)
+library(ggpubr)
 
 # plotting using escheR
-make_escheR(spe) |> 
-  add_fill(var = "sum_log2") |>
+p1 <- make_escheR(spe) |> 
+  add_fill(var = "sum_log2", point_size=1.25) +
+  scale_fill_gradient(low ="white",high =  "darkgreen")
+
+p2 <- make_escheR(spe) |> 
+  add_fill(var = "sum_log2", point_size=1.25) |>
   add_ground(var = "local_outliers", stroke = 1) +
   scale_color_manual(
     name = "", # turn off legend name for ground_truth
@@ -113,46 +118,73 @@ make_escheR(spe) |>
       "TRUE" = "red",
       "FALSE" = "transparent")
   ) +
-  scale_fill_gradient(low ="white",high =  "darkblue")
+  scale_fill_gradient(low ="white",high =  "darkgreen")
+
+plot_list <- list(p1, p2)
+ggarrange(
+  plotlist = plot_list,
+  ncol = 2, nrow = 1,
+  common.legend = FALSE
+)
 ```
 
 ## Artifact detection
 
 Large artifacts can be visualized and detected by calculating the local variance of standard QC metrics, such as mitochondrial ratio.
 
-TODO: add example with regional artifact. 
+```{r example_artifactRemoval, eval = requireNamespace('SpotSweeper')}
 
-```{r example_localVariance, eval = requireNamespace('SpotSweeper')}
+# load in DLPFC sample with hangnail artifact
+data(DLPFC_artifact)
+spe <- DLPFC_artifact
 
-features = c("subsets_Mito_percent")
+# inspect colData before artifact detection
+colnames(colData(spe))
 
-spe <- localVariance(spe, 
-                     features=features,
-                     n_neighbors=18, 
-                     name="local_mito_variance_k18"
-                     )
+# find artifacts using 
+spe <- findArtifacts(spe, 
+                     mito_percent="expr_chrM_ratio",
+                     mito_sum="expr_chrM",
+                     n_rings=5,
+                     name="artifact"
+                    )
 
-# show column data after calculating local variance
+# check that "artifact" is now in colData
 colnames(colData(spe))
 
 ```
 
-```{r local_variance_plot}
-library(ggpubr)
+```{r artifact_visualization}
 
 # plotting using escheR
 p1 <- make_escheR(spe) |> 
-  add_fill(var = "subsets_Mito_percent", point_size=1)
+  add_fill(var = "expr_chrM_ratio", point_size=1.25)
 
 p2 <- make_escheR(spe) |> 
-  add_fill(var = "local_mito_variance_k18", point_size=1)
+  add_fill(var = "expr_chrM", point_size=1.25)
 
-plot_list <- list(p1, p2)
+p3 <- make_escheR(spe) |> 
+  add_fill(var = "k18", point_size=1.25)
+  
+
+p4 <- make_escheR(spe) |> 
+  add_fill(var = "artifact", point_size=1.25) +
+  scale_fill_manual(
+    name = "",
+    values = c(
+      "TRUE" = "red",
+      "FALSE" = "grey")
+  )
+
+plot_list <- list(p1, p2, p3, p4)
 ggarrange(
   plotlist = plot_list,
-  ncol = 2, nrow = 1,
-  common.legend = FALSE)
+  ncol = 2, nrow = 2,
+  common.legend = FALSE
+)
 ```
+
+
 
 ## Citation
 
