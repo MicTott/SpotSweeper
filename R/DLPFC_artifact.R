@@ -23,5 +23,4 @@
 #'
 #' @examples
 #' data(DLPFC_artifact)
-#' @export
 "DLPFC_artifact"
