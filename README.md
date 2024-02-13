@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# SpotSweeper (under development)
+# SpotSweeper
 
 <!-- badges: start -->
 
@@ -15,7 +15,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 outliers and large artifacts in spot-based spatial transcriptomics data,
 such as 10x Genomics `Visium`, using standard QC metrics.
 
-## Installation instructions (in progress)
+## Installation instructions
 
 Currently, the only way to install `SpotSweeper` is by downloading the
 development version which can be installed from

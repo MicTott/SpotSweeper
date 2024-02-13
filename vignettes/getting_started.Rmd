@@ -1,0 +1,116 @@
+---
+title: "Getting started with 'SpotSweeper'"
+author: 
+  - name: Michael Totty
+    affiliation: &id1 "Johns Hopkins Bloomberg School of Public Health, Baltimore, MD, USA"
+  - name: Boyi Guo
+    affiliation: *id1
+  - name: Stephanie Hicks
+    affiliation: *id1
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with 'SpotSweeper'}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  message = FALSE,
+  comment = "#>"
+  #fig.width = 8,
+  #fig.height = 8,
+  #fig.retina = 2
+)
+```
+
+## Input data format
+In the examples below, we assume the input data are provided as a [SpatialExperiment](https://github.com/drighelli/SpatialExperiment) (SPE) object. The outputs for spot-level outliers and artifacts are stored in the `colData` of the SPE object.
+
+
+## Spot-level local outlier detection
+
+This is an example workflow showing how to detect and visualize local outliers in 10X Genomics Visium data. 
+
+```{r example_spe, eval = requireNamespace('SpotSweeper')}
+library(SpotSweeper)
+
+
+# load  Maynard et al DLPFC daatset
+spe <- STexampleData::Visium_humanDLPFC()
+
+# change from gene id to gene names
+rownames(spe) <- rowData(spe)$gene_name
+
+# show column data before SpotSweeper
+colnames(colData(spe))
+
+# drop out-of-tissue spots
+spe <- spe[, spe$in_tissue == 1]
+spe <- spe[, !is.na(spe$ground_truth)]
+```
+
+SpotSweeper can be run on an SPE object with the following code. This outputs the `local_outliers` in the colData of the SPE object. Selecting `data_output=TRUE` exports z-transformed QC metrics as well.
+
+```{r example_localOutliers, eval = requireNamespace('SpotSweeper')}
+
+# Identifying the mitochondrial transcripts in our SpatialExperiment.
+is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
+
+# Calculating QC metrics for each spot using scuttle
+spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
+colnames(colData(spe))
+
+# Identifying local outliers using SpotSweeper
+features <- c('sum' ,'detected', "subsets_Mito_percent")
+spe<- localOutliers(spe, 
+                    features=features,
+                    n_neighbors=18, 
+                    data_output=TRUE,
+                    method="multivariate"
+                    )
+
+# show column data after SpotSweeper
+colnames(colData(spe))
+
+```
+
+We can now visualize `local_outliers` vs one of the QC metrics, `sum_log2`, with help from the `escheR` package.
+
+```{r local_outlier_plot}
+library(escheR)
+library(ggpubr)
+
+# plotting using escheR
+p1 <- make_escheR(spe) |> 
+  add_fill(var = "sum_log2", point_size=1.25) +
+  scale_fill_gradient(low ="white",high =  "darkgreen")
+
+p2 <- make_escheR(spe) |> 
+  add_fill(var = "sum_log2", point_size=1.25) |>
+  add_ground(var = "local_outliers", stroke = 1) +
+  scale_color_manual(
+    name = "", # turn off legend name for ground_truth
+    values = c(
+      "TRUE" = "red",
+      "FALSE" = "transparent")
+  ) +
+  scale_fill_gradient(low ="white",high =  "darkgreen")
+
+plot_list <- list(p1, p2)
+ggarrange(
+  plotlist = plot_list,
+  ncol = 2, nrow = 1,
+  common.legend = FALSE
+)
+```
+
+
+
+# Session information
+
+```{r}
+utils::sessionInfo()
+```

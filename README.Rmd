@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# SpotSweeper (under development)
+# SpotSweeper
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 `SpotSweeper` is a package developed for spatially-aware quality control (QC) methods for the detection, visualization, and removal of both local outliers and large artifacts in spot-based spatial transcriptomics data, such as 10x Genomics `Visium`, using standard QC metrics. 
 
 
-## Installation instructions (in progress)
+## Installation instructions
 
 Currently, the only way to install `SpotSweeper` is by downloading the development version which can be installed from [GitHub](https://github.com/MicTott/SpotSweeper) using the following: 
 
