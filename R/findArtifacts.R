@@ -89,50 +89,37 @@ findArtifacts <- function(spe, mito_percent="expr_chrM_ratio",
     spe.temp <- spe[, colData(spe)[[samples]] == sample]
 
     # ======= Calculate local mito variance ========
-    resid_matrix <- c()
+    var_matrix <- c()
     for (i in 1:n_rings) {
 
       # ==== local mito variance ====
       # get n neighbors for i rings
       n_neighbors <- 3*i*(i+1)
-      name <- paste0("k", n_neighbors)
+      tmp.name <- paste0("k", n_neighbors)
 
       # get local variance of mito ratio
       spe.temp <- localVariance(spe.temp,
                                 features=mito_percent,
                                 n_neighbors=n_neighbors,
                                 n_cores=n_cores,
-                                name=name)
+                                name=tmp.name)
 
-      # ==== Regress out mean-variance bias ====
-      # data.frame containing all local var k
-      mito_var_df <- data.frame(mito_var = log2(colData(spe.temp)[[name]]),
-                                mito_mean = log2(colData(spe.temp)[[paste0(name,"_mean")]])
-      )
-
-      #  (Robust) Linear regression of mito varaince vs mean using IRLS
-      fit.irls <- MASS::rlm(mito_var~mito_mean, mito_var_df)
-
-      # get residuals
-      resid.irls <- resid(fit.irls)
-      colData(spe.temp)[[name]] <- resid.irls
-
-      # add to resid_matrix
-      resid_matrix<- cbind(resid_matrix, resid.irls)
+      # add to var_matrix
+      var_matrix<- cbind(var_matrix, colData(spe.temp)[[tmp.name]])
     }
 
 
     # ========== PCA and clustering ==========
-    # add mito and mito_percent to resid dataframe
-    resid_matrix <- cbind(resid_matrix,
-                          colData(spe.temp)[[mito_percent]],
-                          colData(spe.temp)[[mito_sum]]
+    # add mito and mito_percent to var dataframe
+    var_matrix <- cbind(var_matrix,
+                        colData(spe.temp)[[mito_percent]],
+                        colData(spe.temp)[[mito_sum]]
     )
 
-    resid_df <- data.frame(resid_matrix)
+    var_df <- data.frame(var_matrix)
 
     # Run PCA and add to reduced dims
-    pc <- prcomp(resid_df, center = TRUE, scale. = TRUE)
+    pc <- prcomp(var_df, center = TRUE, scale. = TRUE)
     reducedDim(spe.temp, "PCA_artifacts") <- pc$x
 
     # Cluster using kmeans and add to temp sce

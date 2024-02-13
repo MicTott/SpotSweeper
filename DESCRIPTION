@@ -28,8 +28,7 @@ Imports:
     stats,
     BiocParallel,
     MASS,
-    dbscan,
-    LaplacesDemon
+    dbscan
 Suggests:
     escheR,
     knitr,

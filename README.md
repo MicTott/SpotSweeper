@@ -7,7 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![check-bioc](https://github.com/MicTott/SpotSweeper/actions/workflows/check-bioc.yml/badge.svg)](https://github.com/MicTott/SpotSweeper/actions/workflows/check-bioc.yml)
+[![R-CMD-check](https://github.com/MicTott/SpotSweeper/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MicTott/SpotSweeper/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `SpotSweeper` is a BioConductor package for spatially-aware quality
@@ -214,7 +214,7 @@ Please run this yourself to check for any updates on how to cite
 print(citation("SpotSweeper"), bibtex = TRUE)
 #> To cite package 'SpotSweeper' in publications use:
 #> 
-#>   MicTott (2024). _SpotSweeper: an R package for the automated removal
+#>   MicTott (2024). _SpotSweepR: an R package for the automated removal
 #>   of spot artifacts from spatially-resolved transcriptomics data_.
 #>   doi:10.18129/B9.bioc.SpotSweeper
 #>   <https://doi.org/10.18129/B9.bioc.SpotSweeper>,
@@ -224,7 +224,7 @@ print(citation("SpotSweeper"), bibtex = TRUE)
 #> A BibTeX entry for LaTeX users is
 #> 
 #>   @Manual{,
-#>     title = {SpotSweeper: an R package for the automated removal of spot artifacts from spatially-resolved transcriptomics data},
+#>     title = {SpotSweepR: an R package for the automated removal of spot artifacts from spatially-resolved transcriptomics data},
 #>     author = {{MicTott}},
 #>     year = {2024},
 #>     url = {http://www.bioconductor.org/packages/SpotSweeper},

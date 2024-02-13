@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![check-bioc](https://github.com/MicTott/SpotSweeper/actions/workflows/check-bioc.yml/badge.svg)](https://github.com/MicTott/SpotSweeper/actions/workflows/check-bioc.yml)
+[![R-CMD-check](https://github.com/MicTott/SpotSweeper/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MicTott/SpotSweeper/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `SpotSweeper` is a BioConductor package for spatially-aware quality control (QC) methods for the detection, visualization, and removal of local outliers in spot-based spatial transcriptomics data, such as 10x Genomics `Visium`, using standard QC metrics. 
