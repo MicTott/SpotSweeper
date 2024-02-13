@@ -7,7 +7,7 @@ pkgVer <- function(pkg) {
 c(
 
     bibentry(bibtype="manual",
-        title = "SpotSweeper: an R package for the automated removal of spot artifacts from spatially-resolved transcriptomics data",
+        title = "SpotSweepR: an R package for the automated removal of spot artifacts from spatially-resolved transcriptomics data",
         author = personList(
             as.person("MicTott")
         ),

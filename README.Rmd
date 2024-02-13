@@ -67,7 +67,7 @@ spe <- STexampleData::Visium_humanDLPFC()
 # change from gene id to gene names
 rownames(spe) <- rowData(spe)$gene_name
 
-# show column data before SpotSweepR
+# show column data before SpotSweeper
 colnames(colData(spe))
 
 # drop out-of-tissue spots
@@ -86,7 +86,7 @@ is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
 spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
 colnames(colData(spe))
 
-# Identifying local outliers suing SpotSweepR
+# Identifying local outliers suing SpotSweeper
 features <- c('sum' ,'detected', "subsets_Mito_percent")
 spe<- localOutliers(spe, 
                     features=features,
@@ -95,7 +95,7 @@ spe<- localOutliers(spe,
                     method="multivariate"
                     )
 
-# show column data before SpotSweepR
+# show column data before SpotSweeper
 colnames(colData(spe))
 
 ```

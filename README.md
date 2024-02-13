@@ -75,7 +75,7 @@ spe <- STexampleData::Visium_humanDLPFC()
 # change from gene id to gene names
 rownames(spe) <- rowData(spe)$gene_name
 
-# show column data before SpotSweepR
+# show column data before SpotSweeper
 colnames(colData(spe))
 #> [1] "barcode_id"   "sample_id"    "in_tissue"    "array_row"    "array_col"   
 #> [6] "ground_truth" "cell_count"
@@ -103,7 +103,7 @@ colnames(colData(spe))
 #> [10] "subsets_Mito_sum"      "subsets_Mito_detected" "subsets_Mito_percent" 
 #> [13] "total"
 
-# Identifying local outliers suing SpotSweepR
+# Identifying local outliers suing SpotSweeper
 features <- c('sum' ,'detected', "subsets_Mito_percent")
 spe<- localOutliers(spe, 
                     features=features,
@@ -112,7 +112,7 @@ spe<- localOutliers(spe,
                     method="multivariate"
                     )
 
-# show column data before SpotSweepR
+# show column data before SpotSweeper
 colnames(colData(spe))
 #>  [1] "barcode_id"                "sample_id"                
 #>  [3] "in_tissue"                 "array_row"                
@@ -171,18 +171,18 @@ spe <- localVariance(spe,
 
 # show column data after calculating local variance
 colnames(colData(spe))
-#>  [1] "barcode_id"                   "sample_id"                   
-#>  [3] "in_tissue"                    "array_row"                   
-#>  [5] "array_col"                    "ground_truth"                
-#>  [7] "cell_count"                   "sum"                         
-#>  [9] "detected"                     "subsets_Mito_sum"            
-#> [11] "subsets_Mito_detected"        "subsets_Mito_percent"        
-#> [13] "total"                        "sum_log2"                    
-#> [15] "detected_log2"                "subsets_Mito_percent_log2"   
-#> [17] "coords"                       "local_outliers"              
-#> [19] "sum_z"                        "detected_z"                  
-#> [21] "subsets_Mito_percent_z"       "LOF"                         
-#> [23] "local_mito_variance_k18"      "local_mito_variance_k18_mean"
+#>  [1] "barcode_id"                "sample_id"                
+#>  [3] "in_tissue"                 "array_row"                
+#>  [5] "array_col"                 "ground_truth"             
+#>  [7] "cell_count"                "sum"                      
+#>  [9] "detected"                  "subsets_Mito_sum"         
+#> [11] "subsets_Mito_detected"     "subsets_Mito_percent"     
+#> [13] "total"                     "sum_log2"                 
+#> [15] "detected_log2"             "subsets_Mito_percent_log2"
+#> [17] "coords"                    "local_outliers"           
+#> [19] "sum_z"                     "detected_z"               
+#> [21] "subsets_Mito_percent_z"    "LOF"                      
+#> [23] "local_mito_variance_k18"
 ```
 
 ``` r
