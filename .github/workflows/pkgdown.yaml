@@ -2,21 +2,20 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [devel]  # Trigger on push to 'devel' branch
   pull_request:
-    branches: [main, master]
+    branches: [devel]  # Trigger on PR to 'devel' branch
   release:
     types: [published]
-  workflow_dispatch:
+  workflow_dispatch:   # Allows manual triggering of the workflow
 
 name: pkgdown
 
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
-    # Only restrict concurrency for non-PR jobs
     concurrency:
-      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+      group: ${{ github.workflow }}-${{ github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
@@ -32,7 +31,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
+          extra-packages: any::pkgdown
           needs: website
 
       - name: Build site
@@ -43,6 +42,6 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
-          clean: false
-          branch: gh-pages
-          folder: docs
+          clean: false  # Keeps existing files on gh-pages that are not present in the current build
+          branch: gh-pages  # Target branch for the site deployment
+          folder: docs  # The folder where pkgdown outputs the site, adjust if your output directory is different
