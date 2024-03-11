@@ -1,26 +1,22 @@
 #' localOutliers Function
 #'
-#' This function detects local outliers based on k-nearest neighbors based on either a univariate
-#' (z-score thresholds per QC metrics) or multivariate approach (Local Outlier Factor).
+#' This function detects local outliers in spatial transcriptomics data based on standard
+#' quality control metrics, such as library size, unique genes, and mitochondrial ratio.
+#' Local outliers are defined as spots with low/high quality metrics compared to their
+#' surrounding neighbors, based on a modified z-score statistic.
 #'
-#' @param spe SpatialExperiment object with the following columns in colData: sample_id, sum_umi, sum_gene
+#' @param spe SpatialExperiment object
+#' @param metric colData QC metric to use for outlier detection
+#' @param direction Direction of outlier detection (higher, lower, or both)
 #' @param n_neighbors Number of nearest neighbors to use for outlier detection
-#' @param features Vector of features to use for outlier detection
-#' @param method Method to use for outlier detection (univariate or multivariate)
 #' @param samples Column name in colData to use for sample IDs
-#' @param log2 Logical indicating whether to log2 transform the features
-#' @param cutoff Cutoff for outlier detection
-#' @param scale Logical indicating whether to scale the features for LOF calculation (recommended)
-#' @param minPts Minimum number of points (nearest neighbors) to use for LOF calculation
-#' @param data_output Logical indicating whether to output the z-scores for each feature
-#' @param n_cores Number of cores to use for parallelization in the findKNN function
+#' @param log Logical indicating whether to log2 transform the features (default is TRUE)
+#' @param cutoff Cutoff for outlier detection (default is 3)
 #'
-#' @return SpatialExperiment object with updated colData
+#' @return SpatialExperiment object with updated colData containing outputs
 #'
-#' @importFrom dbscan lof
 #' @importFrom SummarizedExperiment colData
 #' @importFrom BiocNeighbors findKNN
-#' @importFrom BiocParallel MulticoreParam
 #'
 #' @export localOutliers
 #'
@@ -34,9 +30,6 @@
 #' # change from gene id to gene names
 #' rownames(spe) <- rowData(spe)$gene_name
 #'
-#' # show column data before SpotSweepR
-#' colnames(colData(spe))
-#'
 #' # drop out-of-tissue spots
 #' spe <- spe[, spe$in_tissue == 1]
 #' spe <- spe[, !is.na(spe$ground_truth)]
@@ -44,31 +37,30 @@
 #' # Identifying the mitochondrial transcripts in our SpatialExperiment.
 #' is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
 #'
-#' # Calculating QC metrics for each spot using scuttle
-#' spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
-#' colnames(colData(spe))
-#'
+#' # Calculating QC features for each spot using scuttle
+#' spe<- scuttle::addPerCellQC(spe, subsets=list(Mito=is.mito))
 #'
 # Identifying local outliers suing SpotSweepR
-#' features <- c('sum' ,'detected', "subsets_Mito_percent")
 #' spe<- localOutliers(spe,
-#'                     features=features,
-#'                     n_neighbors=36,
-#'                     data_output=TRUE,
-#'                     method="multivariate"
+#'                     metric="detected",
+#'                     direction="lower"
 #'                     )
-localOutliers <- function(spe, n_neighbors = 36, features = c("sum_umi","sum_gene", "expr_chrM_ratio"), method = "multivariate", samples = "sample_id", log2 = TRUE, cutoff = 2.58,
-    scale = TRUE, minPts = 20, data_output = FALSE, n_cores = 1) {
-    # log2 transform specified features
-    features_to_use <- character()
-    if (log2) {
-        for (feature in features) {
-            feature_log2 <- paste0(feature, "_log2")
-            colData(spe)[feature_log2] <- log2(colData(spe)[[feature]])
-            features_to_use <- c(features_to_use, feature_log2)
-        }
+localOutliers <- function(spe,
+                          metric="detected",
+                          direction="lower",
+                          n_neighbors = 36,
+                          samples = "sample_id",
+                          log = TRUE,
+                          cutoff = 3) {
+
+    # log transform specified metric
+    if (log) {
+        metric_log <- paste0(metric, "_log2")
+        colData(spe)[metric_log] <- log2(colData(spe)[[metric]])
+        metric_to_use <- metric_log
+
     } else {
-        features_to_use <- features
+       metric_to_use <- metric
     }
 
     # Get a list of unique sample IDs
@@ -78,73 +70,45 @@ localOutliers <- function(spe, n_neighbors = 36, features = c("sum_umi","sum_gen
     spaQC_list <- vector("list", length(unique_sample_ids))
 
     # Loop through each unique sample ID
-    for (sample_id in seq_along(unique_sample_ids)) {
+    for (sample in unique_sample_ids) {
         # Subset the data for the current sample
-        sample <- unique_sample_ids[sample_id]
-        spe_subset <- subset(spe, , sample_id == sample)
+        spe_subset <- spe[ ,colData(spe)[[samples]] == sample]
 
         # Create a list of spatial coordinates and qc features
         spaQC <- colData(spe_subset)
-        spaQC$coords <- spatialCoords(spe_subset)
 
         # Find nearest neighbors
         suppressWarnings(
         dnn <- BiocNeighbors::findKNN(spatialCoords(spe_subset),
-                                      k = n_neighbors,
-                                      BPPARAM=MulticoreParam(n_cores))$index
+                                      k = n_neighbors)$index
         )
 
-        # Initialize a matrix to store z-scores for each feature
-        mod_z_matrix <- matrix(NA, nrow(spaQC), length(features_to_use))
-        colnames(mod_z_matrix) <- features_to_use
-
-        # Initialize a matrix to store variance for each feature
-        var_matrix <- matrix(NA, nrow(spaQC), length(features_to_use))
-        colnames(var_matrix) <- features_to_use
+        # Initialize a matrix to store z-scores
+        mod_z_matrix <- array(NA, nrow(dnn))
 
         # Loop through each row in the nearest neighbor index matrix
         for (i in 1:nrow(dnn)) {
             dnn.idx <- dnn[i, ]
-            for (j in seq_along(features_to_use)) {
-                mod_z_matrix[i, j] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]), ][[features_to_use[j]]])[1]
-            }
+            mod_z_matrix[i] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]), ][[metric_to_use]])[1]
         }
 
         # Handle non-finite values
         mod_z_matrix[!is.finite(mod_z_matrix)] <- 0
 
-        # Determine local outliers
-        if (method == "univariate") {
-            # Determine local outliers across all features using z threshold
-            spaQC$local_outliers <- as.factor(apply(mod_z_matrix, 1, function(x) any(x > cutoff | x < -cutoff)))
-        } else if (method == "multivariate") {
-            # convert matrix to df and set column names
-            df <- as.data.frame(mod_z_matrix)
-            colnames(df) <- features_to_use
+        # find outliers based on cutoff, store in colData
+        metric_outliers <- paste0(metric, "_outliers")
+        spaQC[metric_outliers]  <- switch(direction,
+                              "higher" = as.factor(apply(mod_z_matrix, 1, function(x) x > cutoff)),
+                              "lower" = as.factor(apply(mod_z_matrix, 1, function(x) x < -cutoff)),
+                              "both" = as.factor(apply(mod_z_matrix, 1, function(x) x > cutoff | x < -cutoff))
+                              )
 
-            # calculate local outlier factor
-            if (scale) {
-                LOF_outs <- lof(scale(df), minPts = minPts)
-            } else {
-                LOF_outs <- lof(df, minPts = minPts)
-            }
-
-            spaQC$local_outliers <- as.factor(ifelse(LOF_outs > cutoff, TRUE, FALSE))
-        }
-
-        # output z features if desired
-        if (data_output) {
-            for (j in seq_along(features_to_use)) {
-                feature_z <- paste0(features[j], "_z")
-                spaQC[feature_z] <- mod_z_matrix[, j]
-            }
-            if (method == "multivariate") {
-                spaQC$LOF <- LOF_outs
-            }
-        }
+        # add z-scores to colData
+        metric_z <- paste0(metric, "_z")
+        spaQC[metric_z] <- mod_z_matrix[]
 
         # Store the modified spaQC dataframe in the list
-        spaQC_list[[sample_id]] <- spaQC
+        spaQC_list[[sample]] <- spaQC
     }
 
     # rbind the list of dataframes
