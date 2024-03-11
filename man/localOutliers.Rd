@@ -6,47 +6,37 @@
 \usage{
 localOutliers(
   spe,
+  metric = "detected",
+  direction = "lower",
   n_neighbors = 36,
-  features = c("sum_umi", "sum_gene", "expr_chrM_ratio"),
-  method = "multivariate",
   samples = "sample_id",
-  log2 = TRUE,
-  cutoff = 2.58,
-  scale = TRUE,
-  minPts = 20,
-  data_output = FALSE,
-  n_cores = 1
+  log = TRUE,
+  cutoff = 3
 )
 }
 \arguments{
-\item{spe}{SpatialExperiment object with the following columns in colData: sample_id, sum_umi, sum_gene}
+\item{spe}{SpatialExperiment object}
+
+\item{metric}{colData QC metric to use for outlier detection}
+
+\item{direction}{Direction of outlier detection (higher, lower, or both)}
 
 \item{n_neighbors}{Number of nearest neighbors to use for outlier detection}
 
-\item{features}{Vector of features to use for outlier detection}
-
-\item{method}{Method to use for outlier detection (univariate or multivariate)}
-
 \item{samples}{Column name in colData to use for sample IDs}
 
-\item{log2}{Logical indicating whether to log2 transform the features}
+\item{log}{Logical indicating whether to log2 transform the features (default is TRUE)}
 
-\item{cutoff}{Cutoff for outlier detection}
-
-\item{scale}{Logical indicating whether to scale the features for LOF calculation (recommended)}
-
-\item{minPts}{Minimum number of points (nearest neighbors) to use for LOF calculation}
-
-\item{data_output}{Logical indicating whether to output the z-scores for each feature}
-
-\item{n_cores}{Number of cores to use for parallelization in the findKNN function}
+\item{cutoff}{Cutoff for outlier detection (default is 3)}
 }
 \value{
-SpatialExperiment object with updated colData
+SpatialExperiment object with updated colData containing outputs
 }
 \description{
-This function detects local outliers based on k-nearest neighbors based on either a univariate
-(z-score thresholds per QC metrics) or multivariate approach (Local Outlier Factor).
+This function detects local outliers in spatial transcriptomics data based on standard
+quality control metrics, such as library size, unique genes, and mitochondrial ratio.
+Local outliers are defined as spots with low/high quality metrics compared to their
+surrounding neighbors, based on a modified z-score statistic.
 }
 \examples{
 library(SpotSweeper)
@@ -58,9 +48,6 @@ spe <- STexampleData::Visium_humanDLPFC()
 # change from gene id to gene names
 rownames(spe) <- rowData(spe)$gene_name
 
-# show column data before SpotSweepR
-colnames(colData(spe))
-
 # drop out-of-tissue spots
 spe <- spe[, spe$in_tissue == 1]
 spe <- spe[, !is.na(spe$ground_truth)]
@@ -68,16 +55,11 @@ spe <- spe[, !is.na(spe$ground_truth)]
 # Identifying the mitochondrial transcripts in our SpatialExperiment.
 is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
 
-# Calculating QC metrics for each spot using scuttle
-spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
-colnames(colData(spe))
+# Calculating QC features for each spot using scuttle
+spe<- scuttle::addPerCellQC(spe, subsets=list(Mito=is.mito))
 
-
-features <- c('sum' ,'detected', "subsets_Mito_percent")
 spe<- localOutliers(spe,
-                    features=features,
-                    n_neighbors=36,
-                    data_output=TRUE,
-                    method="multivariate"
+                    metric="detected",
+                    direction="lower"
                     )
 }

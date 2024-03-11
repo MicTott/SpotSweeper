@@ -1,0 +1,70 @@
+#' Plot Outlier Metrics to PDF
+#'
+#' This function generates a PDF file containing plots for each sample in the
+#' SpatialExperiment object, highlighting outliers based on specified metrics.
+#' Each plot visualizes outlier metrics for a single sample, allowing for
+#' easy comparison and analysis across samples.
+#'
+#' @param spe A SpatialExperiment object containing the data to be plotted.
+#' @param sample_id A character string specifying the column name in `colData(spe)`
+#'   that contains unique sample identifiers. Default is "sample_id".
+#' @param metric A character string specifying the metric to be visualized
+#'   in the plot. This metric should be a column name in `rowData(spe)`.
+#' @param outliers A character string specifying the column name in `rowData(spe)`
+#'   that indicates whether a data point is considered an outlier. Default is
+#'   "local_outliers".
+#' @param low_color A character string indicating the color to be used for the low end
+#'   of the gradient scale. Default is "white".
+#' @param high_color A character string indicating the color to be used for the high end
+#'   of the gradient scale. Default is "black".
+#' @param stroke A numeric value specifying the border thickness for outlier
+#'   points. Default is 1.
+#' @param width A numeric value indicating the width of the PDF's pages. Default
+#'   is 5.
+#' @param height A numeric value indicating the height of the PDF's pages. Default
+#'   is 5.
+#' @param fname A character string specifying the path and name of the output PDF file.
+#'
+#' @return Invisible NULL. The function's primary effect is the creation of a PDF
+#'   file at the specified location.
+#'
+#' @examples
+#' plotOutliersPDF(spe, fname="outliers_visualization.pdf")
+#'
+#' @export
+plotOutliersPDF <- function(spe, samples="sample_id", metric="detected",
+                            outliers="local_outliers",low_color="white",
+                            high_color="black", stroke=1, width=5, height=5,
+                            fname
+                            ) {
+
+  # Get a list of unique sample IDs
+  unique_sample_ids <- unique(colData(spe)[[samples]])
+
+  # initialize PDF and loop through plots
+  pdf(width=width, height=height, fname)
+  for (sample in unique_sample_ids) {
+
+    # Subset the data for the current sample
+    spe_subset <- spe[ ,colData(spe)[[samples]] == sample]
+
+
+    p <- make_escheR(spe_subset) |>
+      add_fill(var = metric) |>
+      add_ground(var = outliers, stroke = stroke) +
+      ggtitle(paste0("Sample: ", sample))
+
+    # remove and replace scales (to avoid warnings for re-coloring)
+    p$scales$scales <- list()
+    p <- p + scale_fill_gradient(low=low_color, high=high_color) +
+      scale_color_manual(
+        name = "", # turn off legend name for ground
+        values = c("TRUE" = "red", "FALSE" = "transparent")
+      ) +
+      scale_y_reverse()
+
+    # print
+    print(p)
+  }
+  dev.off()
+}
