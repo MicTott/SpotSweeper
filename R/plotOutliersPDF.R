@@ -9,8 +9,8 @@
 #' @param sample_id A character string specifying the column name in `colData(spe)`
 #'   that contains unique sample identifiers. Default is "sample_id".
 #' @param metric A character string specifying the metric to be visualized
-#'   in the plot. This metric should be a column name in `rowData(spe)`.
-#' @param outliers A character string specifying the column name in `rowData(spe)`
+#'   in the plot. This metric should be a column name in `colData(spe)`.
+#' @param outliers A character string specifying the column name in `colData(spe)`
 #'   that indicates whether a data point is considered an outlier. Default is
 #'   "local_outliers".
 #' @param low_color A character string indicating the color to be used for the low end
@@ -19,9 +19,9 @@
 #'   of the gradient scale. Default is "black".
 #' @param stroke A numeric value specifying the border thickness for outlier
 #'   points. Default is 1.
-#' @param width A numeric value indicating the width of the PDF's pages. Default
+#' @param width A numeric value indicating the width of the plot. Default
 #'   is 5.
-#' @param height A numeric value indicating the height of the PDF's pages. Default
+#' @param height A numeric value indicating the height of the plot. Default
 #'   is 5.
 #' @param fname A character string specifying the path and name of the output PDF file.
 #'
@@ -32,21 +32,21 @@
 #' plotOutliersPDF(spe, fname="outliers_visualization.pdf")
 #'
 #' @export
-plotOutliersPDF <- function(spe, samples="sample_id", metric="detected",
+plotOutliersPDF <- function(spe, sample_id="sample_id", metric="detected",
                             outliers="local_outliers",low_color="white",
                             high_color="black", stroke=1, width=5, height=5,
                             fname
                             ) {
 
   # Get a list of unique sample IDs
-  unique_sample_ids <- unique(colData(spe)[[samples]])
+  unique_sample_ids <- unique(colData(spe)[[sample_id]])
 
   # initialize PDF and loop through plots
   pdf(width=width, height=height, fname)
   for (sample in unique_sample_ids) {
 
     # Subset the data for the current sample
-    spe_subset <- spe[ ,colData(spe)[[samples]] == sample]
+    spe_subset <- spe[ ,colData(spe)[[sample_id]] == sample]
 
 
     p <- make_escheR(spe_subset) |>
