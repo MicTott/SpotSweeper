@@ -13,10 +13,8 @@
 #' @param outliers A character string specifying the column name in `colData(spe)`
 #'   that indicates whether a data point is considered an outlier. Default is
 #'   "local_outliers".
-#' @param low_color A character string indicating the color to be used for the low end
-#'   of the gradient scale. Default is "white".
-#' @param high_color A character string indicating the color to be used for the high end
-#'   of the gradient scale. Default is "black".
+#' @param colors A character vector specifying the colors to be used for the
+#'  gradient scale. If length is 2, the gradient will be a single color gradient.
 #' @param stroke A numeric value specifying the border thickness for outlier
 #'   points. Default is 1.
 #' @param width A numeric value indicating the width of the plot. Default
@@ -33,9 +31,8 @@
 #'
 #' @export
 plotOutliersPDF <- function(spe, sample_id="sample_id", metric="detected",
-                            outliers="local_outliers",low_color="white",
-                            high_color="black", stroke=1, width=5, height=5,
-                            fname
+                            outliers="local_outliers",colors=c("white", "black"),
+                            stroke=1, width=5, height=5,fname
                             ) {
 
   # Get a list of unique sample IDs
@@ -45,23 +42,14 @@ plotOutliersPDF <- function(spe, sample_id="sample_id", metric="detected",
   pdf(width=width, height=height, fname)
   for (sample in unique_sample_ids) {
 
-    # Subset the data for the current sample
-    spe_subset <- spe[ ,colData(spe)[[sample_id]] == sample]
-
-
-    p <- make_escheR(spe_subset) |>
-      add_fill(var = metric) |>
-      add_ground(var = outliers, stroke = stroke) +
-      ggtitle(paste0("Sample: ", sample))
-
-    # remove and replace scales (to avoid warnings for re-coloring)
-    p$scales$scales <- list()
-    p <- p + scale_fill_gradient(low=low_color, high=high_color) +
-      scale_color_manual(
-        name = "", # turn off legend name for ground
-        values = c("TRUE" = "red", "FALSE" = "transparent")
-      ) +
-      scale_y_reverse()
+  p <- plotOutliers(spe,
+                    sample_id=sample_id,
+                    sample=sample,
+                    metric=metric,
+                    outliers=outliers,
+                    colors=colors,
+                    stroke=stroke
+                    )
 
     # print
     print(p)
