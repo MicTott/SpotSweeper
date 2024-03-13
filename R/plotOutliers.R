@@ -31,14 +31,14 @@
 
 plotOutliers <- function(spe, sample_id = "sample_id",
                         sample=unique(spe$sample_id)[1], metric="detected",
-                        outliers="local_outliers",
+                        outliers="local_outliers", point_size=1,
                         colors=c("white","black"), stroke=1) {
 
 
   spe.subset <- spe[ ,colData(spe)[[sample_id]] == sample]
 
   p <- make_escheR(spe.subset) |>
-    add_fill(var = metric) |>
+    add_fill(var = metric, point_size = point_size) |>
     add_ground(var = outliers, stroke = stroke) +
     ggtitle(paste0("Sample: ", sample))
 
@@ -60,5 +60,5 @@ plotOutliers <- function(spe, sample_id = "sample_id",
       scale_y_reverse()
   }
 
-  print(p)
+  return(p)
 }

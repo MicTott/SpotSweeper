@@ -28,9 +28,9 @@ Imports:
     stats,
     BiocParallel,
     MASS,
-    dbscan
+    dbscan,
+    escheR
 Suggests:
-    escheR,
     knitr,
     scuttle,
     STexampleData,

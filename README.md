@@ -62,8 +62,6 @@ library(SpotSweeper)
 
 # load  Maynard et al DLPFC daatset
 spe <- STexampleData::Visium_humanDLPFC()
-#> Warning: package 'S4Vectors' was built under R version 4.3.2
-#> Warning: package 'GenomeInfoDb' was built under R version 4.3.2
 #> see ?STexampleData and browseVignettes('STexampleData') for documentation
 #> loading from cache
 
@@ -99,27 +97,28 @@ colnames(colData(spe))
 #> [13] "total"
 
 # Identifying local outliers using SpotSweeper
-features <- c('sum' ,'detected', "subsets_Mito_percent")
-spe<- localOutliers(spe, 
-                    features=features,
-                    n_neighbors=18, 
-                    data_output=TRUE,
-                    method="multivariate"
-                    )
+spe <- localOutliers(spe,
+                         metric="sum",
+                         direction="lower",
+                         log=TRUE
+)
 
-# show column data after SpotSweeper
-colnames(colData(spe))
-#>  [1] "barcode_id"                "sample_id"                
-#>  [3] "in_tissue"                 "array_row"                
-#>  [5] "array_col"                 "ground_truth"             
-#>  [7] "cell_count"                "sum"                      
-#>  [9] "detected"                  "subsets_Mito_sum"         
-#> [11] "subsets_Mito_detected"     "subsets_Mito_percent"     
-#> [13] "total"                     "sum_log2"                 
-#> [15] "detected_log2"             "subsets_Mito_percent_log2"
-#> [17] "coords"                    "local_outliers"           
-#> [19] "sum_z"                     "detected_z"               
-#> [21] "subsets_Mito_percent_z"    "LOF"
+spe <- localOutliers(spe,
+                         metric="detected",
+                         direction="lower",
+                         log=TRUE
+)
+
+spe <- localOutliers(spe,
+                         metric="subsets_Mito_percent",
+                         direction="higher",
+                         log=FALSE
+)
+
+# combine all outliers into "local_outliers" column
+spe$local_outliers <- as.logical(spe$sum_outliers) | 
+  as.logical(spe$detected_outliers) | 
+  as.logical(spe$subsets_Mito_percent_outliers)
 ```
 
 We can now visualize `local_outliers` vs one of the QC metrics,
@@ -130,30 +129,31 @@ library(escheR)
 #> Loading required package: ggplot2
 library(ggpubr)
 
-# plotting using escheR
-p1 <- make_escheR(spe) |> 
-  add_fill(var = "sum_log2", point_size=1.25) +
-  scale_fill_gradient(low ="white",high =  "darkgreen")
-#> Scale for fill is already present.
-#> Adding another scale for fill, which will replace the existing scale.
+# library size
+p1 <- plotOutliers(spe, metric="sum_log2", 
+             outliers="sum_outliers", point_size=1.1) +
+  ggtitle("Library Size")
 
-p2 <- make_escheR(spe) |> 
-  add_fill(var = "sum_log2", point_size=1.25) |>
-  add_ground(var = "local_outliers", stroke = 1) +
-  scale_color_manual(
-    name = "", # turn off legend name for ground_truth
-    values = c(
-      "TRUE" = "red",
-      "FALSE" = "transparent")
-  ) +
-  scale_fill_gradient(low ="white",high =  "darkgreen")
-#> Scale for fill is already present.
-#> Adding another scale for fill, which will replace the existing scale.
+# unique genes
+p2 <- plotOutliers(spe, metric="detected_log2", 
+             outliers="detected_outliers", point_size=1.1) +
+  ggtitle("Unique Genes")
 
-plot_list <- list(p1, p2)
+# mitochondrial percent
+p3 <- plotOutliers(spe, metric="subsets_Mito_percent", 
+             outliers="subsets_Mito_percent_outliers", point_size=1.1) +
+  ggtitle("Mitochondrial Percent")
+
+# all local outliers
+p4 <- plotOutliers(spe, metric="sum_log2", 
+             outliers="local_outliers", point_size=1.1, stroke=0.75) +
+  ggtitle("All Local Outliers")
+
+# plot
+plot_list <- list(p1, p2, p3, p4)
 ggarrange(
   plotlist = plot_list,
-  ncol = 2, nrow = 1,
+  ncol = 2, nrow = 2,
   common.legend = FALSE
 )
 ```
