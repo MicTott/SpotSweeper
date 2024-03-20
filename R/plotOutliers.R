@@ -27,7 +27,7 @@
 #'
 #' @examples
 #' plot <- plotOutliers(spe)
-#' print(plot)
+#' plot
 #'
 #' @export
 
