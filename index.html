@@ -5,14 +5,26 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="Spatially-aware quality control software for detecting and removing low quality spots in spot-based spatial transcritpomics methods, such as 10x Visium.">
-<title>SpotSweeper • SpotSweeper</title>
+<meta name="description" content="Spatially-aware quality control (QC) software for both spot-level 
+    and artifact-level QC in spot-based spatial transcripomics, such as 10x 
+    Visium. These methods calculate local (nearest-neighbors) mean and variance 
+    of standard QC metrics (library size, unique genes, and mitochondrial 
+    percentage) to identify outliers spot and large technical artifacts. Scales
+    linearly with the number of spots and is designed to be used with
+    SpatialExperiment objects.">
+<title>Spatially-aware quality control for spatial transcriptomics • SpotSweeper</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="SpotSweeper">
-<meta property="og:description" content="Spatially-aware quality control software for detecting and removing low quality spots in spot-based spatial transcritpomics methods, such as 10x Visium.">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Spatially-aware quality control for spatial transcriptomics">
+<meta property="og:description" content="Spatially-aware quality control (QC) software for both spot-level 
+    and artifact-level QC in spot-based spatial transcripomics, such as 10x 
+    Visium. These methods calculate local (nearest-neighbors) mean and variance 
+    of standard QC metrics (library size, unique genes, and mitochondrial 
+    percentage) to identify outliers spot and large technical artifacts. Scales
+    linearly with the number of spots and is designed to be used with
+    SpatialExperiment objects.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -76,9 +88,9 @@
 <h2 id="installation-instructions">Installation instructions<a class="anchor" aria-label="anchor" href="#installation-instructions"></a>
 </h2>
 <p>Currently, the only way to install <code>SpotSweeper</code> is by downloading the development version which can be installed from <a href="https://github.com/MicTott/SpotSweeper" class="external-link">GitHub</a> using the following:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"devtools"</span>)) <span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"MicTott/SpotSweeper"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"devtools"</span>)) <span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"MicTott/SpotSweeper"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
 <p>Once accepted in <a href="http://bioconductor.org/" class="external-link">Bioconductor</a>, <code>SpotSweeper</code> will be installable using:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -107,8 +119,6 @@
 <span></span>
 <span><span class="co"># load  Maynard et al DLPFC daatset</span></span>
 <span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu">STexampleData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/STexampleData/man/STexampleData.html" class="external-link">Visium_humanDLPFC</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: package 'S4Vectors' was built under R version 4.3.2</span></span>
-<span><span class="co">#&gt; Warning: package 'GenomeInfoDb' was built under R version 4.3.2</span></span>
 <span><span class="co">#&gt; see ?STexampleData and browseVignettes('STexampleData') for documentation</span></span>
 <span><span class="co">#&gt; loading from cache</span></span>
 <span></span>
@@ -139,57 +149,59 @@
 <span><span class="co">#&gt; [13] "total"</span></span>
 <span></span>
 <span><span class="co"># Identifying local outliers using SpotSweeper</span></span>
-<span><span class="va">features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'sum'</span> ,<span class="st">'detected'</span>, <span class="st">"subsets_Mito_percent"</span><span class="op">)</span></span>
-<span><span class="va">spe</span><span class="op">&lt;-</span> <span class="fu"><a href="reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>, </span>
-<span>                    features<span class="op">=</span><span class="va">features</span>,</span>
-<span>                    n_neighbors<span class="op">=</span><span class="fl">18</span>, </span>
-<span>                    data_output<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>                    method<span class="op">=</span><span class="st">"multivariate"</span></span>
-<span>                    <span class="op">)</span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span>                         metric<span class="op">=</span><span class="st">"sum"</span>,</span>
+<span>                         direction<span class="op">=</span><span class="st">"lower"</span>,</span>
+<span>                         log<span class="op">=</span><span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># show column data after SpotSweeper</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "barcode_id"                "sample_id"                </span></span>
-<span><span class="co">#&gt;  [3] "in_tissue"                 "array_row"                </span></span>
-<span><span class="co">#&gt;  [5] "array_col"                 "ground_truth"             </span></span>
-<span><span class="co">#&gt;  [7] "cell_count"                "sum"                      </span></span>
-<span><span class="co">#&gt;  [9] "detected"                  "subsets_Mito_sum"         </span></span>
-<span><span class="co">#&gt; [11] "subsets_Mito_detected"     "subsets_Mito_percent"     </span></span>
-<span><span class="co">#&gt; [13] "total"                     "sum_log2"                 </span></span>
-<span><span class="co">#&gt; [15] "detected_log2"             "subsets_Mito_percent_log2"</span></span>
-<span><span class="co">#&gt; [17] "coords"                    "local_outliers"           </span></span>
-<span><span class="co">#&gt; [19] "sum_z"                     "detected_z"               </span></span>
-<span><span class="co">#&gt; [21] "subsets_Mito_percent_z"    "LOF"</span></span></code></pre></div>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span>                         metric<span class="op">=</span><span class="st">"detected"</span>,</span>
+<span>                         direction<span class="op">=</span><span class="st">"lower"</span>,</span>
+<span>                         log<span class="op">=</span><span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span>                         metric<span class="op">=</span><span class="st">"subsets_Mito_percent"</span>,</span>
+<span>                         direction<span class="op">=</span><span class="st">"higher"</span>,</span>
+<span>                         log<span class="op">=</span><span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># combine all outliers into "local_outliers" column</span></span>
+<span><span class="va">spe</span><span class="op">$</span><span class="va">local_outliers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">sum_outliers</span><span class="op">)</span> <span class="op">|</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">detected_outliers</span><span class="op">)</span> <span class="op">|</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">subsets_Mito_percent_outliers</span><span class="op">)</span></span></code></pre></div>
 <p>We can now visualize <code>local_outliers</code> vs one of the QC metrics, <code>sum_log2</code>, with help from the <code>escheR</code> package.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/boyiguo1/escheR" class="external-link">escheR</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rpkgs.datanovia.com/ggpubr/" class="external-link">ggpubr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># plotting using escheR</span></span>
-<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/make_escheR.html" class="external-link">make_escheR</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/add_fill.html" class="external-link">add_fill</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"sum_log2"</span>, point_size<span class="op">=</span><span class="fl">1.25</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient</a></span><span class="op">(</span>low <span class="op">=</span><span class="st">"white"</span>,high <span class="op">=</span>  <span class="st">"darkgreen"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Scale for fill is already present.</span></span>
-<span><span class="co">#&gt; Adding another scale for fill, which will replace the existing scale.</span></span>
+<span><span class="co"># library size</span></span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"sum_log2"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="st">"sum_outliers"</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Library Size"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/make_escheR.html" class="external-link">make_escheR</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/add_fill.html" class="external-link">add_fill</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"sum_log2"</span>, point_size<span class="op">=</span><span class="fl">1.25</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/add_ground.html" class="external-link">add_ground</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"local_outliers"</span>, stroke <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span></span>
-<span>    name <span class="op">=</span> <span class="st">""</span>, <span class="co"># turn off legend name for ground_truth</span></span>
-<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"red"</span>,</span>
-<span>      <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"transparent"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient</a></span><span class="op">(</span>low <span class="op">=</span><span class="st">"white"</span>,high <span class="op">=</span>  <span class="st">"darkgreen"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Scale for fill is already present.</span></span>
-<span><span class="co">#&gt; Adding another scale for fill, which will replace the existing scale.</span></span>
+<span><span class="co"># unique genes</span></span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"detected_log2"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="st">"detected_outliers"</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Unique Genes"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">plot_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span></span>
+<span><span class="co"># mitochondrial percent</span></span>
+<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"subsets_Mito_percent"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="st">"subsets_Mito_percent_outliers"</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Mitochondrial Percent"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># all local outliers</span></span>
+<span><span class="va">p4</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"sum_log2"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="st">"local_outliers"</span>, point_size<span class="op">=</span><span class="fl">1.1</span>, stroke<span class="op">=</span><span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"All Local Outliers"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot</span></span>
+<span><span class="va">plot_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, <span class="va">p3</span>, <span class="va">p4</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html" class="external-link">ggarrange</a></span><span class="op">(</span></span>
 <span>  plotlist <span class="op">=</span> <span class="va">plot_list</span>,</span>
-<span>  ncol <span class="op">=</span> <span class="fl">2</span>, nrow <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">2</span>, nrow <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  common.legend <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-local_outlier_plot-1.png" width="100%"></p>
@@ -275,13 +287,13 @@
 <div class="section level2">
 <h2 id="development-tools">Development tools<a class="anchor" aria-label="anchor" href="#development-tools"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="sc">*</span> Continuous code testing is possible thanks to [GitHub actions](https<span class="sc">:</span><span class="er">//</span>www.tidyverse.org<span class="sc">/</span>blog<span class="sc">/</span><span class="dv">2020</span><span class="sc">/</span><span class="dv">04</span><span class="sc">/</span>usethis<span class="dv">-1-6-0</span><span class="sc">/</span>)  through <span class="st">`</span><span class="at">r BiocStyle::Biocpkg('biocthis')</span><span class="st">`</span>.</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="sc">*</span> The [documentation website](http<span class="sc">:</span><span class="er">//</span>MicTott.github.io<span class="sc">/</span>SpotSweeper) is automatically updated thanks to <span class="st">`</span><span class="at">r BiocStyle::CRANpkg('pkgdown')</span><span class="st">`</span>.</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="sc">*</span> The code is styled automatically thanks to <span class="st">`</span><span class="at">r BiocStyle::CRANpkg('styler')</span><span class="st">`</span>.</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="sc">*</span> The documentation is formatted thanks to <span class="st">`</span><span class="at">r BiocStyle::CRANpkg('devtools')</span><span class="st">`</span> and <span class="st">`</span><span class="at">r BiocStyle::CRANpkg('roxygen2')</span><span class="st">`</span>.</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>This package was developed using <span class="st">`</span><span class="at">r BiocStyle::Biocpkg('biocthis')</span><span class="st">`</span>.</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="sc">*</span> Continuous code testing is possible thanks to [GitHub actions](https<span class="sc">:</span><span class="er">//</span>www.tidyverse.org<span class="sc">/</span>blog<span class="sc">/</span><span class="dv">2020</span><span class="sc">/</span><span class="dv">04</span><span class="sc">/</span>usethis<span class="dv">-1-6-0</span><span class="sc">/</span>)  through <span class="st">`</span><span class="at">r BiocStyle::Biocpkg('biocthis')</span><span class="st">`</span>.</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="sc">*</span> The [documentation website](http<span class="sc">:</span><span class="er">//</span>MicTott.github.io<span class="sc">/</span>SpotSweeper) is automatically updated thanks to <span class="st">`</span><span class="at">r BiocStyle::CRANpkg('pkgdown')</span><span class="st">`</span>.</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="sc">*</span> The code is styled automatically thanks to <span class="st">`</span><span class="at">r BiocStyle::CRANpkg('styler')</span><span class="st">`</span>.</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="sc">*</span> The documentation is formatted thanks to <span class="st">`</span><span class="at">r BiocStyle::CRANpkg('devtools')</span><span class="st">`</span> and <span class="st">`</span><span class="at">r BiocStyle::CRANpkg('roxygen2')</span><span class="st">`</span>.</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>This package was developed using <span class="st">`</span><span class="at">r BiocStyle::Biocpkg('biocthis')</span><span class="st">`</span>.</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

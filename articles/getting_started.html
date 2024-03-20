@@ -84,7 +84,7 @@ USA<br><h4 data-toc-skip class="author">Stephanie
 Hicks</h4>
             <address class="author_afil">
       Johns Hopkins Bloomberg School of Public Health, Baltimore, MD,
-USA<br><h4 data-toc-skip class="date">2024-02-15</h4>
+USA<br><h4 data-toc-skip class="date">2024-03-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/MicTott/SpotSweeper/blob/HEAD/vignettes/getting_started.Rmd" class="external-link"><code>vignettes/getting_started.Rmd</code></a></small>
       <div class="d-none name"><code>getting_started.Rmd</code></div>
@@ -144,27 +144,28 @@ metrics as well.</p>
 <span><span class="co">#&gt; [13] "total"</span></span>
 <span></span>
 <span><span class="co"># Identifying local outliers using SpotSweeper</span></span>
-<span><span class="va">features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'sum'</span> ,<span class="st">'detected'</span>, <span class="st">"subsets_Mito_percent"</span><span class="op">)</span></span>
-<span><span class="va">spe</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>, </span>
-<span>                    features<span class="op">=</span><span class="va">features</span>,</span>
-<span>                    n_neighbors<span class="op">=</span><span class="fl">18</span>, </span>
-<span>                    data_output<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>                    method<span class="op">=</span><span class="st">"multivariate"</span></span>
-<span>                    <span class="op">)</span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span>                         metric<span class="op">=</span><span class="st">"sum"</span>,</span>
+<span>                         direction<span class="op">=</span><span class="st">"lower"</span>,</span>
+<span>                         log<span class="op">=</span><span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># show column data after SpotSweeper</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "barcode_id"                "sample_id"                </span></span>
-<span><span class="co">#&gt;  [3] "in_tissue"                 "array_row"                </span></span>
-<span><span class="co">#&gt;  [5] "array_col"                 "ground_truth"             </span></span>
-<span><span class="co">#&gt;  [7] "cell_count"                "sum"                      </span></span>
-<span><span class="co">#&gt;  [9] "detected"                  "subsets_Mito_sum"         </span></span>
-<span><span class="co">#&gt; [11] "subsets_Mito_detected"     "subsets_Mito_percent"     </span></span>
-<span><span class="co">#&gt; [13] "total"                     "sum_log2"                 </span></span>
-<span><span class="co">#&gt; [15] "detected_log2"             "subsets_Mito_percent_log2"</span></span>
-<span><span class="co">#&gt; [17] "coords"                    "local_outliers"           </span></span>
-<span><span class="co">#&gt; [19] "sum_z"                     "detected_z"               </span></span>
-<span><span class="co">#&gt; [21] "subsets_Mito_percent_z"    "LOF"</span></span></code></pre></div>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span>                         metric<span class="op">=</span><span class="st">"detected"</span>,</span>
+<span>                         direction<span class="op">=</span><span class="st">"lower"</span>,</span>
+<span>                         log<span class="op">=</span><span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span>                         metric<span class="op">=</span><span class="st">"subsets_Mito_percent"</span>,</span>
+<span>                         direction<span class="op">=</span><span class="st">"higher"</span>,</span>
+<span>                         log<span class="op">=</span><span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># combine all outliers into "local_outliers" column</span></span>
+<span><span class="va">spe</span><span class="op">$</span><span class="va">local_outliers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">sum_outliers</span><span class="op">)</span> <span class="op">|</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">detected_outliers</span><span class="op">)</span> <span class="op">|</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">subsets_Mito_percent_outliers</span><span class="op">)</span></span></code></pre></div>
 <p>We can now visualize <code>local_outliers</code> vs one of the QC
 metrics, <code>sum_log2</code>, with help from the <code>escheR</code>
 package.</p>
@@ -172,26 +173,31 @@ package.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/boyiguo1/escheR" class="external-link">escheR</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rpkgs.datanovia.com/ggpubr/" class="external-link">ggpubr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># plotting using escheR</span></span>
-<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/make_escheR.html" class="external-link">make_escheR</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/add_fill.html" class="external-link">add_fill</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"sum_log2"</span>, point_size<span class="op">=</span><span class="fl">1.25</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient</a></span><span class="op">(</span>low <span class="op">=</span><span class="st">"white"</span>,high <span class="op">=</span>  <span class="st">"darkgreen"</span><span class="op">)</span></span>
+<span><span class="co"># library size</span></span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"sum_log2"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="st">"sum_outliers"</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Library Size"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/make_escheR.html" class="external-link">make_escheR</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/add_fill.html" class="external-link">add_fill</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"sum_log2"</span>, point_size<span class="op">=</span><span class="fl">1.25</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/escheR/man/add_ground.html" class="external-link">add_ground</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"local_outliers"</span>, stroke <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span></span>
-<span>    name <span class="op">=</span> <span class="st">""</span>, <span class="co"># turn off legend name for ground_truth</span></span>
-<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"red"</span>,</span>
-<span>      <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"transparent"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient</a></span><span class="op">(</span>low <span class="op">=</span><span class="st">"white"</span>,high <span class="op">=</span>  <span class="st">"darkgreen"</span><span class="op">)</span></span>
+<span><span class="co"># unique genes</span></span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"detected_log2"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="st">"detected_outliers"</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Unique Genes"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">plot_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span></span>
+<span><span class="co"># mitochondrial percent</span></span>
+<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"subsets_Mito_percent"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="st">"subsets_Mito_percent_outliers"</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Mitochondrial Percent"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># all local outliers</span></span>
+<span><span class="va">p4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"sum_log2"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="st">"local_outliers"</span>, point_size<span class="op">=</span><span class="fl">1.1</span>, stroke<span class="op">=</span><span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"All Local Outliers"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot</span></span>
+<span><span class="va">plot_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, <span class="va">p3</span>, <span class="va">p4</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html" class="external-link">ggarrange</a></span><span class="op">(</span></span>
 <span>  plotlist <span class="op">=</span> <span class="va">plot_list</span>,</span>
-<span>  ncol <span class="op">=</span> <span class="fl">2</span>, nrow <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">2</span>, nrow <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  common.legend <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="getting_started_files/figure-html/local_outlier_plot-1.png" width="700"></p>
@@ -201,9 +207,9 @@ package.</p>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.3.2 (2023-10-31)</span></span>
+<span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.3 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -224,70 +230,69 @@ package.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
 <span><span class="co">#&gt;  [1] ggpubr_0.6.0                escheR_1.2.0               </span></span>
-<span><span class="co">#&gt;  [3] ggplot2_3.4.4               STexampleData_1.10.0       </span></span>
+<span><span class="co">#&gt;  [3] ggplot2_3.5.0               STexampleData_1.10.1       </span></span>
 <span><span class="co">#&gt;  [5] SpatialExperiment_1.12.0    SingleCellExperiment_1.24.0</span></span>
 <span><span class="co">#&gt;  [7] SummarizedExperiment_1.32.0 Biobase_2.62.0             </span></span>
-<span><span class="co">#&gt;  [9] GenomicRanges_1.54.1        GenomeInfoDb_1.38.6        </span></span>
+<span><span class="co">#&gt;  [9] GenomicRanges_1.54.1        GenomeInfoDb_1.38.8        </span></span>
 <span><span class="co">#&gt; [11] IRanges_2.36.0              S4Vectors_0.40.2           </span></span>
 <span><span class="co">#&gt; [13] MatrixGenerics_1.14.0       matrixStats_1.2.0          </span></span>
 <span><span class="co">#&gt; [15] ExperimentHub_2.10.0        AnnotationHub_3.10.0       </span></span>
-<span><span class="co">#&gt; [17] BiocFileCache_2.10.1        dbplyr_2.4.0               </span></span>
+<span><span class="co">#&gt; [17] BiocFileCache_2.10.1        dbplyr_2.5.0               </span></span>
 <span><span class="co">#&gt; [19] BiocGenerics_0.48.1         SpotSweeper_0.99.1         </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] DBI_1.2.1                     bitops_1.0-7                 </span></span>
+<span><span class="co">#&gt;   [1] DBI_1.2.2                     bitops_1.0-7                 </span></span>
 <span><span class="co">#&gt;   [3] rlang_1.1.3                   magrittr_2.0.3               </span></span>
-<span><span class="co">#&gt;   [5] compiler_4.3.2                RSQLite_2.3.5                </span></span>
+<span><span class="co">#&gt;   [5] compiler_4.3.3                RSQLite_2.3.5                </span></span>
 <span><span class="co">#&gt;   [7] DelayedMatrixStats_1.24.0     png_0.1-8                    </span></span>
-<span><span class="co">#&gt;   [9] systemfonts_1.0.5             vctrs_0.6.5                  </span></span>
-<span><span class="co">#&gt;  [11] stringr_1.5.1                 pkgconfig_2.0.3              </span></span>
-<span><span class="co">#&gt;  [13] crayon_1.5.2                  fastmap_1.1.1                </span></span>
-<span><span class="co">#&gt;  [15] backports_1.4.1               magick_2.8.2                 </span></span>
-<span><span class="co">#&gt;  [17] XVector_0.42.0                ellipsis_0.3.2               </span></span>
-<span><span class="co">#&gt;  [19] labeling_0.4.3                scuttle_1.12.0               </span></span>
-<span><span class="co">#&gt;  [21] utf8_1.2.4                    promises_1.2.1               </span></span>
-<span><span class="co">#&gt;  [23] rmarkdown_2.25                ragg_1.2.7                   </span></span>
-<span><span class="co">#&gt;  [25] purrr_1.0.2                   bit_4.0.5                    </span></span>
-<span><span class="co">#&gt;  [27] xfun_0.42                     beachmat_2.18.0              </span></span>
-<span><span class="co">#&gt;  [29] zlibbioc_1.48.0               cachem_1.0.8                 </span></span>
-<span><span class="co">#&gt;  [31] jsonlite_1.8.8                blob_1.2.4                   </span></span>
-<span><span class="co">#&gt;  [33] highr_0.10                    later_1.3.2                  </span></span>
-<span><span class="co">#&gt;  [35] DelayedArray_0.28.0           BiocParallel_1.36.0          </span></span>
-<span><span class="co">#&gt;  [37] interactiveDisplayBase_1.40.0 broom_1.0.5                  </span></span>
-<span><span class="co">#&gt;  [39] parallel_4.3.2                R6_2.5.1                     </span></span>
-<span><span class="co">#&gt;  [41] bslib_0.6.1                   stringi_1.8.3                </span></span>
-<span><span class="co">#&gt;  [43] car_3.1-2                     jquerylib_0.1.4              </span></span>
-<span><span class="co">#&gt;  [45] Rcpp_1.0.12                   knitr_1.45                   </span></span>
-<span><span class="co">#&gt;  [47] httpuv_1.6.14                 Matrix_1.6-1.1               </span></span>
-<span><span class="co">#&gt;  [49] tidyselect_1.2.0              abind_1.4-5                  </span></span>
-<span><span class="co">#&gt;  [51] yaml_2.3.8                    codetools_0.2-19             </span></span>
-<span><span class="co">#&gt;  [53] curl_5.2.0                    lattice_0.21-9               </span></span>
-<span><span class="co">#&gt;  [55] tibble_3.2.1                  shiny_1.8.0                  </span></span>
-<span><span class="co">#&gt;  [57] withr_3.0.0                   KEGGREST_1.42.0              </span></span>
-<span><span class="co">#&gt;  [59] evaluate_0.23                 desc_1.4.3                   </span></span>
-<span><span class="co">#&gt;  [61] Biostrings_2.70.2             pillar_1.9.0                 </span></span>
-<span><span class="co">#&gt;  [63] BiocManager_1.30.22           filelock_1.0.3               </span></span>
-<span><span class="co">#&gt;  [65] carData_3.0-5                 generics_0.1.3               </span></span>
-<span><span class="co">#&gt;  [67] dbscan_1.1-12                 RCurl_1.98-1.14              </span></span>
-<span><span class="co">#&gt;  [69] BiocVersion_3.18.1            munsell_0.5.0                </span></span>
-<span><span class="co">#&gt;  [71] scales_1.3.0                  sparseMatrixStats_1.14.0     </span></span>
-<span><span class="co">#&gt;  [73] xtable_1.8-4                  glue_1.7.0                   </span></span>
-<span><span class="co">#&gt;  [75] tools_4.3.2                   BiocNeighbors_1.20.2         </span></span>
-<span><span class="co">#&gt;  [77] ggsignif_0.6.4                fs_1.6.3                     </span></span>
-<span><span class="co">#&gt;  [79] cowplot_1.1.3                 grid_4.3.2                   </span></span>
-<span><span class="co">#&gt;  [81] tidyr_1.3.1                   colorspace_2.1-0             </span></span>
-<span><span class="co">#&gt;  [83] AnnotationDbi_1.64.1          GenomeInfoDbData_1.2.11      </span></span>
-<span><span class="co">#&gt;  [85] cli_3.6.2                     rappdirs_0.3.3               </span></span>
-<span><span class="co">#&gt;  [87] textshaping_0.3.7             fansi_1.0.6                  </span></span>
-<span><span class="co">#&gt;  [89] viridisLite_0.4.2             S4Arrays_1.2.0               </span></span>
-<span><span class="co">#&gt;  [91] dplyr_1.1.4                   gtable_0.3.4                 </span></span>
-<span><span class="co">#&gt;  [93] rstatix_0.7.2                 sass_0.4.8                   </span></span>
-<span><span class="co">#&gt;  [95] digest_0.6.34                 SparseArray_1.2.4            </span></span>
-<span><span class="co">#&gt;  [97] farver_2.1.1                  rjson_0.2.21                 </span></span>
-<span><span class="co">#&gt;  [99] memoise_2.0.1                 htmltools_0.5.7              </span></span>
-<span><span class="co">#&gt; [101] pkgdown_2.0.7                 lifecycle_1.0.4              </span></span>
-<span><span class="co">#&gt; [103] httr_1.4.7                    mime_0.12                    </span></span>
-<span><span class="co">#&gt; [105] bit64_4.0.5                   MASS_7.3-60</span></span></code></pre></div>
+<span><span class="co">#&gt;   [9] systemfonts_1.0.6             vctrs_0.6.5                  </span></span>
+<span><span class="co">#&gt;  [11] pkgconfig_2.0.3               crayon_1.5.2                 </span></span>
+<span><span class="co">#&gt;  [13] fastmap_1.1.1                 backports_1.4.1              </span></span>
+<span><span class="co">#&gt;  [15] magick_2.8.3                  XVector_0.42.0               </span></span>
+<span><span class="co">#&gt;  [17] ellipsis_0.3.2                labeling_0.4.3               </span></span>
+<span><span class="co">#&gt;  [19] scuttle_1.12.0                utf8_1.2.4                   </span></span>
+<span><span class="co">#&gt;  [21] promises_1.2.1                rmarkdown_2.26               </span></span>
+<span><span class="co">#&gt;  [23] ragg_1.3.0                    purrr_1.0.2                  </span></span>
+<span><span class="co">#&gt;  [25] bit_4.0.5                     xfun_0.42                    </span></span>
+<span><span class="co">#&gt;  [27] beachmat_2.18.1               zlibbioc_1.48.2              </span></span>
+<span><span class="co">#&gt;  [29] cachem_1.0.8                  jsonlite_1.8.8               </span></span>
+<span><span class="co">#&gt;  [31] blob_1.2.4                    highr_0.10                   </span></span>
+<span><span class="co">#&gt;  [33] later_1.3.2                   DelayedArray_0.28.0          </span></span>
+<span><span class="co">#&gt;  [35] BiocParallel_1.36.0           interactiveDisplayBase_1.40.0</span></span>
+<span><span class="co">#&gt;  [37] broom_1.0.5                   parallel_4.3.3               </span></span>
+<span><span class="co">#&gt;  [39] R6_2.5.1                      bslib_0.6.1                  </span></span>
+<span><span class="co">#&gt;  [41] car_3.1-2                     jquerylib_0.1.4              </span></span>
+<span><span class="co">#&gt;  [43] Rcpp_1.0.12                   knitr_1.45                   </span></span>
+<span><span class="co">#&gt;  [45] httpuv_1.6.14                 Matrix_1.6-5                 </span></span>
+<span><span class="co">#&gt;  [47] tidyselect_1.2.1              abind_1.4-5                  </span></span>
+<span><span class="co">#&gt;  [49] yaml_2.3.8                    codetools_0.2-19             </span></span>
+<span><span class="co">#&gt;  [51] curl_5.2.1                    lattice_0.22-5               </span></span>
+<span><span class="co">#&gt;  [53] tibble_3.2.1                  withr_3.0.0                  </span></span>
+<span><span class="co">#&gt;  [55] KEGGREST_1.42.0               shiny_1.8.0                  </span></span>
+<span><span class="co">#&gt;  [57] evaluate_0.23                 desc_1.4.3                   </span></span>
+<span><span class="co">#&gt;  [59] Biostrings_2.70.3             pillar_1.9.0                 </span></span>
+<span><span class="co">#&gt;  [61] BiocManager_1.30.22           filelock_1.0.3               </span></span>
+<span><span class="co">#&gt;  [63] carData_3.0-5                 generics_0.1.3               </span></span>
+<span><span class="co">#&gt;  [65] RCurl_1.98-1.14               BiocVersion_3.18.1           </span></span>
+<span><span class="co">#&gt;  [67] sparseMatrixStats_1.14.0      munsell_0.5.0                </span></span>
+<span><span class="co">#&gt;  [69] scales_1.3.0                  xtable_1.8-4                 </span></span>
+<span><span class="co">#&gt;  [71] glue_1.7.0                    tools_4.3.3                  </span></span>
+<span><span class="co">#&gt;  [73] BiocNeighbors_1.20.2          ggsignif_0.6.4               </span></span>
+<span><span class="co">#&gt;  [75] fs_1.6.3                      cowplot_1.1.3                </span></span>
+<span><span class="co">#&gt;  [77] grid_4.3.3                    tidyr_1.3.1                  </span></span>
+<span><span class="co">#&gt;  [79] AnnotationDbi_1.64.1          colorspace_2.1-0             </span></span>
+<span><span class="co">#&gt;  [81] GenomeInfoDbData_1.2.11       cli_3.6.2                    </span></span>
+<span><span class="co">#&gt;  [83] rappdirs_0.3.3                textshaping_0.3.7            </span></span>
+<span><span class="co">#&gt;  [85] fansi_1.0.6                   viridisLite_0.4.2            </span></span>
+<span><span class="co">#&gt;  [87] S4Arrays_1.2.1                dplyr_1.1.4                  </span></span>
+<span><span class="co">#&gt;  [89] gtable_0.3.4                  rstatix_0.7.2                </span></span>
+<span><span class="co">#&gt;  [91] sass_0.4.9                    digest_0.6.35                </span></span>
+<span><span class="co">#&gt;  [93] SparseArray_1.2.4             farver_2.1.1                 </span></span>
+<span><span class="co">#&gt;  [95] rjson_0.2.21                  memoise_2.0.1                </span></span>
+<span><span class="co">#&gt;  [97] htmltools_0.5.7               pkgdown_2.0.7                </span></span>
+<span><span class="co">#&gt;  [99] lifecycle_1.0.4               httr_1.4.7                   </span></span>
+<span><span class="co">#&gt; [101] mime_0.12                     bit64_4.0.5                  </span></span>
+<span><span class="co">#&gt; [103] MASS_7.3-60.0.1</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
