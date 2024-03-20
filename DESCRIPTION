@@ -43,4 +43,4 @@ Suggests:
     testthat
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-LazyData: false
+LazyData: False
