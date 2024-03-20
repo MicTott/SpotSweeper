@@ -7,8 +7,11 @@ Authors@R:
            comment = c(ORCID = "0000-0002-9292-8556"))
 Description: Spatially-aware quality control (QC) software for both spot-level 
     and artifact-level QC in spot-based spatial transcripomics, such as 10x 
-    Visium. These methods are based on using information from nearest-neighbors 
-    to identify local outliers spots and large technical artifacts.
+    Visium. These methods calculate local (nearest-neighbors) mean and variance 
+    of standard QC metrics (library size, unique genes, and mitochondrial 
+    percentage) to identify outliers spot and large technical artifacts. Scales
+    linearly with the number of spots and is designed to be used with
+    'SpatialExperiment' objects.
 License: MIT + file LICENSE
 URL: https://github.com/MicTott/SpotSweeper, https://mictott.github.io/SpotSweeper/
 BugReports: https://support.bioconductor.org/tag/SpotSweeper
