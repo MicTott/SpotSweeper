@@ -26,6 +26,8 @@
 #' @return Invisible NULL. The function's primary effect is the creation of a PDF
 #'   file at the specified location.
 #'
+#' @importFrom escheR make_escheR add_fill add_ground
+#'
 #' @examples
 #' plotOutliersPDF(spe, fname="outliers_visualization.pdf")
 #'

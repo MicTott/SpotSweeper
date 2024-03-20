@@ -23,6 +23,8 @@
 #'   with additional layers for visualizing the specified metric and outliers. The
 #'   plot is not explicitly printed by the function and should be printed by the caller.
 #'
+#' @importFrom escheR make_escheR add_fill add_ground
+#'
 #' @examples
 #' plot <- plotOutliers(spe)
 #' print(plot)

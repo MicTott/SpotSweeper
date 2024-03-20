@@ -10,8 +10,8 @@ plotOutliers(
   sample = unique(spe$sample_id)[1],
   metric = "detected",
   outliers = "local_outliers",
-  low_color = "white",
-  high_color = "black",
+  point_size = 1,
+  colors = c("white", "black"),
   stroke = 1
 )
 }
@@ -31,11 +31,8 @@ in the plot. This metric should be a column name in \code{colData(spe)}.}
 that indicates whether a data point is considered an outlier. Default is
 "local_outliers".}
 
-\item{low_color}{A character string indicating the color to be used for the low end
-of the gradient scale. Default is "white".}
-
-\item{high_color}{A character string indicating the color to be used for the high end
-of the gradient scale. Default is "black".}
+\item{colors}{A character vector specifying the colors to be used for the
+gradient scale. If length is 2, the gradient will be a single color gradient.}
 
 \item{stroke}{A numeric value specifying the border thickness for outlier
 points. Default is 1.}
