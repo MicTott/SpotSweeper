@@ -16,6 +16,8 @@
 #'
 #' @importFrom SummarizedExperiment colData
 #' @importFrom BiocNeighbors findKNN
+#' @importFrom MASS rlm
+
 #'
 #' @export localVariance
 #'

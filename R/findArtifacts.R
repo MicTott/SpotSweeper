@@ -19,7 +19,6 @@
 #' @seealso
 #' \code{\link{localVariance}}
 #'
-#' @import MASS
 #' @import SingleCellExperiment
 #' @import SpatialExperiment
 #' @importFrom SummarizedExperiment colData

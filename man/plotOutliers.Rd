@@ -49,6 +49,6 @@ the metric of interest and indicates outliers with a distinct color.
 }
 \examples{
 plot <- plotOutliers(spe)
-print(plot)
+plot
 
 }

@@ -25,7 +25,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Depends:
-    R (>= 4.3)
+    R (>= 4.4.0)
 Imports:
     SpatialExperiment,
     SummarizedExperiment,
@@ -33,8 +33,8 @@ Imports:
     SingleCellExperiment,
     stats,
     BiocParallel,
-    MASS,
-    escheR
+    escheR,
+    MASS
 Suggests:
     knitr,
     scuttle,
