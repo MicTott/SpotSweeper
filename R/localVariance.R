@@ -16,7 +16,6 @@
 #'
 #' @importFrom SummarizedExperiment colData
 #' @importFrom BiocNeighbors findKNN
-#' @importFrom BiocParallel MulticoreParam
 #'
 #' @export localVariance
 #'
@@ -73,20 +72,18 @@ localVariance <- function(spe, n_neighbors = 36, features = c("expr_chrM_ratio")
 
   # Loop through each unique sample ID
   for (sample_id in seq_along(unique_sample_ids)) {
+
     # Subset the data for the current sample
-    sample <- unique_sample_ids[sample_id]
-    spe_subset <- subset(spe, , sample_id == sample)
+    spe_subset <- spe[ ,colData(spe)[[samples]] == sample]
 
     # Create a list of spatial coordinates and qc features
     spaQC <- colData(spe_subset)
     spaQC$coords <- spatialCoords(spe_subset)
 
     # Find nearest neighbors
-    suppressWarnings(
     dnn <- BiocNeighbors::findKNN(spatialCoords(spe_subset),
                                   k = n_neighbors,
-                                  BPPARAM=MulticoreParam(n_cores))$index
-    )
+                                  warn.ties = FALSE)$index
 
     #  === Get local variance ===
     # Initialize a matrix to store variance for each feature
