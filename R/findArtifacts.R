@@ -89,7 +89,7 @@ findArtifacts <- function(spe, mito_percent="expr_chrM_ratio",
 
     # ======= Calculate local mito variance ========
     var_matrix <- c()
-    for (i in 1:n_rings) {
+    for (i in seq_len(n_rings)) {
 
       # ==== local mito variance ====
       # get n neighbors for i rings

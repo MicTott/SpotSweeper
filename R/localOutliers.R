@@ -86,7 +86,7 @@ localOutliers <- function(spe,
         mod_z_matrix <- array(NA, nrow(dnn))
 
         # Loop through each row in the nearest neighbor index matrix
-        for (i in 1:nrow(dnn)) {
+        for (i in seq_len(nrow(dnn))) {
             dnn.idx <- dnn[i, ]
             mod_z_matrix[i] <- modified_z(spaQC[c(i, dnn.idx[dnn.idx != 0]), ][[metric_to_use]])[1]
         }

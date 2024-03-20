@@ -96,7 +96,7 @@ localVariance <- function(spe, n_neighbors = 36, features = c("expr_chrM_ratio")
     colnames(mean_matrix) <- features_to_use
 
     # Loop through each row in the nearest neighbor index matrix
-    for (i in 1:nrow(dnn)) {
+    for (i in seq_len(nrow(dnn))) {
       dnn.idx <- dnn[i, ]
       for (j in seq_along(features_to_use)) {
         var_matrix[i, j] <- var(spaQC[c(i, dnn.idx[dnn.idx != 0]), ][[features_to_use[j]]], na.rm=TRUE)[1]
