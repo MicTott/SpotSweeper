@@ -78,10 +78,9 @@ localOutliers <- function(spe,
         spaQC <- colData(spe_subset)
 
         # Find nearest neighbors
-        suppressWarnings(
         dnn <- BiocNeighbors::findKNN(spatialCoords(spe_subset),
-                                      k = n_neighbors)$index
-        )
+                                      k = n_neighbors,
+                                      warn.ties = FALSE)$index
 
         # Initialize a matrix to store z-scores
         mod_z_matrix <- array(NA, nrow(dnn))
