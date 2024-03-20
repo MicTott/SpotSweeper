@@ -34,7 +34,7 @@ In the examples below, we assume the input data are provided as a [SpatialExperi
 
 This is an example workflow showing how to detect and visualize local outliers in 10X Genomics Visium data. 
 
-```{r example_spe, eval = requireNamespace('SpotSweeper')}
+```{r example_spe}
 library(SpotSweeper)
 
 
@@ -54,7 +54,7 @@ spe <- spe[, !is.na(spe$ground_truth)]
 
 SpotSweeper can be run on an SPE object with the following code. This outputs the `local_outliers` in the colData of the SPE object. Selecting `data_output=TRUE` exports z-transformed QC metrics as well.
 
-```{r example_localOutliers, eval = requireNamespace('SpotSweeper')}
+```{r example_localOutliers}
 
 # Identifying the mitochondrial transcripts in our SpatialExperiment.
 is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
