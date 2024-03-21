@@ -187,6 +187,11 @@ spe <- findArtifacts(spe,
                      n_rings=5,
                      name="artifact"
                     )
+#> [1] "k6"
+#> [1] "k18"
+#> [1] "k36"
+#> [1] "k60"
+#> [1] "k90"
 
 # check that "artifact" is now in colData
 colnames(colData(spe))
@@ -235,15 +240,6 @@ ggarrange(
 ```
 
 <img src="man/figures/README-artifact_visualization-1.png" width="100%" />
-
-## Citation
-
-Please look out for our preprint describing `SpotSweeper` on bioRxiv.
-Until then, please cite the package as follows:
-
-``` r
-citation("SpotSweeper")
-```
 
 ## Development tools
 

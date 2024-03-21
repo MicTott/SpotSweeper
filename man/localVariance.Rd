@@ -27,8 +27,6 @@ calculation}
 
 \item{log2}{Whether to log2 transform the features}
 
-\item{n_cores}{Number of cores to use for parallelization}
-
 \item{name}{Name of the new column to add to colData}
 }
 \value{

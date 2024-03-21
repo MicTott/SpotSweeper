@@ -205,16 +205,6 @@ ggarrange(
 ```
 
 
-
-## Citation
-
-Please look out for our preprint describing `SpotSweeper` on bioRxiv. Until then, please cite the package as follows:
-
-```{r citation, eval = FALSE}
-citation("SpotSweeper")
-```
-
-
 ## Development tools
 
 ```{r dev_tools, eval = FALSE}

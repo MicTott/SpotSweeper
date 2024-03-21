@@ -10,7 +10,7 @@ author:
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting Started with 'SpotSweeper'}
+  %\VignetteIndexEntry{Getting Started with `SpotSweeper`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -26,62 +26,90 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Input data format
-In the examples below, we assume the input data are provided as a [SpatialExperiment](https://github.com/drighelli/SpatialExperiment) (SPE) object. The outputs for spot-level outliers and artifacts are stored in the `colData` of the SPE object.
+## Introduction
 
+`SpotSweeper` is an R package for spatial transcriptomics data quality control (QC). It provides functions for detecting and visualizing spot-level local outliers and artifacts using spatially-aware methods. The package is designed to work with [SpatialExperiment](https://github.com/drighelli/SpatialExperiment) objects, and is compatible with data from 10X Genomics Visium and other spatial transcriptomics platforms.
+
+## Installation
+
+Currently, the only way to install `SpotSweeper` is by downloading the development version which can be installed from [GitHub](https://github.com/MicTott/SpotSweeper) using the following: 
+
+```{r 'install_dev', eval = FALSE}
+if (!require("devtools")) install.packages("devtools")
+remotes::install_github("MicTott/SpotSweeper")
+}
+```
+
+Once accepted in [Bioconductor](http://bioconductor.org/), `SpotSweeper` will be installable using:
+
+```{r 'install', eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+}
+
+BiocManager::install("SpotSweeper")
+```
 
 ## Spot-level local outlier detection
 
-This is an example workflow showing how to detect and visualize local outliers in 10X Genomics Visium data. 
+### Loading example data
+
+Here we'll walk you through the standard workflow for using 'SpotSweeper' to detect and visualize local outliers in spatial transcriptomics data. We'll use the `Visium_humanDLPFC` dataset from the `STexampleData` package, which is a `SpatialExperiment` object.
+
+Because local outliers will be saved in the `colData` of the `SpatialExperiment` object, we'll first view the `colData` and drop out-of-tissue spots before calculating quality control (QC) metrics and running `SpotSweeper`. 
+
 
 ```{r example_spe}
 library(SpotSweeper)
 
-
 # load  Maynard et al DLPFC daatset
 spe <- STexampleData::Visium_humanDLPFC()
-
-# change from gene id to gene names
-rownames(spe) <- rowData(spe)$gene_name
 
 # show column data before SpotSweeper
 colnames(colData(spe))
 
 # drop out-of-tissue spots
 spe <- spe[, spe$in_tissue == 1]
-spe <- spe[, !is.na(spe$ground_truth)]
 ```
 
-SpotSweeper can be run on an SPE object with the following code. This outputs the `local_outliers` in the colData of the SPE object. Selecting `data_output=TRUE` exports z-transformed QC metrics as well.
+### Calculating QC metrics using `scuttle`
 
-```{r example_localOutliers}
+We'll use the `scuttle` package to calculate QC metrics. To do this, we'll need to first change the `rownames` from gene id to gene names. We'll then get the mitochondrial transcripts and calculate QC metrics for each spot using `scuttle::addPerCellQCMetrics`.
 
-# Identifying the mitochondrial transcripts in our SpatialExperiment.
+```{r example_scuttle}
+# change from gene id to gene names
+rownames(spe) <- rowData(spe)$gene_name
+
+# identifying the mitochondrial transcripts
 is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
 
-# Calculating QC metrics for each spot using scuttle
+# calculating QC metrics for each spot using scuttle
 spe<- scuttle::addPerCellQCMetrics(spe, subsets=list(Mito=is.mito))
 colnames(colData(spe))
 
-# Identifying local outliers using SpotSweeper
-spe <- localOutliers(spe,
-                         metric="sum",
-                         direction="lower",
-                         log=TRUE
-)
+```
 
-spe <- localOutliers(spe,
-                         metric="detected",
-                         direction="lower",
-                         log=TRUE
-)
 
-spe <- localOutliers(spe,
-                         metric="subsets_Mito_percent",
-                         direction="higher",
-                         log=FALSE
-)
+### Identifying local outliers using `SpotSweeper`
 
+
+We can now use `SpotSweeper` to identify local outliers in the spatial transcriptomics data. We'll use the `localOutliers` function to detect local outliers based on the unique detected genes, total library size, and percent of the total reads that are mitochondrial. These methods assume a normal distribution, so we'll use the log-transformed sum of the counts and the log-transformed number of detected genes. For mitochondrial percent, we'll use the raw mitochondrial percentage. 
+
+```{r example_local_outliers}
+# library size
+spe <- localOutliers(spe, metric="sum",direction="lower", log=TRUE)
+
+# unique genes
+spe <- localOutliers(spe, metric="detected", direction="lower", log=TRUE)
+
+# mitochondrial percent
+spe <- localOutliers(spe, metric="subsets_Mito_percent", direction="higher", log=FALSE)
+
+```
+
+The `localOutlier` function automatically outputs the results to the `colData` with the naming convention `X_outliers`, where `X` is the name of the input `colData`. We can then combine all outliers into a single column called `local_outliers` in the `colData` of the `SpatialExperiment` object.
+
+```{r example_combine_local_outliers}
 # combine all outliers into "local_outliers" column
 spe$local_outliers <- as.logical(spe$sum_outliers) | 
   as.logical(spe$detected_outliers) | 
@@ -89,7 +117,9 @@ spe$local_outliers <- as.logical(spe$sum_outliers) |
 
 ```
 
-We can now visualize `local_outliers` vs one of the QC metrics, `sum_log2`, with help from the `escheR` package.
+### Visualizing local outliers
+
+We can visualize the local outliers using the `plotOutliers` function. This function creates a scatter plot of the specified metric and highlights the local outliers in red using the `escheR` package. Here, we'll visualize local outliers of library size, unique genes, mitochondrial percent, and finally, all local outliers. We'll then arrange these plots in a grid using `ggpubr::arrange`.
 
 ```{r local_outlier_plot}
 library(escheR)
@@ -126,7 +156,78 @@ ggarrange(
 ```
 
 
+## Removing technical artifacts using `SpotSweeper`
 
+### Loading example data
+
+```{r example_artifactRemoval, eval = requireNamespace('SpotSweeper')}
+# load in DLPFC sample with hangnail artifact
+data(DLPFC_artifact)
+spe <- DLPFC_artifact
+
+# inspect colData before artifact detection
+colnames(colData(spe))
+
+```
+
+
+### Visualizing technical artifacts
+
+Technical artifacts can commonly be visualized by standard QC metrics, including library size, unique genes, or mitochondrial percentage. We can first visualize the technical artifacts using the `plotOutliers` function. This function plots the Visium spots with the specified QC metric.We'll then again arrange these plots using `ggpubr::arrange`.
+
+```{r artifact_QC_plots}
+# library size
+p1 <- plotOutliers(spe, metric="sum_umi", 
+             outliers=NULL, point_size=1.1) +
+  ggtitle("Library Size")
+
+# unique genes
+p2 <- plotOutliers(spe, metric="sum_gene", 
+             outliers=NULL, point_size=1.1) +
+  ggtitle("Unique Genes")
+
+# mitochondrial percent
+p3 <- plotOutliers(spe, metric="expr_chrM_ratio", 
+             outliers=NULL, point_size=1.1) +
+  ggtitle("Mitochondrial Percent")
+
+# plot
+plot_list <- list(p1, p2, p3)
+ggarrange(
+  plotlist = plot_list,
+  ncol = 3, nrow = 1,
+  common.legend = FALSE
+)
+```
+
+### Identifying artifacts using `SpotSweeper`
+
+We can then use the `findArtifacts` function to identify artifacts in the spatial transcriptomics (data. This function identifies technical artifacts based on the first principle component of the local variance of the specified QC metric (`mito_percent`) at numerous neighorhood sizes (`n_rings=5`). Currently, `kmeans` clustering is used to cluster the technical artifact vs high-quality Visium spots. Similar to `localOutliers`, the `findArtifacts` function then outputs the results to the `colData`.
+
+```{r artifact_plot}
+# find artifacts using SpotSweeper
+spe <- findArtifacts(spe, 
+                     mito_percent="expr_chrM_ratio",
+                     mito_sum="expr_chrM",
+                     n_rings=5,
+                     name="artifact"
+                    )
+
+# check that "artifact" is now in colData
+colnames(colData(spe))
+
+```
+
+
+### Visualizing artifacts
+
+We can visualize the artifacts using the `escheR` package. Here, we'll visualize the artifacts using the `make_escheR` function and arrange these plots using `ggpubr::arrange`.
+
+```{r artifact_visualization}
+plotOutliers(spe, metric="expr_chrM_ratio", 
+             outliers="artifact", point_size=1.1) +
+  ggtitle("Hangnail artifact")
+```
 # Session information
 
 ```{r}

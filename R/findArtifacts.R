@@ -128,8 +128,8 @@ findArtifacts <- function(spe, mito_percent="expr_chrM_ratio",
     # =========== Artifact annotation ===========
 
     # calculate average local variance of the two clusters
-    clus1_mean <- mean(colData(spe.temp)[[tmp.name]][spe.temp$Kmeans==1])
-    clus2_mean <- mean(colData(spe.temp)[[tmp.name]][spe.temp$Kmeans==2])
+    clus1_mean <- mean(colData(spe.temp)[[paste0("k", 18)]][spe.temp$Kmeans==1])
+    clus2_mean <- mean(colData(spe.temp)[[paste0("k", 18)]][spe.temp$Kmeans==2])
 
     artifact_clus <- which.min(c(clus1_mean, clus2_mean))
 
