@@ -84,7 +84,7 @@ USA<br><h4 data-toc-skip class="author">Stephanie
 Hicks</h4>
             <address class="author_afil">
       Johns Hopkins Bloomberg School of Public Health, Baltimore, MD,
-USA<br><h4 data-toc-skip class="date">2024-03-20</h4>
+USA<br><h4 data-toc-skip class="date">2024-03-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/MicTott/SpotSweeper/blob/HEAD/vignettes/getting_started.Rmd" class="external-link"><code>vignettes/getting_started.Rmd</code></a></small>
       <div class="d-none name"><code>getting_started.Rmd</code></div>
@@ -95,27 +95,54 @@ USA<br><h4 data-toc-skip class="date">2024-03-20</h4>
 
     
     
-<div class="section level3">
-<h3 id="input-data-format">Input data format<a class="anchor" aria-label="anchor" href="#input-data-format"></a>
-</h3>
-<p>In the examples below, we assume the input data are provided as a <a href="https://github.com/drighelli/SpatialExperiment" class="external-link">SpatialExperiment</a>
-(SPE) object. The outputs for spot-level outliers and artifacts are
-stored in the <code>colData</code> of the SPE object.</p>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p><code>SpotSweeper</code> is an R package for spatial transcriptomics
+data quality control (QC). It provides functions for detecting and
+visualizing spot-level local outliers and artifacts using
+spatially-aware methods. The package is designed to work with <a href="https://github.com/drighelli/SpatialExperiment" class="external-link">SpatialExperiment</a>
+objects, and is compatible with data from 10X Genomics Visium and other
+spatial transcriptomics platforms.</p>
 </div>
-<div class="section level3">
-<h3 id="spot-level-local-outlier-detection">Spot-level local outlier detection<a class="anchor" aria-label="anchor" href="#spot-level-local-outlier-detection"></a>
-</h3>
-<p>This is an example workflow showing how to detect and visualize local
-outliers in 10X Genomics Visium data.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/MicTott/SpotSweeper" class="external-link">SpotSweeper</a></span><span class="op">)</span></span>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Currently, the only way to install <code>SpotSweeper</code> is by
+downloading the development version which can be installed from <a href="https://github.com/MicTott/SpotSweeper" class="external-link">GitHub</a> using the
+following:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"devtools"</span>)) <span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"MicTott/SpotSweeper"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p>Once accepted in <a href="http://bioconductor.org/" class="external-link">Bioconductor</a>,
+<code>SpotSweeper</code> will be installable using:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
 <span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"SpotSweeper"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="spot-level-local-outlier-detection">Spot-level local outlier detection<a class="anchor" aria-label="anchor" href="#spot-level-local-outlier-detection"></a>
+</h2>
+<div class="section level3">
+<h3 id="loading-example-data">Loading example data<a class="anchor" aria-label="anchor" href="#loading-example-data"></a>
+</h3>
+<p>Here we’ll walk you through the standard workflow for using
+‘SpotSweeper’ to detect and visualize local outliers in spatial
+transcriptomics data. We’ll use the <code>Visium_humanDLPFC</code>
+dataset from the <code>STexampleData</code> package, which is a
+<code>SpatialExperiment</code> object.</p>
+<p>Because local outliers will be saved in the <code>colData</code> of
+the <code>SpatialExperiment</code> object, we’ll first view the
+<code>colData</code> and drop out-of-tissue spots before calculating
+quality control (QC) metrics and running <code>SpotSweeper</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/MicTott/SpotSweeper" class="external-link">SpotSweeper</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># load  Maynard et al DLPFC daatset</span></span>
 <span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu">STexampleData</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/STexampleData/man/STexampleData.html" class="external-link">Visium_humanDLPFC</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># change from gene id to gene names</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">rowData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">$</span><span class="va">gene_name</span></span>
 <span></span>
 <span><span class="co"># show column data before SpotSweeper</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span>
@@ -123,53 +150,75 @@ outliers in 10X Genomics Visium data.</p>
 <span><span class="co">#&gt; [6] "ground_truth" "cell_count"</span></span>
 <span></span>
 <span><span class="co"># drop out-of-tissue spots</span></span>
-<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="va">spe</span><span class="op">[</span>, <span class="va">spe</span><span class="op">$</span><span class="va">in_tissue</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span></span>
-<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="va">spe</span><span class="op">[</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">ground_truth</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<p>SpotSweeper can be run on an SPE object with the following code. This
-outputs the <code>local_outliers</code> in the colData of the SPE
-object. Selecting <code>data_output=TRUE</code> exports z-transformed QC
-metrics as well.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># Identifying the mitochondrial transcripts in our SpatialExperiment.</span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="va">spe</span><span class="op">[</span>, <span class="va">spe</span><span class="op">$</span><span class="va">in_tissue</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="calculating-qc-metrics-using-scuttle">Calculating QC metrics using <code>scuttle</code><a class="anchor" aria-label="anchor" href="#calculating-qc-metrics-using-scuttle"></a>
+</h3>
+<p>We’ll use the <code>scuttle</code> package to calculate QC metrics.
+To do this, we’ll need to first change the <code>rownames</code> from
+gene id to gene names. We’ll then get the mitochondrial transcripts and
+calculate QC metrics for each spot using
+<code><a href="https://rdrr.io/pkg/scuttle/man/addPerCellQCMetrics.html" class="external-link">scuttle::addPerCellQCMetrics</a></code>.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># change from gene id to gene names</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">rowData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">$</span><span class="va">gene_name</span></span>
+<span></span>
+<span><span class="co"># identifying the mitochondrial transcripts</span></span>
 <span><span class="va">is.mito</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"^MT-"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
-<span><span class="co"># Calculating QC metrics for each spot using scuttle</span></span>
+<span><span class="co"># calculating QC metrics for each spot using scuttle</span></span>
 <span><span class="va">spe</span><span class="op">&lt;-</span> <span class="fu">scuttle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/addPerCellQCMetrics.html" class="external-link">addPerCellQCMetrics</a></span><span class="op">(</span><span class="va">spe</span>, subsets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Mito<span class="op">=</span><span class="va">is.mito</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "barcode_id"            "sample_id"             "in_tissue"            </span></span>
 <span><span class="co">#&gt;  [4] "array_row"             "array_col"             "ground_truth"         </span></span>
 <span><span class="co">#&gt;  [7] "cell_count"            "sum"                   "detected"             </span></span>
 <span><span class="co">#&gt; [10] "subsets_Mito_sum"      "subsets_Mito_detected" "subsets_Mito_percent" </span></span>
-<span><span class="co">#&gt; [13] "total"</span></span>
+<span><span class="co">#&gt; [13] "total"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="identifying-local-outliers-using-spotsweeper">Identifying local outliers using <code>SpotSweeper</code><a class="anchor" aria-label="anchor" href="#identifying-local-outliers-using-spotsweeper"></a>
+</h3>
+<p>We can now use <code>SpotSweeper</code> to identify local outliers in
+the spatial transcriptomics data. We’ll use the
+<code>localOutliers</code> function to detect local outliers based on
+the unique detected genes, total library size, and percent of the total
+reads that are mitochondrial. These methods assume a normal
+distribution, so we’ll use the log-transformed sum of the counts and the
+log-transformed number of detected genes. For mitochondrial percent,
+we’ll use the raw mitochondrial percentage.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># library size</span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"sum"</span>,direction<span class="op">=</span><span class="st">"lower"</span>, log<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Identifying local outliers using SpotSweeper</span></span>
-<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
-<span>                         metric<span class="op">=</span><span class="st">"sum"</span>,</span>
-<span>                         direction<span class="op">=</span><span class="st">"lower"</span>,</span>
-<span>                         log<span class="op">=</span><span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
+<span><span class="co"># unique genes</span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"detected"</span>, direction<span class="op">=</span><span class="st">"lower"</span>, log<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
-<span>                         metric<span class="op">=</span><span class="st">"detected"</span>,</span>
-<span>                         direction<span class="op">=</span><span class="st">"lower"</span>,</span>
-<span>                         log<span class="op">=</span><span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
-<span>                         metric<span class="op">=</span><span class="st">"subsets_Mito_percent"</span>,</span>
-<span>                         direction<span class="op">=</span><span class="st">"higher"</span>,</span>
-<span>                         log<span class="op">=</span><span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># combine all outliers into "local_outliers" column</span></span>
+<span><span class="co"># mitochondrial percent</span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"subsets_Mito_percent"</span>, direction<span class="op">=</span><span class="st">"higher"</span>, log<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>The <code>localOutlier</code> function automatically outputs the
+results to the <code>colData</code> with the naming convention
+<code>X_outliers</code>, where <code>X</code> is the name of the input
+<code>colData</code>. We can then combine all outliers into a single
+column called <code>local_outliers</code> in the <code>colData</code> of
+the <code>SpatialExperiment</code> object.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># combine all outliers into "local_outliers" column</span></span>
 <span><span class="va">spe</span><span class="op">$</span><span class="va">local_outliers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">sum_outliers</span><span class="op">)</span> <span class="op">|</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">detected_outliers</span><span class="op">)</span> <span class="op">|</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">subsets_Mito_percent_outliers</span><span class="op">)</span></span></code></pre></div>
-<p>We can now visualize <code>local_outliers</code> vs one of the QC
-metrics, <code>sum_log2</code>, with help from the <code>escheR</code>
-package.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+</div>
+<div class="section level3">
+<h3 id="visualizing-local-outliers">Visualizing local outliers<a class="anchor" aria-label="anchor" href="#visualizing-local-outliers"></a>
+</h3>
+<p>We can visualize the local outliers using the
+<code>plotOutliers</code> function. This function creates a scatter plot
+of the specified metric and highlights the local outliers in red using
+the <code>escheR</code> package. Here, we’ll visualize local outliers of
+library size, unique genes, mitochondrial percent, and finally, all
+local outliers. We’ll then arrange these plots in a grid using
+<code>ggpubr::arrange</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/boyiguo1/escheR" class="external-link">escheR</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rpkgs.datanovia.com/ggpubr/" class="external-link">ggpubr</a></span><span class="op">)</span></span>
 <span></span>
@@ -202,10 +251,108 @@ package.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="getting_started_files/figure-html/local_outlier_plot-1.png" width="700"></p>
 </div>
+</div>
 <div class="section level2">
-<h2 id="session-information">Session information<a class="anchor" aria-label="anchor" href="#session-information"></a>
+<h2 id="removing-technical-artifacts-using-spotsweeper">Removing technical artifacts using <code>SpotSweeper</code><a class="anchor" aria-label="anchor" href="#removing-technical-artifacts-using-spotsweeper"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="loading-example-data-1">Loading example data<a class="anchor" aria-label="anchor" href="#loading-example-data-1"></a>
+</h3>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># load in DLPFC sample with hangnail artifact</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">DLPFC_artifact</span><span class="op">)</span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="va">DLPFC_artifact</span></span>
+<span></span>
+<span><span class="co"># inspect colData before artifact detection</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "sample_id"          "in_tissue"          "array_row"         </span></span>
+<span><span class="co">#&gt;  [4] "array_col"          "key"                "sum_umi"           </span></span>
+<span><span class="co">#&gt;  [7] "sum_gene"           "expr_chrM"          "expr_chrM_ratio"   </span></span>
+<span><span class="co">#&gt; [10] "ManualAnnotation"   "subject"            "region"            </span></span>
+<span><span class="co">#&gt; [13] "sex"                "age"                "diagnosis"         </span></span>
+<span><span class="co">#&gt; [16] "sample_id_complete" "count"              "sizeFactor"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="visualizing-technical-artifacts">Visualizing technical artifacts<a class="anchor" aria-label="anchor" href="#visualizing-technical-artifacts"></a>
+</h3>
+<p>Technical artifacts can commonly be visualized by standard QC
+metrics, including library size, unique genes, or mitochondrial
+percentage. We can first visualize the technical artifacts using the
+<code>plotOutliers</code> function. This function plots the Visium spots
+with the specified QC metric.We’ll then again arrange these plots using
+<code>ggpubr::arrange</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># library size</span></span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"sum_umi"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="cn">NULL</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Library Size"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># unique genes</span></span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"sum_gene"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="cn">NULL</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Unique Genes"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># mitochondrial percent</span></span>
+<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"expr_chrM_ratio"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="cn">NULL</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Mitochondrial Percent"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot</span></span>
+<span><span class="va">plot_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, <span class="va">p3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html" class="external-link">ggarrange</a></span><span class="op">(</span></span>
+<span>  plotlist <span class="op">=</span> <span class="va">plot_list</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">3</span>, nrow <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  common.legend <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="getting_started_files/figure-html/artifact_QC_plots-1.png" width="700"></p>
+</div>
+<div class="section level3">
+<h3 id="identifying-artifacts-using-spotsweeper">Identifying artifacts using <code>SpotSweeper</code><a class="anchor" aria-label="anchor" href="#identifying-artifacts-using-spotsweeper"></a>
+</h3>
+<p>We can then use the <code>findArtifacts</code> function to identify
+artifacts in the spatial transcriptomics (data. This function identifies
+technical artifacts based on the first principle component of the local
+variance of the specified QC metric (<code>mito_percent</code>) at
+numerous neighorhood sizes (<code>n_rings=5</code>). Currently,
+<code>kmeans</code> clustering is used to cluster the technical artifact
+vs high-quality Visium spots. Similar to <code>localOutliers</code>, the
+<code>findArtifacts</code> function then outputs the results to the
+<code>colData</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># find artifacts using SpotSweeper</span></span>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/findArtifacts.html">findArtifacts</a></span><span class="op">(</span><span class="va">spe</span>, </span>
+<span>                     mito_percent<span class="op">=</span><span class="st">"expr_chrM_ratio"</span>,</span>
+<span>                     mito_sum<span class="op">=</span><span class="st">"expr_chrM"</span>,</span>
+<span>                     n_rings<span class="op">=</span><span class="fl">5</span>,</span>
+<span>                     name<span class="op">=</span><span class="st">"artifact"</span></span>
+<span>                    <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># check that "artifact" is now in colData</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "sample_id"            "in_tissue"            "array_row"           </span></span>
+<span><span class="co">#&gt;  [4] "array_col"            "key"                  "sum_umi"             </span></span>
+<span><span class="co">#&gt;  [7] "sum_gene"             "expr_chrM"            "expr_chrM_ratio"     </span></span>
+<span><span class="co">#&gt; [10] "ManualAnnotation"     "subject"              "region"              </span></span>
+<span><span class="co">#&gt; [13] "sex"                  "age"                  "diagnosis"           </span></span>
+<span><span class="co">#&gt; [16] "sample_id_complete"   "count"                "sizeFactor"          </span></span>
+<span><span class="co">#&gt; [19] "expr_chrM_ratio_log2" "expr_chrM_log2"       "coords"              </span></span>
+<span><span class="co">#&gt; [22] "k6"                   "k18"                  "k36"                 </span></span>
+<span><span class="co">#&gt; [25] "k60"                  "k90"                  "Kmeans"              </span></span>
+<span><span class="co">#&gt; [28] "artifact"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="visualizing-artifacts">Visualizing artifacts<a class="anchor" aria-label="anchor" href="#visualizing-artifacts"></a>
+</h3>
+<p>We can visualize the artifacts using the <code>escheR</code> package.
+Here, we’ll visualize the artifacts using the <code>make_escheR</code>
+function and arrange these plots using <code>ggpubr::arrange</code>.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"expr_chrM_ratio"</span>, </span>
+<span>             outliers<span class="op">=</span><span class="st">"artifact"</span>, point_size<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Hangnail artifact"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="getting_started_files/figure-html/artifact_visualization-1.png" width="700">
+# Session information</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.3.3 (2024-02-29)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
@@ -293,6 +440,7 @@ package.</p>
 <span><span class="co">#&gt;  [99] lifecycle_1.0.4               httr_1.4.7                   </span></span>
 <span><span class="co">#&gt; [101] mime_0.12                     bit64_4.0.5                  </span></span>
 <span><span class="co">#&gt; [103] MASS_7.3-60.0.1</span></span></code></pre></div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
