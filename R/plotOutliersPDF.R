@@ -34,7 +34,7 @@
 #' @export
 plotOutliersPDF <- function(spe, sample_id="sample_id", metric="detected",
                             outliers="local_outliers",colors=c("white", "black"),
-                            stroke=1, width=5, height=5,fname
+                            stroke=1, point_size=2, width=5, height=5,fname
                             ) {
 
   # Get a list of unique sample IDs
@@ -50,7 +50,8 @@ plotOutliersPDF <- function(spe, sample_id="sample_id", metric="detected",
                     metric=metric,
                     outliers=outliers,
                     colors=colors,
-                    stroke=stroke
+                    stroke=stroke,
+                    point_size=point_size
                     )
 
     # print

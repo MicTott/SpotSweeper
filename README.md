@@ -187,11 +187,6 @@ spe <- findArtifacts(spe,
                      n_rings=5,
                      name="artifact"
                     )
-#> [1] "k6"
-#> [1] "k18"
-#> [1] "k36"
-#> [1] "k60"
-#> [1] "k90"
 
 # check that "artifact" is now in colData
 colnames(colData(spe))
