@@ -73,6 +73,7 @@ easy comparison and analysis across samples.</p>
 <span>  outliers <span class="op">=</span> <span class="st">"local_outliers"</span>,</span>
 <span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"black"</span><span class="op">)</span>,</span>
 <span>  stroke <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  point_size <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  <span class="va">fname</span></span>
@@ -86,8 +87,9 @@ easy comparison and analysis across samples.</p>
 
 
 <dt>sample_id</dt>
-<dd><p>A character string specifying the column name in <code>colData(spe)</code>
-that contains unique sample identifiers. Default is "sample_id".</p></dd>
+<dd><p>A character string specifying the column name in
+<code>colData(spe)</code> that contains unique sample identifiers. Default is
+'sample_id'.</p></dd>
 
 
 <dt>metric</dt>
@@ -96,14 +98,14 @@ in the plot. This metric should be a column name in <code>colData(spe)</code>.</
 
 
 <dt>outliers</dt>
-<dd><p>A character string specifying the column name in <code>colData(spe)</code>
-that indicates whether a data point is considered an outlier. Default is
-"local_outliers".</p></dd>
+<dd><p>A character string specifying the column name in
+<code>colData(spe)</code> that indicates whether a data point is considered an
+outlier. Default is local_outliers'.</p></dd>
 
 
 <dt>colors</dt>
 <dd><p>A character vector specifying the colors to be used for the
-gradient scale. If length is 2, the gradient will be a single color gradient.</p></dd>
+gradient scale. If length is 2, the gradient will be a single color gradient</p></dd>
 
 
 <dt>stroke</dt>
@@ -122,20 +124,20 @@ is 5.</p></dd>
 
 
 <dt>fname</dt>
-<dd><p>A character string specifying the path and name of the output PDF file.</p></dd>
+<dd><p>A character string specifying the path and name of the output
+PDF file.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>Invisible NULL. The function's primary effect is the creation of a PDF
-file at the specified location.</p>
+<p>ggplot object if specified. Generates a plot otherwise.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">plotOutliersPDF</span><span class="op">(</span><span class="va">spe</span>, fname<span class="op">=</span><span class="st">"outliers_visualization.pdf"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">plotOutliersPDF</span><span class="op">(</span><span class="va">spe</span>, fname <span class="op">=</span> <span class="st">"outliers_visualization.pdf"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'colData': object 'spe' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

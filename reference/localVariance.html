@@ -63,7 +63,6 @@
 <span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"expr_chrM_ratio"</span><span class="op">)</span>,</span>
 <span>  samples <span class="op">=</span> <span class="st">"sample_id"</span>,</span>
 <span>  log2 <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -95,6 +94,10 @@ calculation</p></dd>
 <dt>name</dt>
 <dd><p>Name of the new column to add to colData</p></dd>
 
+
+<dt>n_cores</dt>
+<dd><p>Number of cores to use for parallelization</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -105,7 +108,9 @@ calculation</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/MicTott/SpotSweeper" class="external-link">SpotSweeper</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># for more details see extended example in vignettes</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/MicTott/SpotSweeper" class="external-link">SpotSweeper</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/drighelli/SpatialExperiment" class="external-link">SpatialExperiment</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># load example data</span></span></span>
@@ -129,7 +134,7 @@ calculation</p></dd>
 <span class="r-in"><span><span class="va">is.mito</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"^MT-"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Calculating QC metrics for each spot using scuttle</span></span></span>
-<span class="r-in"><span><span class="va">spe</span><span class="op">&lt;-</span> <span class="fu">scuttle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/addPerCellQCMetrics.html" class="external-link">addPerCellQCMetrics</a></span><span class="op">(</span><span class="va">spe</span>, subsets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Mito<span class="op">=</span><span class="va">is.mito</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu">scuttle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/addPerCellQCMetrics.html" class="external-link">addPerCellQCMetrics</a></span><span class="op">(</span><span class="va">spe</span>, subsets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Mito <span class="op">=</span> <span class="va">is.mito</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "barcode_id"            "sample_id"             "in_tissue"            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4] "array_row"             "array_col"             "ground_truth"         </span>
@@ -138,10 +143,14 @@ calculation</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [13] "total"                </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu">localVariance</span><span class="op">(</span><span class="va">spe</span>,</span></span>
-<span class="r-in"><span>                     features <span class="op">=</span> <span class="st">"subsets_Mito_percent"</span>,</span></span>
-<span class="r-in"><span>                     n_neighbors<span class="op">=</span><span class="fl">36</span>,</span></span>
-<span class="r-in"><span>                     name<span class="op">=</span><span class="st">"local_mito_variance_k36"</span></span></span>
-<span class="r-in"><span>                     <span class="op">)</span></span></span>
+<span class="r-in"><span>    features <span class="op">=</span> <span class="st">"subsets_Mito_percent"</span>,</span></span>
+<span class="r-in"><span>    n_neighbors <span class="op">=</span> <span class="fl">36</span>,</span></span>
+<span class="r-in"><span>    name <span class="op">=</span> <span class="st">"local_mito_variance_k36"</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"local_mito_variance_k36"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coord_fixed(ratio = 1):</span> could not find function "coord_fixed"</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
