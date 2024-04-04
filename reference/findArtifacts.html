@@ -118,10 +118,6 @@ Default is TRUE.</p></dd>
 <dd><p>Logical, indicating whether to include local variances in
 the output. Default is TRUE.</p></dd>
 
-
-<dt>n_cores</dt>
-<dd><p>Number of cores to use for parallel processing. Default is 1.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -209,12 +205,11 @@ annotations.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># find artifacts</span></span></span>
 <span class="r-in"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu">findArtifacts</span><span class="op">(</span><span class="va">spe</span>,</span></span>
-<span class="r-in"><span>    mito_percent <span class="op">=</span> <span class="st">"subsets_Mito_percent"</span>,</span></span>
-<span class="r-in"><span>    mito_sum <span class="op">=</span> <span class="st">"subsets_Mito_sum"</span>,</span></span>
+<span class="r-in"><span>    mito_percent <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span></span>
+<span class="r-in"><span>    mito_sum <span class="op">=</span> <span class="st">"expr_chrM"</span>,</span></span>
 <span class="r-in"><span>    n_rings <span class="op">=</span> <span class="fl">5</span>,</span></span>
 <span class="r-in"><span>    name <span class="op">=</span> <span class="st">"artifact"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in log2(colData(spe)[[feature]]):</span> non-numeric argument to mathematical function</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"subsets_Mito_ratio"</span>, outliers<span class="op">=</span><span class="st">"artifact"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coord_fixed(ratio = 1):</span> could not find function "coord_fixed"</span>
