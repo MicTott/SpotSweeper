@@ -250,29 +250,29 @@ local outliers. We’ll then arrange these plots in a grid using
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rpkgs.datanovia.com/ggpubr/" class="external-link">ggpubr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># library size</span></span>
-<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
-<span>    metric <span class="op">=</span> <span class="st">"sum_log2"</span>,</span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span>    metric <span class="op">=</span> <span class="st">"sum_log"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="st">"sum_outliers"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Library Size"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># unique genes</span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
-<span>    metric <span class="op">=</span> <span class="st">"detected_log2"</span>,</span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span>    metric <span class="op">=</span> <span class="st">"detected_log"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="st">"detected_outliers"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Unique Genes"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># mitochondrial percent</span></span>
-<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"subsets_Mito_percent"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="st">"subsets_Mito_percent_outliers"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Mitochondrial Percent"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># all local outliers</span></span>
-<span><span class="va">p4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
-<span>    metric <span class="op">=</span> <span class="st">"sum_log2"</span>,</span>
+<span><span class="va">p4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span>    metric <span class="op">=</span> <span class="st">"sum_log"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="st">"local_outliers"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span>, stroke <span class="op">=</span> <span class="fl">0.75</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"All Local Outliers"</span><span class="op">)</span></span>
@@ -313,26 +313,26 @@ local outliers. We’ll then arrange these plots in a grid using
 <p>Technical artifacts can commonly be visualized by standard QC
 metrics, including library size, unique genes, or mitochondrial
 percentage. We can first visualize the technical artifacts using the
-<code>plotOutliers</code> function. This function plots the Visium spots
-with the specified QC metric.We’ll then again arrange these plots using
+<code>plotQC</code> function. This function plots the Visium spots with
+the specified QC metric.We’ll then again arrange these plots using
 <code>ggpubr::arrange</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># library size</span></span>
-<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"sum_umi"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="cn">NULL</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Library Size"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># unique genes</span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"sum_gene"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="cn">NULL</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Unique Genes"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># mitochondrial percent</span></span>
-<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="cn">NULL</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
@@ -370,25 +370,25 @@ vs high-quality Visium spots. Similar to <code>localOutliers</code>, the
 <span></span>
 <span><span class="co"># check that "artifact" is now in colData</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "sample_id"            "in_tissue"            "array_row"           </span></span>
-<span><span class="co">##  [4] "array_col"            "key"                  "sum_umi"             </span></span>
-<span><span class="co">##  [7] "sum_gene"             "expr_chrM"            "expr_chrM_ratio"     </span></span>
-<span><span class="co">## [10] "ManualAnnotation"     "subject"              "region"              </span></span>
-<span><span class="co">## [13] "sex"                  "age"                  "diagnosis"           </span></span>
-<span><span class="co">## [16] "sample_id_complete"   "count"                "sizeFactor"          </span></span>
-<span><span class="co">## [19] "expr_chrM_ratio_log2" "expr_chrM_log2"       "coords"              </span></span>
-<span><span class="co">## [22] "k6"                   "k18"                  "k36"                 </span></span>
-<span><span class="co">## [25] "k60"                  "k90"                  "Kmeans"              </span></span>
+<pre><code><span><span class="co">##  [1] "sample_id"           "in_tissue"           "array_row"          </span></span>
+<span><span class="co">##  [4] "array_col"           "key"                 "sum_umi"            </span></span>
+<span><span class="co">##  [7] "sum_gene"            "expr_chrM"           "expr_chrM_ratio"    </span></span>
+<span><span class="co">## [10] "ManualAnnotation"    "subject"             "region"             </span></span>
+<span><span class="co">## [13] "sex"                 "age"                 "diagnosis"          </span></span>
+<span><span class="co">## [16] "sample_id_complete"  "count"               "sizeFactor"         </span></span>
+<span><span class="co">## [19] "expr_chrM_ratio_log" "expr_chrM_log"       "coords"             </span></span>
+<span><span class="co">## [22] "k6"                  "k18"                 "k36"                </span></span>
+<span><span class="co">## [25] "k60"                 "k90"                 "Kmeans"             </span></span>
 <span><span class="co">## [28] "artifact"</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="visualizing-artifacts">Visualizing artifacts<a class="anchor" aria-label="anchor" href="#visualizing-artifacts"></a>
 </h3>
 <p>We can visualize the artifacts using the <code>escheR</code> package.
-Here, we’ll visualize the artifacts using the <code>make_escheR</code>
+Here, we’ll visualize the artifacts using the <code>plotQC</code>
 function and arrange these plots using <code>ggpubr::arrange</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="st">"artifact"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>

@@ -62,7 +62,7 @@
 <span>  n_neighbors <span class="op">=</span> <span class="fl">36</span>,</span>
 <span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"expr_chrM_ratio"</span><span class="op">)</span>,</span>
 <span>  samples <span class="op">=</span> <span class="st">"sample_id"</span>,</span>
-<span>  log2 <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  log <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -87,8 +87,8 @@ calculation</p></dd>
 <dd><p>Column in colData to use for sample ID</p></dd>
 
 
-<dt>log2</dt>
-<dd><p>Whether to log2 transform the features</p></dd>
+<dt>log</dt>
+<dd><p>Whether to log1p transform the features</p></dd>
 
 
 <dt>name</dt>
@@ -144,8 +144,8 @@ calculation</p></dd>
 <span class="r-in"><span>    name <span class="op">=</span> <span class="st">"local_mito_variance_k36"</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plotOutliers.html">plotOutliers</a></span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"local_mito_variance_k36"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coord_fixed(ratio = 1):</span> could not find function "coord_fixed"</span>
+<span class="r-in"><span><span class="fu">plotOutliers</span><span class="op">(</span><span class="va">spe</span>, metric<span class="op">=</span><span class="st">"local_mito_variance_k36"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plotOutliers(spe, metric = "local_mito_variance_k36"):</span> could not find function "plotOutliers"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
