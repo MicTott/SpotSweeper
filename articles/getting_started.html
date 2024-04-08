@@ -236,12 +236,12 @@ the <code>SpatialExperiment</code> object.</p>
 <div class="section level3">
 <h3 id="visualizing-local-outliers">Visualizing local outliers<a class="anchor" aria-label="anchor" href="#visualizing-local-outliers"></a>
 </h3>
-<p>We can visualize the local outliers using the
-<code>plotOutliers</code> function. This function creates a scatter plot
-of the specified metric and highlights the local outliers in red using
-the <code>escheR</code> package. Here, we’ll visualize local outliers of
-library size, unique genes, mitochondrial percent, and finally, all
-local outliers. We’ll then arrange these plots in a grid using
+<p>We can visualize the local outliers using the <code>plotQC</code>
+function. This function creates a scatter plot of the specified metric
+and highlights the local outliers in red using the <code>escheR</code>
+package. Here, we’ll visualize local outliers of library size, unique
+genes, mitochondrial percent, and finally, all local outliers. We’ll
+then arrange these plots in a grid using
 <code>ggpubr::arrange</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/boyiguo1/escheR" class="external-link">escheR</a></span><span class="op">)</span></span></code></pre></div>
