@@ -1,9 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.0.7
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   getting_started: getting_started.html
-last_built: 2024-04-09T00:51Z
+last_built: 2024-04-19T17:49Z
 urls:
   reference: https://mictott.github.io/SpotSweeper/reference
   article: https://mictott.github.io/SpotSweeper/articles
