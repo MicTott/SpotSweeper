@@ -71,8 +71,8 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><code>SpotSweeper</code> is a package developed for spatially-aware quality control (QC) methods for the detection, visualization, and removal of both local outliers and large artifacts in spot-based spatial transcriptomics data, such as 10x Genomics <code>Visium</code>, using standard QC metrics.</p>
-<p>The package is currently under development and is not yet available on Bioconductor. The package is currently in the experimental stage of development. If you experience an issues user the package, please open an issue on the <a href="https://github.com/MicTott/SpotSweeper/issues" class="external-link">GitHub repository</a>.</p>
+<p><code>SpotSweeper</code> is a package developed for spatially-aware quality control (QC) methods for the detection, visualization, and removal of both local outliers and regional artifacts in spot-based spatial transcriptomics data, such as 10x Genomics <code>Visium</code>, using standard QC metrics.</p>
+<p>If you experience an issues user the package, please open an issue on the <a href="https://github.com/MicTott/SpotSweeper/issues" class="external-link">GitHub repository</a>.</p>
 <p>To find more information, please visit the <a href="http://MicTott.github.io/SpotSweeper" class="external-link">documentation website</a>.</p>
 <p><img src="./reference/figures/schematic.png" width="100%"></p>
 <div class="section level2">
@@ -89,11 +89,6 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://devtools.r-lib.org/" class="external-link">"devtools"</a></span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"MicTott/SpotSweeper"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="input-data-format">Input data format<a class="anchor" aria-label="anchor" href="#input-data-format"></a>
-</h2>
-<p>In the examples below, we assume the input data are provided as a <a href="https://github.com/drighelli/SpatialExperiment" class="external-link">SpatialExperiment</a> (SPE) object. The outputs for spot-level outliers and artifacts are stored in the <code>colData</code> of the SPE object.</p>
 </div>
 <div class="section level2">
 <h2 id="tutorials">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials"></a>
