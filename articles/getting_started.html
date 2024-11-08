@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">SpotSweeper</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@ USA<br><h4 data-toc-skip class="author">Stephanie
 Hicks</h4>
             <address class="author_afil">
       Johns Hopkins Bloomberg School of Public Health, Baltimore, MD,
-USA<br><h4 data-toc-skip class="date">2024-07-23</h4>
+USA<br><h4 data-toc-skip class="date">2024-11-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/MicTott/SpotSweeper/blob/devel/vignettes/getting_started.Rmd" class="external-link"><code>vignettes/getting_started.Rmd</code></a></small>
       <div class="d-none name"><code>getting_started.Rmd</code></div>
@@ -221,19 +221,19 @@ the <code>SpatialExperiment</code> object.</p>
 <div class="section level3">
 <h3 id="visualizing-local-outliers">Visualizing local outliers<a class="anchor" aria-label="anchor" href="#visualizing-local-outliers"></a>
 </h3>
-<p>We can visualize the local outliers using the <code>plotQC</code>
-function. This function creates a scatter plot of the specified metric
-and highlights the local outliers in red using the <code>escheR</code>
-package. Here, we’ll visualize local outliers of library size, unique
-genes, mitochondrial percent, and finally, all local outliers. We’ll
-then arrange these plots in a grid using
-<code>ggpubr::arrange</code>.</p>
+<p>We can visualize the local outliers using the
+<code>plotQCmetrics</code> function. This function creates a scatter
+plot of the specified metric and highlights the local outliers in red
+using the <code>escheR</code> package. Here, we’ll visualize local
+outliers of library size, unique genes, mitochondrial percent, and
+finally, all local outliers. We’ll then arrange these plots in a grid
+using <code>ggpubr::arrange</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/boyiguo1/escheR" class="external-link">escheR</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: ggplot2</span></span></code></pre>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># all local outliers</span></span>
-<span><span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>, metric <span class="op">=</span> <span class="st">"sum_log"</span>, outliers <span class="op">=</span> <span class="st">"local_outliers"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span>, </span>
+<span><span class="fu"><a href="../reference/plotQCmetrics.html">plotQCmetrics</a></span><span class="op">(</span><span class="va">spe</span>, metric <span class="op">=</span> <span class="st">"sum_log"</span>, outliers <span class="op">=</span> <span class="st">"local_outliers"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span>, </span>
 <span>       stroke <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
 <span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"All Local Outliers"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="getting_started_files/figure-html/local_outlier_plot-1.png" width="300"></p>
@@ -265,11 +265,11 @@ then arrange these plots in a grid using
 <p>Technical artifacts can commonly be visualized by standard QC
 metrics, including library size, unique genes, or mitochondrial
 percentage. We can first visualize the technical artifacts using the
-<code>plotQC</code> function. In this sample, we can clearly see a
-hangnail artifact on the right side of the tissue section in the
+<code>plotQCmetrics</code> function. In this sample, we can clearly see
+a hangnail artifact on the right side of the tissue section in the
 mitochondrial ratio plot.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotQCmetrics.html">plotQCmetrics</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="cn">NULL</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
@@ -283,7 +283,7 @@ mitochondrial ratio plot.</p>
 artifacts in the spatial transcriptomics (data. This function identifies
 technical artifacts based on the first principle component of the local
 variance of the specified QC metric (<code>mito_percent</code>) at
-numerous neighorhood sizes (<code>n_rings=5</code>). Currently,
+numerous neighorhood sizes (<code>n_order=5</code>). Currently,
 <code>kmeans</code> clustering is used to cluster the technical artifact
 vs high-quality Visium spots. Similar to <code>localOutliers</code>, the
 <code>findArtifacts</code> function then outputs the results to the
@@ -293,7 +293,7 @@ vs high-quality Visium spots. Similar to <code>localOutliers</code>, the
 <span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/findArtifacts.html">findArtifacts</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    mito_percent <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span>
 <span>    mito_sum <span class="op">=</span> <span class="st">"expr_chrM"</span>,</span>
-<span>    n_rings <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>    n_order <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>    name <span class="op">=</span> <span class="st">"artifact"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -313,10 +313,10 @@ vs high-quality Visium spots. Similar to <code>localOutliers</code>, the
 <h3 id="visualizing-artifacts">Visualizing artifacts<a class="anchor" aria-label="anchor" href="#visualizing-artifacts"></a>
 </h3>
 <p>We can visualize the artifacts using the <code>escheR</code> package.
-Here, we’ll visualize the artifacts using the <code>plotQC</code>
+Here, we’ll visualize the artifacts using the <code>plotQCmetrics</code>
 function and arrange these plots using <code>ggpubr::arrange</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotQC.html">plotQC</a></span><span class="op">(</span><span class="va">spe</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotQCmetrics.html">plotQCmetrics</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="st">"artifact"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
@@ -325,9 +325,9 @@ function and arrange these plots using <code>ggpubr::arrange</code>.</p>
 # Session information</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## R version 4.4.1 (2024-06-14)</span></span>
+<pre><code><span><span class="co">## R version 4.4.2 (2024-10-31)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 22.04.5 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -347,63 +347,48 @@ function and arrange these plots using <code>ggpubr::arrange</code>.</p>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] escheR_1.4.0                ggplot2_3.5.1              </span></span>
-<span><span class="co">##  [3] STexampleData_1.12.3        SpatialExperiment_1.14.0   </span></span>
-<span><span class="co">##  [5] SingleCellExperiment_1.26.0 SummarizedExperiment_1.34.0</span></span>
-<span><span class="co">##  [7] Biobase_2.64.0              GenomicRanges_1.56.1       </span></span>
-<span><span class="co">##  [9] GenomeInfoDb_1.40.1         IRanges_2.38.1             </span></span>
-<span><span class="co">## [11] S4Vectors_0.42.1            MatrixGenerics_1.16.0      </span></span>
-<span><span class="co">## [13] matrixStats_1.3.0           ExperimentHub_2.12.0       </span></span>
-<span><span class="co">## [15] AnnotationHub_3.12.0        BiocFileCache_2.12.0       </span></span>
-<span><span class="co">## [17] dbplyr_2.5.0                BiocGenerics_0.50.0        </span></span>
-<span><span class="co">## [19] SpotSweeper_1.1.2           BiocStyle_2.32.1           </span></span>
+<span><span class="co">##  [1] escheR_1.6.0                ggplot2_3.5.1              </span></span>
+<span><span class="co">##  [3] STexampleData_1.14.0        SpatialExperiment_1.16.0   </span></span>
+<span><span class="co">##  [5] SingleCellExperiment_1.28.0 SummarizedExperiment_1.36.0</span></span>
+<span><span class="co">##  [7] Biobase_2.66.0              GenomicRanges_1.58.0       </span></span>
+<span><span class="co">##  [9] GenomeInfoDb_1.42.0         IRanges_2.40.0             </span></span>
+<span><span class="co">## [11] S4Vectors_0.44.0            MatrixGenerics_1.18.0      </span></span>
+<span><span class="co">## [13] matrixStats_1.4.1           ExperimentHub_2.14.0       </span></span>
+<span><span class="co">## [15] AnnotationHub_3.14.0        BiocFileCache_2.14.0       </span></span>
+<span><span class="co">## [17] dbplyr_2.5.0                BiocGenerics_0.52.0        </span></span>
+<span><span class="co">## [19] SpotSweeper_1.3.1           BiocStyle_2.34.0           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] DBI_1.2.3                 rlang_1.1.4              </span></span>
-<span><span class="co">##  [3] magrittr_2.0.3            spatialEco_2.0-2         </span></span>
-<span><span class="co">##  [5] compiler_4.4.1            RSQLite_2.3.7            </span></span>
-<span><span class="co">##  [7] DelayedMatrixStats_1.26.0 png_0.1-8                </span></span>
-<span><span class="co">##  [9] systemfonts_1.1.0         vctrs_0.6.5              </span></span>
-<span><span class="co">## [11] pkgconfig_2.0.3           crayon_1.5.3             </span></span>
-<span><span class="co">## [13] fastmap_1.2.0             magick_2.8.4             </span></span>
-<span><span class="co">## [15] XVector_0.44.0            labeling_0.4.3           </span></span>
-<span><span class="co">## [17] scuttle_1.14.0            utf8_1.2.4               </span></span>
-<span><span class="co">## [19] rmarkdown_2.27            UCSC.utils_1.0.0         </span></span>
-<span><span class="co">## [21] ragg_1.3.2                purrr_1.0.2              </span></span>
-<span><span class="co">## [23] bit_4.0.5                 xfun_0.46                </span></span>
-<span><span class="co">## [25] beachmat_2.20.0           zlibbioc_1.50.0          </span></span>
-<span><span class="co">## [27] cachem_1.1.0              jsonlite_1.8.8           </span></span>
-<span><span class="co">## [29] blob_1.2.4                highr_0.11               </span></span>
-<span><span class="co">## [31] DelayedArray_0.30.1       BiocParallel_1.38.0      </span></span>
-<span><span class="co">## [33] terra_1.7-78              parallel_4.4.1           </span></span>
-<span><span class="co">## [35] R6_2.5.1                  bslib_0.7.0              </span></span>
-<span><span class="co">## [37] jquerylib_0.1.4           Rcpp_1.0.13              </span></span>
-<span><span class="co">## [39] bookdown_0.40             knitr_1.48               </span></span>
-<span><span class="co">## [41] Matrix_1.7-0              tidyselect_1.2.1         </span></span>
-<span><span class="co">## [43] abind_1.4-5               yaml_2.3.9               </span></span>
-<span><span class="co">## [45] codetools_0.2-20          curl_5.2.1               </span></span>
-<span><span class="co">## [47] lattice_0.22-6            tibble_3.2.1             </span></span>
-<span><span class="co">## [49] withr_3.0.0               KEGGREST_1.44.1          </span></span>
-<span><span class="co">## [51] evaluate_0.24.0           desc_1.4.3               </span></span>
-<span><span class="co">## [53] Biostrings_2.72.1         pillar_1.9.0             </span></span>
-<span><span class="co">## [55] BiocManager_1.30.23       filelock_1.0.3           </span></span>
-<span><span class="co">## [57] generics_0.1.3            BiocVersion_3.19.1       </span></span>
-<span><span class="co">## [59] sparseMatrixStats_1.16.0  munsell_0.5.1            </span></span>
-<span><span class="co">## [61] scales_1.3.0              glue_1.7.0               </span></span>
-<span><span class="co">## [63] tools_4.4.1               BiocNeighbors_1.22.0     </span></span>
-<span><span class="co">## [65] fs_1.6.4                  grid_4.4.1               </span></span>
-<span><span class="co">## [67] AnnotationDbi_1.66.0      colorspace_2.1-0         </span></span>
-<span><span class="co">## [69] GenomeInfoDbData_1.2.12   cli_3.6.3                </span></span>
-<span><span class="co">## [71] rappdirs_0.3.3            textshaping_0.4.0        </span></span>
-<span><span class="co">## [73] fansi_1.0.6               viridisLite_0.4.2        </span></span>
-<span><span class="co">## [75] S4Arrays_1.4.1            dplyr_1.1.4              </span></span>
-<span><span class="co">## [77] gtable_0.3.5              sass_0.4.9               </span></span>
-<span><span class="co">## [79] digest_0.6.36             SparseArray_1.4.8        </span></span>
-<span><span class="co">## [81] farver_2.1.2              rjson_0.2.21             </span></span>
-<span><span class="co">## [83] memoise_2.0.1             htmltools_0.5.8.1        </span></span>
-<span><span class="co">## [85] pkgdown_2.1.0             lifecycle_1.0.4          </span></span>
-<span><span class="co">## [87] httr_1.4.7                mime_0.12                </span></span>
-<span><span class="co">## [89] bit64_4.0.5               MASS_7.3-60.2</span></span></code></pre>
+<span><span class="co">##  [1] DBI_1.2.3               rlang_1.1.4             magrittr_2.0.3         </span></span>
+<span><span class="co">##  [4] spatialEco_2.0-2        compiler_4.4.2          RSQLite_2.3.7          </span></span>
+<span><span class="co">##  [7] png_0.1-8               systemfonts_1.1.0       vctrs_0.6.5            </span></span>
+<span><span class="co">## [10] pkgconfig_2.0.3         crayon_1.5.3            fastmap_1.2.0          </span></span>
+<span><span class="co">## [13] magick_2.8.5            XVector_0.46.0          labeling_0.4.3         </span></span>
+<span><span class="co">## [16] scuttle_1.16.0          utf8_1.2.4              rmarkdown_2.29         </span></span>
+<span><span class="co">## [19] UCSC.utils_1.2.0        ragg_1.3.3              purrr_1.0.2            </span></span>
+<span><span class="co">## [22] bit_4.5.0               xfun_0.49               beachmat_2.22.0        </span></span>
+<span><span class="co">## [25] zlibbioc_1.52.0         cachem_1.1.0            jsonlite_1.8.9         </span></span>
+<span><span class="co">## [28] blob_1.2.4              highr_0.11              DelayedArray_0.32.0    </span></span>
+<span><span class="co">## [31] BiocParallel_1.40.0     terra_1.7-83            parallel_4.4.2         </span></span>
+<span><span class="co">## [34] R6_2.5.1                bslib_0.8.0             jquerylib_0.1.4        </span></span>
+<span><span class="co">## [37] Rcpp_1.0.13-1           bookdown_0.41           knitr_1.48             </span></span>
+<span><span class="co">## [40] Matrix_1.7-1            tidyselect_1.2.1        abind_1.4-8            </span></span>
+<span><span class="co">## [43] yaml_2.3.10             codetools_0.2-20        curl_6.0.0             </span></span>
+<span><span class="co">## [46] lattice_0.22-6          tibble_3.2.1            withr_3.0.2            </span></span>
+<span><span class="co">## [49] KEGGREST_1.46.0         evaluate_1.0.1          desc_1.4.3             </span></span>
+<span><span class="co">## [52] Biostrings_2.74.0       pillar_1.9.0            BiocManager_1.30.25    </span></span>
+<span><span class="co">## [55] filelock_1.0.3          generics_0.1.3          BiocVersion_3.20.0     </span></span>
+<span><span class="co">## [58] munsell_0.5.1           scales_1.3.0            glue_1.8.0             </span></span>
+<span><span class="co">## [61] tools_4.4.2             BiocNeighbors_2.0.0     fs_1.6.5               </span></span>
+<span><span class="co">## [64] grid_4.4.2              AnnotationDbi_1.68.0    colorspace_2.1-1       </span></span>
+<span><span class="co">## [67] GenomeInfoDbData_1.2.13 cli_3.6.3               rappdirs_0.3.3         </span></span>
+<span><span class="co">## [70] textshaping_0.4.0       fansi_1.0.6             viridisLite_0.4.2      </span></span>
+<span><span class="co">## [73] S4Arrays_1.6.0          dplyr_1.1.4             gtable_0.3.6           </span></span>
+<span><span class="co">## [76] sass_0.4.9              digest_0.6.37           SparseArray_1.6.0      </span></span>
+<span><span class="co">## [79] farver_2.1.2            rjson_0.2.23            memoise_2.0.1          </span></span>
+<span><span class="co">## [82] htmltools_0.5.8.1       pkgdown_2.1.1           lifecycle_1.0.4        </span></span>
+<span><span class="co">## [85] httr_1.4.7              mime_0.12               bit64_4.5.2            </span></span>
+<span><span class="co">## [88] MASS_7.3-61</span></span></code></pre>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -417,7 +402,7 @@ function and arrange these plots using <code>ggpubr::arrange</code>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

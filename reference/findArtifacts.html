@@ -13,7 +13,7 @@ SpatialExperiment (sce) object."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">SpotSweeper</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,8 @@ SpatialExperiment (sce) object.</p>
 <span>  mito_percent <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span>
 <span>  mito_sum <span class="op">=</span> <span class="st">"expr_chrM"</span>,</span>
 <span>  samples <span class="op">=</span> <span class="st">"sample_id"</span>,</span>
-<span>  n_rings <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  n_order <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  shape <span class="op">=</span> <span class="st">"hexagonal"</span>,</span>
 <span>  log <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"artifact"</span>,</span>
 <span>  var_output <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -87,9 +88,14 @@ Default is 'expr_chrM'.</p></dd>
 'sample_id'.</p></dd>
 
 
-<dt id="arg-n-rings">n_rings<a class="anchor" aria-label="anchor" href="#arg-n-rings"></a></dt>
-<dd><p>The number of rings for local mito variance calculation.
+<dt id="arg-n-order">n_order<a class="anchor" aria-label="anchor" href="#arg-n-order"></a></dt>
+<dd><p>The number of orders for local mito variance calculation.
 Default is 5.</p></dd>
+
+
+<dt id="arg-shape">shape<a class="anchor" aria-label="anchor" href="#arg-shape"></a></dt>
+<dd><p>The shape of the neighborhood for local variance calculation.
+Can be either 'hexagonal' or 'square'. Default is 'hexagonal'.</p></dd>
 
 
 <dt id="arg-log">log<a class="anchor" aria-label="anchor" href="#arg-log"></a></dt>
@@ -158,8 +164,8 @@ annotations.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     as.data.frame, basename, cbind, colnames, dirname, do.call,</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     duplicated, eval, evalq, get, grep, grepl, intersect, is.unsorted,</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     lapply, mapply, match, mget, order, paste, pmax, pmax.int, pmin,</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     pmin.int, rank, rbind, rownames, sapply, setdiff, table, tapply,</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     union, unique, unsplit, which.max, which.min</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     pmin.int, rank, rbind, rownames, sapply, saveRDS, setdiff, table,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     tapply, union, unique, unsplit, which.max, which.min</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: S4Vectors</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘S4Vectors’</span>
@@ -195,7 +201,8 @@ annotations.</p>
 <span class="r-in"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu">findArtifacts</span><span class="op">(</span><span class="va">spe</span>,</span></span>
 <span class="r-in"><span>    mito_percent <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span></span>
 <span class="r-in"><span>    mito_sum <span class="op">=</span> <span class="st">"expr_chrM"</span>,</span></span>
-<span class="r-in"><span>    n_rings <span class="op">=</span> <span class="fl">2</span>, <span class="co"># 5 recommended, using 1 for time</span></span></span>
+<span class="r-in"><span>    n_order <span class="op">=</span> <span class="fl">2</span>, <span class="co"># 5 recommended, using 2 for time</span></span></span>
+<span class="r-in"><span>    shape <span class="op">=</span> <span class="st">"hexagonal"</span>,</span></span>
 <span class="r-in"><span>    name <span class="op">=</span> <span class="st">"artifact"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -211,7 +218,7 @@ annotations.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
