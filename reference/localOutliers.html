@@ -63,7 +63,6 @@ z-score statistic.</p>
 <span>  samples <span class="op">=</span> <span class="st">"sample_id"</span>,</span>
 <span>  log <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cutoff <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  neighborhood <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment-methods.html" class="external-link">spatialCoords</a></span><span class="op">(</span><span class="va">spe_subset</span><span class="op">)</span>,</span>
 <span>  workers <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -99,10 +98,6 @@ z-score statistic.</p>
 
 <dt id="arg-cutoff">cutoff<a class="anchor" aria-label="anchor" href="#arg-cutoff"></a></dt>
 <dd><p>Cutoff for outlier detection (default is 3)</p></dd>
-
-
-<dt id="arg-neighborhood">neighborhood<a class="anchor" aria-label="anchor" href="#arg-neighborhood"></a></dt>
-<dd><p>Matrix of spatial coordinates for neighborhood calculation</p></dd>
 
 
 <dt id="arg-workers">workers<a class="anchor" aria-label="anchor" href="#arg-workers"></a></dt>
@@ -149,10 +144,8 @@ z-score statistic.</p>
 <span class="r-in"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu">localOutliers</span><span class="op">(</span><span class="va">spe</span>,</span></span>
 <span class="r-in"><span>                     metric <span class="op">=</span> <span class="st">"sum"</span>,</span></span>
 <span class="r-in"><span>                     direction <span class="op">=</span> <span class="st">"lower"</span>,</span></span>
-<span class="r-in"><span>                     log <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                     neighborhood <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment-methods.html" class="external-link">spatialCoords</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                     log <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in localOutliers(spe, metric = "sum", direction = "lower", log = TRUE,     neighborhood = spatialCoords(spe)):</span> unused argument (neighborhood = spatialCoords(spe))</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
