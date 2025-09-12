@@ -15,7 +15,7 @@ z-score statistic."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">SpotSweeper</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,8 @@ z-score statistic.</p>
 <span>  samples <span class="op">=</span> <span class="st">"sample_id"</span>,</span>
 <span>  log <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cutoff <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  workers <span class="op">=</span> <span class="fl">1</span></span>
+<span>  workers <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  coords <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -72,11 +73,11 @@ z-score statistic.</p>
 
 
 <dl><dt id="arg-spe">spe<a class="anchor" aria-label="anchor" href="#arg-spe"></a></dt>
-<dd><p>SpatialExperiment or SingleCellExperiment object</p></dd>
+<dd><p>SpatialExperiment, SingleCellExperiment, or Seurat object</p></dd>
 
 
 <dt id="arg-metric">metric<a class="anchor" aria-label="anchor" href="#arg-metric"></a></dt>
-<dd><p>colData QC metric to use for outlier detection</p></dd>
+<dd><p>Metadata QC metric to use for outlier detection (colData for SpatialExperiment, meta.data for Seurat)</p></dd>
 
 
 <dt id="arg-direction">direction<a class="anchor" aria-label="anchor" href="#arg-direction"></a></dt>
@@ -88,7 +89,7 @@ z-score statistic.</p>
 
 
 <dt id="arg-samples">samples<a class="anchor" aria-label="anchor" href="#arg-samples"></a></dt>
-<dd><p>Column name in colData to use for sample IDs</p></dd>
+<dd><p>Column name in metadata to use for sample IDs</p></dd>
 
 
 <dt id="arg-log">log<a class="anchor" aria-label="anchor" href="#arg-log"></a></dt>
@@ -103,10 +104,15 @@ z-score statistic.</p>
 <dt id="arg-workers">workers<a class="anchor" aria-label="anchor" href="#arg-workers"></a></dt>
 <dd><p>Number of workers for parallel processing (default is 1)</p></dd>
 
+
+<dt id="arg-coords">coords<a class="anchor" aria-label="anchor" href="#arg-coords"></a></dt>
+<dd><p>Custom coordinates matrix for neighborhood detection (default is NULL, uses spatial coordinates).
+Can be PCA, UMAP, or any other coordinate system. Should be a numeric matrix with spots as rows and coordinates as columns.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>SpatialExperiment or SingleCellExperiment object with updated colData containing outputs</p>
+    <p>SpatialExperiment, SingleCellExperiment, or Seurat object with updated metadata containing outputs</p>
     </div>
 
     <div class="section level2">
@@ -145,6 +151,29 @@ z-score statistic.</p>
 <span class="r-in"><span>                     log <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example with Seurat object (if Seurat is available):</span></span></span>
+<span class="r-in"><span><span class="co"># library(Seurat) </span></span></span>
+<span class="r-in"><span><span class="co"># # Assuming 'seurat_obj' is a Seurat object with spatial data</span></span></span>
+<span class="r-in"><span><span class="co"># seurat_obj &lt;- localOutliers(seurat_obj,</span></span></span>
+<span class="r-in"><span><span class="co">#                             metric = "nCount_RNA",</span></span></span>
+<span class="r-in"><span><span class="co">#                             direction = "lower", </span></span></span>
+<span class="r-in"><span><span class="co">#                             samples = "orig.ident")</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example with custom coordinates (PCA, UMAP, etc.):</span></span></span>
+<span class="r-in"><span><span class="co"># # Use PCA coordinates for neighborhood detection instead of spatial</span></span></span>
+<span class="r-in"><span><span class="co"># spe &lt;- runPCA(spe, ncomponents = 50)</span></span></span>
+<span class="r-in"><span><span class="co"># pca_coords &lt;- reducedDim(spe, "PCA")[, 1:10]  # Use first 10 PCs</span></span></span>
+<span class="r-in"><span><span class="co"># spe &lt;- localOutliers(spe,</span></span></span>
+<span class="r-in"><span><span class="co">#                      metric = "sum", </span></span></span>
+<span class="r-in"><span><span class="co">#                      coords = pca_coords)</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span><span class="co"># # Use UMAP coordinates for neighborhood detection</span></span></span>
+<span class="r-in"><span><span class="co"># spe &lt;- runUMAP(spe, dimred = "PCA")  </span></span></span>
+<span class="r-in"><span><span class="co"># umap_coords &lt;- reducedDim(spe, "UMAP")</span></span></span>
+<span class="r-in"><span><span class="co"># spe &lt;- localOutliers(spe,</span></span></span>
+<span class="r-in"><span><span class="co">#                      metric = "detected",</span></span></span>
+<span class="r-in"><span><span class="co">#                      coords = umap_coords)</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -156,7 +185,7 @@ z-score statistic.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
