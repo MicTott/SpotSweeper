@@ -3,12 +3,14 @@ Title: Spatially-aware quality control for spatial transcriptomics
 Version: 1.5.0
 Date: 2025-09-12
 Authors@R: c(
-    person("Michael", "Totty", ,"mictott@gmail.com", role = c("aut", "cre"),
+    person("Michael", "Totty", email = "mictott@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9292-8556")),
-    person("Stephanie", "Hicks", ,email = "shicks19@jhu.edu", role = c("aut"),
+    person("Stephanie", "Hicks", email = "shicks19@jhu.edu", role = c("aut"),
            comment = c(ORCID = "0000-0002-7858-0231")),
-    person("Boyi", "Guo", ,email = "boyi.guo.work@gmail.com", role = c("aut"),
+    person("Boyi", "Guo", email = "boyi.guo.work@gmail.com", role = c("aut"),
            comment = c(ORCID = "0000-0003-2950-2349")))
+Author: Michael Totty [aut, cre], Stephanie Hicks [aut], Boyi Guo [aut]
+Maintainer: Michael Totty <mictott@gmail.com>
 Description: Spatially-aware quality control (QC) software for both spot-level 
     and artifact-level QC in spot-based spatial transcripomics, such as 10x 
     Visium. These methods calculate local (nearest-neighbors) mean and variance 
@@ -25,7 +27,7 @@ biocViews:
     GeneExpression, 
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Depends:
     R (>= 4.4.0)
 Imports:
