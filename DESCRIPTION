@@ -9,8 +9,6 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-7858-0231")),
     person("Boyi", "Guo", email = "boyi.guo.work@gmail.com", role = c("aut"),
            comment = c(ORCID = "0000-0003-2950-2349")))
-Author: Michael Totty [aut, cre], Stephanie Hicks [aut], Boyi Guo [aut]
-Maintainer: Michael Totty <mictott@gmail.com>
 Description: Spatially-aware quality control (QC) software for both spot-level 
     and artifact-level QC in spot-based spatial transcripomics, such as 10x 
     Visium. These methods calculate local (nearest-neighbors) mean and variance 

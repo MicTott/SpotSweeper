@@ -12,19 +12,20 @@ localOutliers(
   samples = "sample_id",
   log = TRUE,
   cutoff = 3,
-  workers = 1
+  workers = 1,
+  coords = NULL
 )
 }
 \arguments{
-\item{spe}{SpatialExperiment or SingleCellExperiment object}
+\item{spe}{SpatialExperiment, SingleCellExperiment, or Seurat object}
 
-\item{metric}{colData QC metric to use for outlier detection}
+\item{metric}{Metadata QC metric to use for outlier detection (colData for SpatialExperiment, meta.data for Seurat)}
 
 \item{direction}{Direction of outlier detection (higher, lower, or both)}
 
 \item{n_neighbors}{Number of nearest neighbors to use for outlier detection}
 
-\item{samples}{Column name in colData to use for sample IDs}
+\item{samples}{Column name in metadata to use for sample IDs}
 
 \item{log}{Logical indicating whether to log1p transform the features
 (default is TRUE)}
@@ -32,9 +33,12 @@ localOutliers(
 \item{cutoff}{Cutoff for outlier detection (default is 3)}
 
 \item{workers}{Number of workers for parallel processing (default is 1)}
+
+\item{coords}{Custom coordinates matrix for neighborhood detection (default is NULL, uses spatial coordinates).
+Can be PCA, UMAP, or any other coordinate system. Should be a numeric matrix with spots as rows and coordinates as columns.}
 }
 \value{
-SpatialExperiment or SingleCellExperiment object with updated colData containing outputs
+SpatialExperiment, SingleCellExperiment, or Seurat object with updated metadata containing outputs
 }
 \description{
 This function detects local outliers in spatial transcriptomics data based on
@@ -70,5 +74,28 @@ spe <- localOutliers(spe,
                      direction = "lower",
                      log = TRUE
 )
+
+# Example with Seurat object (if Seurat is available):
+# library(Seurat) 
+# # Assuming 'seurat_obj' is a Seurat object with spatial data
+# seurat_obj <- localOutliers(seurat_obj,
+#                             metric = "nCount_RNA",
+#                             direction = "lower", 
+#                             samples = "orig.ident")
+
+# Example with custom coordinates (PCA, UMAP, etc.):
+# # Use PCA coordinates for neighborhood detection instead of spatial
+# spe <- runPCA(spe, ncomponents = 50)
+# pca_coords <- reducedDim(spe, "PCA")[, 1:10]  # Use first 10 PCs
+# spe <- localOutliers(spe,
+#                      metric = "sum", 
+#                      coords = pca_coords)
+#
+# # Use UMAP coordinates for neighborhood detection
+# spe <- runUMAP(spe, dimred = "PCA")  
+# umap_coords <- reducedDim(spe, "UMAP")
+# spe <- localOutliers(spe,
+#                      metric = "detected",
+#                      coords = umap_coords)
 
 }

@@ -2,8 +2,8 @@
 
 export(findArtifacts)
 export(flagVisiumOutliers)
-export(getSpatialCoords)
 export(getMetadata)
+export(getSpatialCoords)
 export(localOutliers)
 export(localVariance)
 export(plotQCmetrics)
