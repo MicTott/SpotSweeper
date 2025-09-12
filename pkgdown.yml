@@ -3,7 +3,7 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   getting_started: getting_started.html
-last_built: 2025-09-12T04:57Z
+last_built: 2025-09-12T14:55Z
 urls:
   reference: https://mictott.github.io/SpotSweeper/reference
   article: https://mictott.github.io/SpotSweeper/articles
