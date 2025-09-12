@@ -1,14 +1,42 @@
 # SpotSweeper Package News
 
-# Verison 1.3.2
+# Version 1.5.0
 
-## Minor Changes
-- **Broadened Compatibility**: Updated all functions to use `inherits(spe, "SpatialExperiment")` instead of checking `class(spe)` directly. This change ensures that derived classes (e.g., `SpatialFeatureExperiment`) are also supported, improving flexibility and ease of use.
+## Major Features
+- **Seurat Compatibility**: Added comprehensive compatibility layer enabling SpotSweeper functions to work seamlessly with Seurat spatial objects alongside existing SpatialExperiment support. This major enhancement expands SpotSweeper's usability across the spatial transcriptomics ecosystem.
+- **Flexible Coordinate Systems**: Enhanced `localOutliers()` to support custom coordinate systems for neighborhood detection, enabling outlier detection in PCA, UMAP, or any reduced-dimension space.
 
-# Verison 1.3.2
+## New Functions
+- **`getSpatialCoords()`**: Universal function to extract spatial coordinates from both SpatialExperiment and Seurat objects
+- **`getMetadata()`**: Universal function to access metadata (colData/meta.data) from both object types  
+- **`setMetadata()`**: Universal function to update metadata in both object types
+- **`subsetSpatialObject()`**: Universal subsetting function for both object types
+- **`validateMetadataColumns()`**: Validation function to ensure required columns exist
+- **`is_seurat()`** and **`is_spatial_experiment()`**: Object type detection functions
+
+## Enhanced Functions
+- **`localOutliers()`**: 
+  - Now accepts both SpatialExperiment and Seurat objects with automatic detection
+  - New `coords` parameter allows custom coordinate matrices for neighborhood detection
+  - Default behavior unchanged (uses spatial coordinates)
+  - Supports PCA, UMAP, t-SNE, or any coordinate system for neighbor finding
+
+## Bug Fixes
+- **Fixed focal spot inclusion**: Removed focal spot from neighborhood when calculating modified z-scores in `localOutliers()` to prevent circular logic and bias, resulting in more accurate outlier detection.
+
+## Documentation
+- Updated function documentation to reflect dual compatibility and new coordinate options
+- Added Seurat usage examples alongside existing SpatialExperiment examples
+- Added examples for custom coordinate systems (PCA, UMAP)
+- Comprehensive test suite for compatibility layer and coordinate functionality
+
+# Version 1.3.2
 
 ## New Features
 - **Added** the 'flagVisiumOutliers()' function to identify and flag systematic outlier spots in Visium datasets. This feature enhances data quality by allowing users to efficiently detect and exclude problematic spots from downstream analyses.
+
+## Minor Changes
+- **Broadened Compatibility**: Updated all functions to use `inherits(spe, "SpatialExperiment")` instead of checking `class(spe)` directly. This change ensures that derived classes (e.g., `SpatialFeatureExperiment`) are also supported, improving flexibility and ease of use.
 
 # Version 1.3.1
 
