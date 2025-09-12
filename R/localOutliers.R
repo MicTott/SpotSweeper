@@ -15,6 +15,8 @@
 #' (default is TRUE)
 #' @param cutoff Cutoff for outlier detection (default is 3)
 #' @param workers Number of workers for parallel processing (default is 1)
+#' @param coords Custom coordinates matrix for neighborhood detection (default is NULL, uses spatial coordinates). 
+#'   Can be PCA, UMAP, or any other coordinate system. Should be a numeric matrix with spots as rows and coordinates as columns.
 #'
 #' @return SpatialExperiment, SingleCellExperiment, or Seurat object with updated metadata containing outputs
 #'
@@ -61,10 +63,25 @@
 #' #                             direction = "lower", 
 #' #                             samples = "orig.ident")
 #'
+#' # Example with custom coordinates (PCA, UMAP, etc.):
+#' # # Use PCA coordinates for neighborhood detection instead of spatial
+#' # spe <- runPCA(spe, ncomponents = 50)
+#' # pca_coords <- reducedDim(spe, "PCA")[, 1:10]  # Use first 10 PCs
+#' # spe <- localOutliers(spe,
+#' #                      metric = "sum", 
+#' #                      coords = pca_coords)
+#' #
+#' # # Use UMAP coordinates for neighborhood detection
+#' # spe <- runUMAP(spe, dimred = "PCA")  
+#' # umap_coords <- reducedDim(spe, "UMAP")
+#' # spe <- localOutliers(spe,
+#' #                      metric = "detected",
+#' #                      coords = umap_coords)
+#'
 localOutliers <- function(
     spe, metric = "detected",
     direction = "lower", n_neighbors = 36, samples = "sample_id",
-    log = TRUE, cutoff = 3, workers=1) {
+    log = TRUE, cutoff = 3, workers = 1, coords = NULL) {
 
   # ===== Validity checks =====
   # Check if 'spe' is a supported object type
@@ -87,6 +104,18 @@ localOutliers <- function(
   # Check 'cutoff' is a numeric value
   if (!is.numeric(cutoff)) {
     stop("'cutoff' must be a numeric value.")
+  }
+  
+  # Validate custom coordinates if provided
+  if (!is.null(coords)) {
+    if (!is.numeric(coords) || !is.matrix(coords)) {
+      stop("'coords' must be a numeric matrix with spots as rows and coordinates as columns.")
+    }
+    # Get metadata to check dimensions
+    temp_metadata <- getMetadata(spe)
+    if (nrow(coords) != nrow(temp_metadata)) {
+      stop("'coords' must have the same number of rows as spots/cells in the object.")
+    }
   }
 
   # ===== Start function =====
@@ -117,12 +146,20 @@ localOutliers <- function(
     sample_indices <- metadata[[samples]] == sample
     spe_subset <- subsetSpatialObject(spe, sample_indices)
 
-    # Get metadata and spatial coordinates for subset
+    # Get metadata and coordinates for subset
     subset_metadata <- getMetadata(spe_subset)
-    spatial_coords <- getSpatialCoords(spe_subset)
+    
+    # Use custom coordinates if provided, otherwise use spatial coordinates
+    if (!is.null(coords)) {
+      # Subset custom coordinates for this sample
+      neighborhood_coords <- coords[sample_indices, , drop = FALSE]
+    } else {
+      # Use spatial coordinates (default behavior)
+      neighborhood_coords <- getSpatialCoords(spe_subset)
+    }
 
-    # Find nearest neighbors
-    dnn <- BiocNeighbors::findKNN(spatial_coords,
+    # Find nearest neighbors using specified coordinate system
+    dnn <- BiocNeighbors::findKNN(neighborhood_coords,
                                   k = n_neighbors, warn.ties = FALSE,
                                   BPPARAM = BiocParallel::MulticoreParam(workers=workers))$index
 
