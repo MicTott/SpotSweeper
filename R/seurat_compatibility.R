@@ -109,6 +109,10 @@ setMetadata <- function(x, metadata) {
            "Install with: BiocManager::install('SummarizedExperiment')")
     }
     
+    # Convert data.frame to DataFrame for SpatialExperiment compatibility
+    if (is.data.frame(metadata)) {
+      metadata <- S4Vectors::DataFrame(metadata)
+    }
     SummarizedExperiment::colData(x) <- metadata
     return(x)
     
