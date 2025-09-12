@@ -15,3 +15,9 @@ Data.frame of metadata
 \description{
 Get metadata from either SpatialExperiment or Seurat object
 }
+\examples{
+library(STexampleData)
+spe <- Visium_humanDLPFC()
+metadata <- getMetadata(spe)
+colnames(metadata)
+}

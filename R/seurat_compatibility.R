@@ -23,6 +23,11 @@ is_spatial_experiment <- function(x) {
 #' @param image_id For Seurat objects, which image to use (default: first image)
 #' @return Matrix of spatial coordinates with rows as spots and columns as x,y coordinates
 #' @export
+#' @examples
+#' library(STexampleData)
+#' spe <- Visium_humanDLPFC()
+#' coords <- getSpatialCoords(spe)
+#' head(coords)
 getSpatialCoords <- function(x, image_id = NULL) {
   if (is_seurat(x)) {
     if (!requireNamespace("Seurat", quietly = TRUE)) {
@@ -74,6 +79,11 @@ getSpatialCoords <- function(x, image_id = NULL) {
 #' @param x SpatialExperiment or Seurat object
 #' @return Data.frame of metadata
 #' @export
+#' @examples
+#' library(STexampleData)
+#' spe <- Visium_humanDLPFC()
+#' metadata <- getMetadata(spe)
+#' colnames(metadata)
 getMetadata <- function(x) {
   if (is_seurat(x)) {
     return(x@meta.data)
@@ -97,7 +107,15 @@ getMetadata <- function(x) {
 #' @param x SpatialExperiment or Seurat object
 #' @param metadata Data.frame of metadata to set
 #' @return Modified object with updated metadata
+#' @importFrom S4Vectors DataFrame
 #' @export
+#' @examples
+#' library(STexampleData)
+#' spe <- Visium_humanDLPFC()
+#' metadata <- getMetadata(spe)
+#' metadata$new_column <- 1
+#' spe_updated <- setMetadata(spe, metadata)
+#' "new_column" %in% colnames(getMetadata(spe_updated))
 setMetadata <- function(x, metadata) {
   if (is_seurat(x)) {
     x@meta.data <- metadata
@@ -111,7 +129,7 @@ setMetadata <- function(x, metadata) {
     
     # Convert data.frame to DataFrame for SpatialExperiment compatibility
     if (is.data.frame(metadata)) {
-      metadata <- S4Vectors::DataFrame(metadata)
+      metadata <- DataFrame(metadata)
     }
     SummarizedExperiment::colData(x) <- metadata
     return(x)
@@ -128,6 +146,12 @@ setMetadata <- function(x, metadata) {
 #' @param column_name Column name for logical subsetting (for Seurat objects)
 #' @return Subsetted object
 #' @export
+#' @examples
+#' library(STexampleData)
+#' spe <- Visium_humanDLPFC()
+#' # Subset first 100 spots
+#' spe_subset <- subsetSpatialObject(spe, 1:100)
+#' ncol(spe_subset)
 subsetSpatialObject <- function(x, indices, column_name = NULL) {
   if (is_seurat(x)) {
     if (is.logical(indices) && !is.null(column_name)) {
@@ -158,6 +182,11 @@ subsetSpatialObject <- function(x, indices, column_name = NULL) {
 #' @param required_columns Character vector of required column names
 #' @return Logical indicating if all columns exist
 #' @export
+#' @examples
+#' library(STexampleData)
+#' spe <- Visium_humanDLPFC()
+#' # Check if required columns exist
+#' validateMetadataColumns(spe, c("sample_id", "in_tissue"))
 validateMetadataColumns <- function(x, required_columns) {
   metadata <- getMetadata(x)
   missing_cols <- setdiff(required_columns, colnames(metadata))

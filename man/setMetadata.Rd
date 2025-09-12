@@ -17,3 +17,11 @@ Modified object with updated metadata
 \description{
 Set metadata for either SpatialExperiment or Seurat object
 }
+\examples{
+library(STexampleData)
+spe <- Visium_humanDLPFC()
+metadata <- getMetadata(spe)
+metadata$new_column <- 1
+spe_updated <- setMetadata(spe, metadata)
+"new_column" \%in\% colnames(getMetadata(spe_updated))
+}

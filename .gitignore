@@ -8,3 +8,5 @@
 docs
 *.ai
 SpotSweeper.Rproj
+.RData
+.Rhistory

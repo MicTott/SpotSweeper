@@ -17,3 +17,9 @@ Logical indicating if all columns exist
 \description{
 Validate that required columns exist in metadata
 }
+\examples{
+library(STexampleData)
+spe <- Visium_humanDLPFC()
+# Check if required columns exist
+validateMetadataColumns(spe, c("sample_id", "in_tissue"))
+}

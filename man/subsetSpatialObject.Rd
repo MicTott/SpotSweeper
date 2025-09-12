@@ -19,3 +19,10 @@ Subsetted object
 \description{
 Subset spatial object by cell/spot indices
 }
+\examples{
+library(STexampleData)
+spe <- Visium_humanDLPFC()
+# Subset first 100 spots
+spe_subset <- subsetSpatialObject(spe, 1:100)
+ncol(spe_subset)
+}

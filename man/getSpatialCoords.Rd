@@ -17,3 +17,9 @@ Matrix of spatial coordinates with rows as spots and columns as x,y coordinates
 \description{
 Get spatial coordinates from either SpatialExperiment or Seurat object
 }
+\examples{
+library(STexampleData)
+spe <- Visium_humanDLPFC()
+coords <- getSpatialCoords(spe)
+head(coords)
+}
