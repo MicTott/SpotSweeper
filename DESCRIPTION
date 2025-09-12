@@ -47,7 +47,8 @@ Suggests:
     scuttle,
     STexampleData,
     ggpubr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    Seurat
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 LazyData: False

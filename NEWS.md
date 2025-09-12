@@ -4,6 +4,7 @@
 
 ## Major Features
 - **Seurat Compatibility**: Added comprehensive compatibility layer enabling SpotSweeper functions to work seamlessly with Seurat spatial objects alongside existing SpatialExperiment support. This major enhancement expands SpotSweeper's usability across the spatial transcriptomics ecosystem.
+- **Flexible Coordinate Systems**: Enhanced `localOutliers()` to support custom coordinate systems for neighborhood detection, enabling outlier detection in PCA, UMAP, or any reduced-dimension space.
 
 ## New Functions
 - **`getSpatialCoords()`**: Universal function to extract spatial coordinates from both SpatialExperiment and Seurat objects
@@ -14,12 +15,20 @@
 - **`is_seurat()`** and **`is_spatial_experiment()`**: Object type detection functions
 
 ## Enhanced Functions
-- **`localOutliers()`**: Now accepts both SpatialExperiment and Seurat objects with automatic detection and appropriate handling
+- **`localOutliers()`**: 
+  - Now accepts both SpatialExperiment and Seurat objects with automatic detection
+  - New `coords` parameter allows custom coordinate matrices for neighborhood detection
+  - Default behavior unchanged (uses spatial coordinates)
+  - Supports PCA, UMAP, t-SNE, or any coordinate system for neighbor finding
+
+## Bug Fixes
+- **Fixed focal spot inclusion**: Removed focal spot from neighborhood when calculating modified z-scores in `localOutliers()` to prevent circular logic and bias, resulting in more accurate outlier detection.
 
 ## Documentation
-- Updated function documentation to reflect dual compatibility
+- Updated function documentation to reflect dual compatibility and new coordinate options
 - Added Seurat usage examples alongside existing SpatialExperiment examples
-- Comprehensive test suite for compatibility layer functionality
+- Added examples for custom coordinate systems (PCA, UMAP)
+- Comprehensive test suite for compatibility layer and coordinate functionality
 
 # Version 1.3.2
 
