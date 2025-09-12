@@ -1,6 +1,6 @@
 # SpotSweeper Package News
 
-# Version 1.3.4
+# Version 1.5.0
 
 ## Major Features
 - **Seurat Compatibility**: Added comprehensive compatibility layer enabling SpotSweeper functions to work seamlessly with Seurat spatial objects alongside existing SpatialExperiment support. This major enhancement expands SpotSweeper's usability across the spatial transcriptomics ecosystem.
