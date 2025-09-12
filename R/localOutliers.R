@@ -146,8 +146,8 @@ localOutliers <- function(
     sample_indices <- metadata[[samples]] == sample
     spe_subset <- subsetSpatialObject(spe, sample_indices)
 
-    # Get metadata and coordinates for subset
-    subset_metadata <- getMetadata(spe_subset)
+    # Get metadata for subset - use the updated metadata that includes log transforms
+    subset_metadata <- metadata[sample_indices, , drop = FALSE]
     
     # Use custom coordinates if provided, otherwise use spatial coordinates
     if (!is.null(coords)) {
