@@ -130,7 +130,7 @@ localOutliers <- function(
     neighborhoods <- lapply(seq_len(nrow(dnn)), function(i) {
       indices <- dnn[i, ]
       indices <- indices[indices != 0]
-      indices <- c(i, indices)
+      # Don't include focal spot - use neighbors only for unbiased z-score
 
       subset_metadata[indices, metric_to_use]
     })
