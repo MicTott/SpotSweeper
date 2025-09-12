@@ -1,14 +1,33 @@
 # SpotSweeper Package News
 
-# Verison 1.3.2
+# Version 1.3.4
 
-## Minor Changes
-- **Broadened Compatibility**: Updated all functions to use `inherits(spe, "SpatialExperiment")` instead of checking `class(spe)` directly. This change ensures that derived classes (e.g., `SpatialFeatureExperiment`) are also supported, improving flexibility and ease of use.
+## Major Features
+- **Seurat Compatibility**: Added comprehensive compatibility layer enabling SpotSweeper functions to work seamlessly with Seurat spatial objects alongside existing SpatialExperiment support. This major enhancement expands SpotSweeper's usability across the spatial transcriptomics ecosystem.
 
-# Verison 1.3.2
+## New Functions
+- **`getSpatialCoords()`**: Universal function to extract spatial coordinates from both SpatialExperiment and Seurat objects
+- **`getMetadata()`**: Universal function to access metadata (colData/meta.data) from both object types  
+- **`setMetadata()`**: Universal function to update metadata in both object types
+- **`subsetSpatialObject()`**: Universal subsetting function for both object types
+- **`validateMetadataColumns()`**: Validation function to ensure required columns exist
+- **`is_seurat()`** and **`is_spatial_experiment()`**: Object type detection functions
+
+## Enhanced Functions
+- **`localOutliers()`**: Now accepts both SpatialExperiment and Seurat objects with automatic detection and appropriate handling
+
+## Documentation
+- Updated function documentation to reflect dual compatibility
+- Added Seurat usage examples alongside existing SpatialExperiment examples
+- Comprehensive test suite for compatibility layer functionality
+
+# Version 1.3.2
 
 ## New Features
 - **Added** the 'flagVisiumOutliers()' function to identify and flag systematic outlier spots in Visium datasets. This feature enhances data quality by allowing users to efficiently detect and exclude problematic spots from downstream analyses.
+
+## Minor Changes
+- **Broadened Compatibility**: Updated all functions to use `inherits(spe, "SpatialExperiment")` instead of checking `class(spe)` directly. This change ensures that derived classes (e.g., `SpatialFeatureExperiment`) are also supported, improving flexibility and ease of use.
 
 # Version 1.3.1
 

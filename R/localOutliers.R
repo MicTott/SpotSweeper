@@ -6,17 +6,17 @@
 #' quality metrics compared to their surrounding neighbors, based on a modified
 #' z-score statistic.
 #'
-#' @param spe SpatialExperiment or SingleCellExperiment object
-#' @param metric colData QC metric to use for outlier detection
+#' @param spe SpatialExperiment, SingleCellExperiment, or Seurat object
+#' @param metric Metadata QC metric to use for outlier detection (colData for SpatialExperiment, meta.data for Seurat)
 #' @param direction Direction of outlier detection (higher, lower, or both)
 #' @param n_neighbors Number of nearest neighbors to use for outlier detection
-#' @param samples Column name in colData to use for sample IDs
+#' @param samples Column name in metadata to use for sample IDs
 #' @param log Logical indicating whether to log1p transform the features
 #' (default is TRUE)
 #' @param cutoff Cutoff for outlier detection (default is 3)
 #' @param workers Number of workers for parallel processing (default is 1)
 #'
-#' @return SpatialExperiment or SingleCellExperiment object with updated colData containing outputs
+#' @return SpatialExperiment, SingleCellExperiment, or Seurat object with updated metadata containing outputs
 #'
 #' @importFrom SummarizedExperiment colData
 #' @importFrom BiocNeighbors findKNN
@@ -53,15 +53,23 @@
 #'                      log = TRUE
 #' )
 #'
+#' # Example with Seurat object (if Seurat is available):
+#' # library(Seurat) 
+#' # # Assuming 'seurat_obj' is a Seurat object with spatial data
+#' # seurat_obj <- localOutliers(seurat_obj,
+#' #                             metric = "nCount_RNA",
+#' #                             direction = "lower", 
+#' #                             samples = "orig.ident")
+#'
 localOutliers <- function(
     spe, metric = "detected",
     direction = "lower", n_neighbors = 36, samples = "sample_id",
     log = TRUE, cutoff = 3, workers=1) {
 
   # ===== Validity checks =====
-  # Check if 'spe' is (or inherits from) SpatialExperiment
-  if (!inherits(spe, "SpatialExperiment")) {
-    stop("Input data must be a SpatialExperiment or inherit from SpatialExperiment.")
+  # Check if 'spe' is a supported object type
+  if (!is_seurat(spe) && !is_spatial_experiment(spe)) {
+    stop("Input must be a SpatialExperiment, SingleCellExperiment, or Seurat object.")
   }
 
   # Validate 'direction'
@@ -82,31 +90,39 @@ localOutliers <- function(
   }
 
   # ===== Start function =====
+  # Get metadata using compatibility layer
+  metadata <- getMetadata(spe)
+  
+  # Validate required columns exist
+  validateMetadataColumns(spe, c(metric, samples))
+  
   # log transform specified metric
   if (log) {
     metric_log <- paste0(metric, "_log")
-    colData(spe)[metric_log] <- log1p(colData(spe)[[metric]])
+    metadata[[metric_log]] <- log1p(metadata[[metric]])
     metric_to_use <- metric_log
   } else {
     metric_to_use <- metric
   }
 
   # Get a list of unique sample IDs
-  unique_sample_ids <- unique(colData(spe)[[samples]])
+  unique_sample_ids <- unique(metadata[[samples]])
 
-  # Initialize list to store each columnData
-  columnData_list <- sapply(unique_sample_ids, FUN = function(x) NULL)
+  # Initialize list to store each metadata
+  metadata_list <- sapply(unique_sample_ids, FUN = function(x) NULL)
 
   # Loop through each unique sample ID
   for (sample in unique_sample_ids) {
     # Subset the data for the current sample
-    spe_subset <- spe[, colData(spe)[[samples]] == sample]
+    sample_indices <- metadata[[samples]] == sample
+    spe_subset <- subsetSpatialObject(spe, sample_indices)
 
-    # Create a list of spatial coordinates and qc features
-    columnData <- colData(spe_subset)
+    # Get metadata and spatial coordinates for subset
+    subset_metadata <- getMetadata(spe_subset)
+    spatial_coords <- getSpatialCoords(spe_subset)
 
     # Find nearest neighbors
-    dnn <- BiocNeighbors::findKNN(spatialCoords(spe_subset),
+    dnn <- BiocNeighbors::findKNN(spatial_coords,
                                   k = n_neighbors, warn.ties = FALSE,
                                   BPPARAM = BiocParallel::MulticoreParam(workers=workers))$index
 
@@ -116,7 +132,7 @@ localOutliers <- function(
       indices <- indices[indices != 0]
       indices <- c(i, indices)
 
-      columnData[indices, metric_to_use]
+      subset_metadata[indices, metric_to_use]
     })
 
     # Compute modified-z and return the middle spot
@@ -127,9 +143,9 @@ localOutliers <- function(
     # Handle non-finite values
     mod_z_matrix[!is.finite(mod_z_matrix)] <- 0
 
-    # find outliers based on cutoff, store in colData
+    # find outliers based on cutoff, store in metadata
     metric_outliers <- paste0(metric, "_outliers")
-    columnData[metric_outliers] <- switch(direction,
+    subset_metadata[[metric_outliers]] <- switch(direction,
                                           higher = sapply(
                                             mod_z_matrix,
                                             function(x) x > cutoff
@@ -147,19 +163,19 @@ localOutliers <- function(
                                           )
     )
 
-    # add z-scores to colData
+    # add z-scores to metadata
     metric_z <- paste0(metric, "_z")
-    columnData[metric_z] <- mod_z_matrix[]
+    subset_metadata[[metric_z]] <- mod_z_matrix
 
-    # Store the modified columnData dataframe in the list
-    columnData_list[[sample]] <- columnData
+    # Store the modified metadata dataframe in the list
+    metadata_list[[sample]] <- subset_metadata
   }
 
   # rbind the list of dataframes
-  columnData_aggregated <- do.call(rbind, columnData_list)
+  metadata_aggregated <- do.call(rbind, metadata_list)
 
-  # replace column data
-  colData(spe) <- columnData_aggregated
+  # replace metadata using compatibility layer
+  spe <- setMetadata(spe, metadata_aggregated)
 
   return(spe)
 }
