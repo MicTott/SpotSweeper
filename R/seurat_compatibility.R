@@ -54,11 +54,31 @@ getSpatialCoords <- function(x, image_id = NULL) {
     
     # Extract coordinates using Seurat function
     coords <- Seurat::GetTissueCoordinates(x, image = image_id)
-    
+
     # Convert to matrix format matching spatialCoords output
-    coords_matrix <- as.matrix(coords[, c("imagerow", "imagecol")])
+    # Handle different column naming conventions in Seurat spatial data
+    # Visium data typically has: imagerow, imagecol
+    # Other spatial data might have: x, y or row, col
+    coord_cols <- colnames(coords)
+
+    if (all(c("imagerow", "imagecol") %in% coord_cols)) {
+      coords_matrix <- as.matrix(coords[, c("imagerow", "imagecol")])
+    } else if (all(c("x", "y") %in% coord_cols)) {
+      coords_matrix <- as.matrix(coords[, c("x", "y")])
+    } else if (all(c("row", "col") %in% coord_cols)) {
+      coords_matrix <- as.matrix(coords[, c("row", "col")])
+    } else {
+      # Fall back to first two numeric columns
+      numeric_cols <- sapply(coords, is.numeric)
+      if (sum(numeric_cols) < 2) {
+        stop("Could not find two numeric coordinate columns. Available columns: ",
+             paste(coord_cols, collapse = ", "))
+      }
+      coords_matrix <- as.matrix(coords[, which(numeric_cols)[1:2]])
+    }
+
     colnames(coords_matrix) <- c("x", "y")
-    
+
     return(coords_matrix)
     
   } else if (is_spatial_experiment(x)) {
