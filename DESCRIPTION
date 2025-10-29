@@ -1,6 +1,6 @@
 Package: SpotSweeper
 Title: Spatially-aware quality control for spatial transcriptomics
-Version: 1.6.0
+Version: 1.7.0
 Date: 2025-10-14
 Authors@R: c(
     person("Michael", "Totty", ,"mictott@gmail.com", role = c("aut", "cre"),
