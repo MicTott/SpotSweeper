@@ -77,6 +77,20 @@ findArtifacts <- function(
     stop("Samples column must be present in colData.")
   }
 
+  mito_percent_values <- colData(spe)[[mito_percent]]
+  mito_sum_values <- colData(spe)[[mito_sum]]
+  if (!is.numeric(mito_percent_values) || !is.numeric(mito_sum_values)) {
+    stop("Mitochondrial metrics must be numeric.")
+  }
+  if (all(!is.finite(mito_sum_values) | mito_sum_values == 0)) {
+    stop(
+      "No mitochondrial signal was detected. 'findArtifacts()' cannot be ",
+      "used with assays, such as Visium FFPE probe panels, that do not ",
+      "measure mitochondrial genes. Use 'localOutliers()' with library size ",
+      "or detected genes instead."
+    )
+  }
+
   if (!is.numeric(n_order) ||
       n_order <= 0 ||
       n_order != round(n_order)) {
@@ -94,15 +108,19 @@ findArtifacts <- function(
   }
 
   # Initialize a list to store spe for each sample
-  columnData_list <- sapply(unique_sample_ids, FUN = function(x) NULL)
+  columnData_list <- vector("list", length(unique_sample_ids))
+  names(columnData_list) <- as.character(unique_sample_ids)
 
   for (sample in unique_sample_ids) {
     # subset by sample
     spe.temp <- spe[, colData(spe)[[samples]] == sample]
 
     # ======= Calculate local mito variance ========
-    # Use vapply to iterate over order_seq
-    var_matrix <- vapply(seq_len(n_order), function(i) {
+    var_matrix <- matrix(
+      nrow = ncol(spe.temp),
+      ncol = n_order
+    )
+    for (i in seq_len(n_order)) {
       # Calculate n_neighbors for the current order
       if (shape == "hexagonal") {
         n_neighbors <- 3 * i * (i + 1)
@@ -112,15 +130,15 @@ findArtifacts <- function(
       tmp.name <- paste0("k", n_neighbors)
 
       # Apply local variance calculation
-      spe.temp <<- localVariance(spe.temp,
-                                 metric = mito_percent,
-                                 n_neighbors = n_neighbors,
-                                 name = tmp.name,
-                                 log=log)
+      spe.temp <- localVariance(spe.temp,
+                                metric = mito_percent,
+                                n_neighbors = n_neighbors,
+                                name = tmp.name,
+                                log = log)
 
       # Extract and return the column corresponding to tmp.name from colData
-      colData(spe.temp)[[tmp.name]]
-    }, numeric(length(spe.temp[[1]])))
+      var_matrix[, i] <- colData(spe.temp)[[tmp.name]]
+    }
 
 
     # ========== PCA and clustering ==========

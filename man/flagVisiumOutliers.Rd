@@ -2,37 +2,30 @@
 % Please edit documentation in R/flagVisiumOutliers.R
 \name{flagVisiumOutliers}
 \alias{flagVisiumOutliers}
-\title{Flag Visium Outliers in SpatialExperiment Objects}
+\title{Flag systematic Visium outlier positions}
 \usage{
-flagVisiumOutliers(spe)
+flagVisiumOutliers(spe, image_id = NULL)
 }
 \arguments{
-\item{spe}{A \code{SpatialExperiment} object containing spatial transcriptomics data.
-The object must include \code{array_row} and \code{array_col} columns in its \code{colData} that
-specify the spatial coordinates of each spot.}
+\item{spe}{A \code{SpatialExperiment} or \code{Seurat} object containing Visium array
+coordinates. \code{SpatialExperiment} inputs must contain \code{array_row} and
+\code{array_col} metadata columns. Seurat inputs may contain the same columns or
+expose them through a Visium image.}
+
+\item{image_id}{For Seurat inputs, the image containing Visium array
+coordinates. The first image is used when \code{NULL}.}
 }
 \value{
-A \code{SpatialExperiment} object identical to the input \code{spe} but with an additional
-logical column \code{systematic_outliers} in its \code{colData}. This column indicates whether
-each spot is flagged as a technical outlier (\code{TRUE}) or not (\code{FALSE}).
+\code{spe} with a logical \code{systematic_outliers} metadata column.
 }
 \description{
-The \code{flagVisiumoutliers} function identifies and flags Visium systematic outlier spots in a
-\code{SpatialExperiment} object based on barcodes. These outliers are marked in the \code{colData}
-of the \code{SpatialExperiment} object, allowing users to exclude them from downstream analyses
-to enhance data quality and reliability.
+\code{flagVisiumOutliers()} marks six Visium array positions that have shown
+systematically low library sizes across multiple datasets. It accepts either
+a \code{SpatialExperiment} or \code{Seurat} object and adds a logical
+\code{systematic_outliers} column to its metadata.
 }
 \examples{
-library(SpotSweeper)
-library(SpatialExperiment)
-
-# load example data
 spe <- STexampleData::Visium_humanDLPFC()
-
-# Flag outlier spots
 spe <- flagVisiumOutliers(spe)
-
-# drop outlier spots
-spe <- spe[, !colData(spe)$systematic_outliers]
-
+spe <- spe[, !spe$systematic_outliers]
 }

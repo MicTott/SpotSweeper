@@ -2,24 +2,25 @@
 % Please edit documentation in R/seurat_compatibility.R
 \name{getSpatialCoords}
 \alias{getSpatialCoords}
-\title{Get spatial coordinates from either SpatialExperiment or Seurat object}
+\title{Get spatial coordinates from a spatial object}
 \usage{
 getSpatialCoords(x, image_id = NULL)
 }
 \arguments{
-\item{x}{SpatialExperiment or Seurat object}
+\item{x}{A \code{SpatialExperiment} or \code{Seurat} object.}
 
-\item{image_id}{For Seurat objects, which image to use (default: first image)}
+\item{image_id}{For a Seurat object, an optional image name. If omitted,
+coordinates from all images are combined and returned in object order.}
 }
 \value{
-Matrix of spatial coordinates with rows as spots and columns as x,y coordinates
+A numeric matrix with spots as rows and spatial dimensions as
+columns.
 }
 \description{
-Get spatial coordinates from either SpatialExperiment or Seurat object
+Get spatial coordinates from a spatial object
 }
 \examples{
-library(STexampleData)
-spe <- Visium_humanDLPFC()
-coords <- getSpatialCoords(spe)
-head(coords)
+spe <- STexampleData::Visium_humanDLPFC()
+coordinates <- getSpatialCoords(spe)
+head(coordinates)
 }

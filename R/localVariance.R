@@ -110,7 +110,7 @@ localVariance <- function(spe, n_neighbors = 36,
   unique_sample_ids <- unique(colData(spe)[[samples]])
 
   # Initialize list to store each columnData dataframe
-  columnData_list <- sapply(unique_sample_ids, FUN = function(x) NULL)
+  columnData_list <- vector("list", length(unique_sample_ids))
 
   # Loop through each unique sample ID
   for (sample_id in seq_along(unique_sample_ids)) {
@@ -123,9 +123,14 @@ localVariance <- function(spe, n_neighbors = 36,
     columnData$coords <- spatialCoords(spe_subset)
 
     # Find nearest neighbors
+    parallel_param <- if (workers == 1L) {
+      BiocParallel::SerialParam()
+    } else {
+      BiocParallel::MulticoreParam(workers = workers)
+    }
     dnn <- BiocNeighbors::findKNN(spatialCoords(spe_subset),
                                   k = n_neighbors,
-                                  BPPARAM = BiocParallel::MulticoreParam(workers),
+                                  BPPARAM = parallel_param,
                                   warn.ties = FALSE
     )$index
 
@@ -140,9 +145,9 @@ localVariance <- function(spe, n_neighbors = 36,
     })
 
     # Compute variance and mean
-    stats_matrix <- t(sapply(neighborhoods, function(x) {
+    stats_matrix <- t(vapply(neighborhoods, function(x) {
       c(var = var(x, na.rm = TRUE), mean = mean(x, na.rm = TRUE))
-    }))
+    }, numeric(2)))
 
     # Handle non-finite values
     stats_matrix[!is.finite(stats_matrix)] <- 0

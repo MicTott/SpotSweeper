@@ -31,21 +31,26 @@ BiocStyle::markdown()
 outliers and artifacts using spatially-aware methods. The package is designed 
 to work with [SpatialExperiment](https://github.com/drighelli/SpatialExperiment)
 objects, and is compatible with data from 10X Genomics Visium and other spatial 
-transcriptomics platforms.
+transcriptomics platforms. Spot-level outlier detection and systematic Visium
+position flagging also accept `Seurat` objects without conversion.
+
+### Assay and chemistry support
+
+`localOutliers()` can use any numeric spot-level QC metric. Library size and
+the number of detected genes are therefore suitable for both fresh-frozen and
+FFPE data. Mitochondrial metrics should only be used when the assay measures
+mitochondrial genes.
+
+`findArtifacts()` detects hangnail-like regional artifacts using mitochondrial
+signal and is not suitable for Visium FFPE probe panels that omit mitochondrial
+genes. For those assays, use `localOutliers()` with library size or detected
+genes. Spatially contiguous dry-edge regions require a region-level method and
+should not be interpreted as failures of local outlier detection.
 
 ## Installation
 
-Currently, the only way to install `SpotSweeper` is by downloading the 
-development version which can be installed from 
-[GitHub](https://github.com/MicTott/SpotSweeper) using the following: 
-
-```{r 'install_dev', eval = FALSE}
-if (!require("devtools")) install.packages("devtools")
-remotes::install_github("MicTott/SpotSweeper")
-```
-
-Once accepted in [Bioconductor](http://bioconductor.org/), `SpotSweeper` will be
-installable using:
+Install the current release from
+[Bioconductor](https://bioconductor.org/packages/SpotSweeper/) with:
 
 ```{r 'install', eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
@@ -53,6 +58,15 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 }
 
 BiocManager::install("SpotSweeper")
+```
+
+The GitHub development version can be installed with:
+
+```{r 'install_dev', eval = FALSE}
+if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")
+}
+remotes::install_github("MicTott/SpotSweeper")
 ```
 
 ## Spot-level local outlier detection
@@ -146,6 +160,26 @@ with the naming convention `X_outliers`, where `X` is the name of the input
 spe$local_outliers <- as.logical(spe$sum_outliers) |
     as.logical(spe$detected_outliers) |
     as.logical(spe$subsets_Mito_percent_outliers)
+```
+
+### Using a Seurat object
+
+The same `localOutliers()` call works with a Seurat object. Metrics are read
+from and results are written to the object's metadata. Coordinates are obtained
+from its spatial image; alternatively, provide a numeric matrix through
+`coords`.
+
+```{r example_seurat, eval = FALSE}
+seurat <- localOutliers(
+    seurat,
+    metric = "nCount_Spatial",
+    direction = "lower",
+    samples = "orig.ident",
+    log = TRUE
+)
+
+head(seurat$nCount_Spatial_z)
+table(seurat$nCount_Spatial_outliers)
 ```
 
 ### Visualizing local outliers

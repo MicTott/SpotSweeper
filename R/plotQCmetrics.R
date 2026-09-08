@@ -126,8 +126,3 @@ plotQCmetrics <- function(
 
   return(p)
 }
-
-plotQC <- function(...) {
-  .Deprecated("plotQCmetrics")
-  plotQCmetrics(...)
-}

@@ -2,24 +2,22 @@
 % Please edit documentation in R/seurat_compatibility.R
 \name{validateMetadataColumns}
 \alias{validateMetadataColumns}
-\title{Validate that required columns exist in metadata}
+\title{Validate columns in spatial-object metadata}
 \usage{
 validateMetadataColumns(x, required_columns)
 }
 \arguments{
-\item{x}{SpatialExperiment or Seurat object}
+\item{x}{A \code{SpatialExperiment} or \code{Seurat} object.}
 
-\item{required_columns}{Character vector of required column names}
+\item{required_columns}{Character vector of required metadata column names.}
 }
 \value{
-Logical indicating if all columns exist
+\code{TRUE}, invisibly. An error is raised if columns are missing.
 }
 \description{
-Validate that required columns exist in metadata
+Validate columns in spatial-object metadata
 }
 \examples{
-library(STexampleData)
-spe <- Visium_humanDLPFC()
-# Check if required columns exist
+spe <- STexampleData::Visium_humanDLPFC()
 validateMetadataColumns(spe, c("sample_id", "in_tissue"))
 }

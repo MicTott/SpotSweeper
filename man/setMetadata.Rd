@@ -2,26 +2,25 @@
 % Please edit documentation in R/seurat_compatibility.R
 \name{setMetadata}
 \alias{setMetadata}
-\title{Set metadata for either SpatialExperiment or Seurat object}
+\title{Replace column metadata in a spatial object}
 \usage{
 setMetadata(x, metadata)
 }
 \arguments{
-\item{x}{SpatialExperiment or Seurat object}
+\item{x}{A \code{SpatialExperiment} or \code{Seurat} object.}
 
-\item{metadata}{Data.frame of metadata to set}
+\item{metadata}{A data-frame-like object with one row per spot. Named rows
+are reordered to match the object before assignment.}
 }
 \value{
-Modified object with updated metadata
+\code{x} with replaced column metadata.
 }
 \description{
-Set metadata for either SpatialExperiment or Seurat object
+Replace column metadata in a spatial object
 }
 \examples{
-library(STexampleData)
-spe <- Visium_humanDLPFC()
+spe <- STexampleData::Visium_humanDLPFC()
 metadata <- getMetadata(spe)
-metadata$new_column <- 1
-spe_updated <- setMetadata(spe, metadata)
-"new_column" \%in\% colnames(getMetadata(spe_updated))
+metadata$example_column <- seq_len(nrow(metadata))
+spe <- setMetadata(spe, metadata)
 }

@@ -11,3 +11,5 @@ SpotSweeper.Rproj
 .RData
 .Rhistory
 SpotSweeper.BiocCheck/
+SpotSweeper.Rcheck/
+SpotSweeper_*.tar.gz

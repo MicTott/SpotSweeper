@@ -1,5 +1,27 @@
 # SpotSweeper Package News
 
+# Version 1.9.1
+
+## Bug fixes
+
+- Corrected the robust local z-score calculation in `localOutliers()`. Scores
+  now use the focal spot value and the unscaled median absolute deviation of
+  neighboring spots, matching the published method. Previous versions applied
+  the normal-consistency scaling twice and could associate a neighbor's score
+  with the focal spot.
+- Removed the `spatialEco` dependency, which is no longer needed for local
+  z-score calculation.
+
+## Seurat compatibility
+
+- Reworked Seurat support around small, tested object adapters that preserve
+  spot names and ordering and use public `SeuratObject` accessors.
+- Added integration tests for `localOutliers()`, spatial-coordinate extraction,
+  metadata replacement, subsetting, and `flagVisiumOutliers()` with real Seurat
+  objects.
+- Added explicit guidance when `findArtifacts()` is used with data lacking
+  mitochondrial signal, including Visium FFPE probe-panel data.
+
 # Version 1.5.0
 
 ## Major Features
@@ -8,14 +30,14 @@
 
 ## New Functions
 - **`getSpatialCoords()`**: Universal function to extract spatial coordinates from both SpatialExperiment and Seurat objects
-- **`getMetadata()`**: Universal function to access metadata (colData/meta.data) from both object types  
+- **`getMetadata()`**: Universal function to access metadata (colData/meta.data) from both object types
 - **`setMetadata()`**: Universal function to update metadata in both object types
 - **`subsetSpatialObject()`**: Universal subsetting function for both object types
 - **`validateMetadataColumns()`**: Validation function to ensure required columns exist
 - **`is_seurat()`** and **`is_spatial_experiment()`**: Object type detection functions
 
 ## Enhanced Functions
-- **`localOutliers()`**: 
+- **`localOutliers()`**:
   - Now accepts both SpatialExperiment and Seurat objects with automatic detection
   - New `coords` parameter allows custom coordinate matrices for neighborhood detection
   - Default behavior unchanged (uses spatial coordinates)

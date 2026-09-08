@@ -8,3 +8,6 @@
 ^docs$
 ^pkgdown$
 ^LICENSE\.md$
+^SpotSweeper_[0-9.]+\.tar\.gz$
+^SpotSweeper\.Rcheck$
+^SpotSweeper\.BiocCheck$

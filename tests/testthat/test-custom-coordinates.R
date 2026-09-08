@@ -1,70 +1,51 @@
-test_that("localOutliers works with custom coordinates", {
-  
-  skip_if_not_installed("SpatialExperiment")
-  skip_if_not_installed("STexampleData")
-  
-  # Load test data
-  spe <- STexampleData::Visium_humanDLPFC()
-  spe <- spe[1:100, 1:50]  # Small subset for testing
-  
-  # Test default behavior (spatial coordinates)
-  expect_no_error(
-    spe_default <- localOutliers(spe, 
-                                metric = "in_tissue",
-                                direction = "lower",
-                                n_neighbors = 10)
+test_that("custom coordinate rows are aligned by spot name", {
+  spe <- make_test_spe()
+  custom_coordinates <- SpatialExperiment::spatialCoords(spe)
+  custom_coordinates <- custom_coordinates[rev(rownames(custom_coordinates)), ]
+
+  expected <- localOutliers(
+    spe,
+    metric = "metric",
+    n_neighbors = 4,
+    log = FALSE
   )
-  
-  # Test with custom coordinates (random for testing)
-  set.seed(42)
-  custom_coords <- matrix(rnorm(ncol(spe) * 2), ncol = 2)
-  rownames(custom_coords) <- colnames(spe)
-  
-  expect_no_error(
-    spe_custom <- localOutliers(spe,
-                               metric = "in_tissue", 
-                               direction = "lower",
-                               n_neighbors = 10,
-                               coords = custom_coords)
+  observed <- localOutliers(
+    spe,
+    metric = "metric",
+    n_neighbors = 4,
+    log = FALSE,
+    coords = custom_coordinates
   )
-  
-  # Check that results are different (since neighborhoods are different)
-  default_z <- getMetadata(spe_default)$in_tissue_z
-  custom_z <- getMetadata(spe_custom)$in_tissue_z
-  
-  # Results should be different due to different neighborhood definitions
-  expect_false(identical(default_z, custom_z))
-  
-  # Both should have the same structure
-  expect_equal(length(default_z), length(custom_z))
-  expect_equal(length(default_z), ncol(spe))
+
+  expect_equal(observed$metric_z, expected$metric_z)
 })
 
-test_that("localOutliers coords validation works", {
-  
-  skip_if_not_installed("SpatialExperiment") 
-  skip_if_not_installed("STexampleData")
-  
-  spe <- STexampleData::Visium_humanDLPFC()
-  spe <- spe[1:50, 1:20]
-  
-  # Test invalid coords - not a matrix
+test_that("custom coordinates are validated", {
+  spe <- make_test_spe()
+
   expect_error(
-    localOutliers(spe, coords = c(1, 2, 3)),
-    "'coords' must be a numeric matrix"
+    localOutliers(spe, metric = "metric", coords = seq_len(6)),
+    "numeric matrix"
   )
-  
-  # Test wrong dimensions
-  wrong_coords <- matrix(rnorm(10), ncol = 2)
   expect_error(
-    localOutliers(spe, coords = wrong_coords),
-    "same number of rows as spots"
+    localOutliers(
+      spe,
+      metric = "metric",
+      coords = matrix(seq_len(4), ncol = 2)
+    ),
+    "one row for every spot"
   )
-  
-  # Test non-numeric coords
-  char_coords <- matrix(letters[1:40], ncol = 2)
+
+  character_coordinates <- matrix(letters[seq_len(12)], ncol = 2)
   expect_error(
-    localOutliers(spe, coords = char_coords),
-    "'coords' must be a numeric matrix"
+    localOutliers(spe, metric = "metric", coords = character_coordinates),
+    "numeric matrix"
+  )
+
+  mismatched_coordinates <- matrix(seq_len(12), ncol = 2)
+  rownames(mismatched_coordinates) <- paste0("other", seq_len(6))
+  expect_error(
+    localOutliers(spe, metric = "metric", coords = mismatched_coordinates),
+    "row names"
   )
 })

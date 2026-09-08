@@ -2,27 +2,25 @@
 % Please edit documentation in R/seurat_compatibility.R
 \name{subsetSpatialObject}
 \alias{subsetSpatialObject}
-\title{Subset spatial object by cell/spot indices}
+\title{Subset a spatial object by spots}
 \usage{
 subsetSpatialObject(x, indices, column_name = NULL)
 }
 \arguments{
-\item{x}{SpatialExperiment or Seurat object}
+\item{x}{A \code{SpatialExperiment} or \code{Seurat} object.}
 
-\item{indices}{Logical or integer vector for subsetting}
+\item{indices}{Logical, integer, or character spot indices. If
+\code{column_name} is supplied, these are values to retain from that column.}
 
-\item{column_name}{Column name for logical subsetting (for Seurat objects)}
+\item{column_name}{Optional metadata column used for value-based subsetting.}
 }
 \value{
-Subsetted object
+A subset of \code{x} containing the selected spots.
 }
 \description{
-Subset spatial object by cell/spot indices
+Subset a spatial object by spots
 }
 \examples{
-library(STexampleData)
-spe <- Visium_humanDLPFC()
-# Subset first 100 spots
-spe_subset <- subsetSpatialObject(spe, 1:100)
-ncol(spe_subset)
+spe <- STexampleData::Visium_humanDLPFC()
+spe_subset <- subsetSpatialObject(spe, seq_len(100))
 }

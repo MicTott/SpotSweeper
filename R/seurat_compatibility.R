@@ -1,220 +1,292 @@
-#' SpotSweeper Seurat Compatibility Layer
-#' 
-#' Functions to enable SpotSweeper compatibility with Seurat spatial objects
-#' alongside SpatialExperiment objects.
+# Object adapters ---------------------------------------------------------
 
-#' Check if object is a Seurat object
-#' @param x Object to check
-#' @return Logical indicating if object is Seurat
 is_seurat <- function(x) {
   inherits(x, "Seurat")
 }
 
-#' Check if object is a SpatialExperiment object
-#' @param x Object to check  
-#' @return Logical indicating if object is SpatialExperiment
 is_spatial_experiment <- function(x) {
   inherits(x, "SpatialExperiment")
 }
 
-#' Get spatial coordinates from either SpatialExperiment or Seurat object
-#' 
-#' @param x SpatialExperiment or Seurat object
-#' @param image_id For Seurat objects, which image to use (default: first image)
-#' @return Matrix of spatial coordinates with rows as spots and columns as x,y coordinates
-#' @export
-#' @examples
-#' library(STexampleData)
-#' spe <- Visium_humanDLPFC()
-#' coords <- getSpatialCoords(spe)
-#' head(coords)
-getSpatialCoords <- function(x, image_id = NULL) {
-  if (is_seurat(x)) {
-    if (!requireNamespace("Seurat", quietly = TRUE)) {
-      stop("Package 'Seurat' is required but not available.\n",
-           "Install with: install.packages('Seurat')")
-    }
-    
-    # Get available images
-    available_images <- names(x@images)
-    if (length(available_images) == 0) {
-      stop("No spatial images found in Seurat object")
-    }
-    
-    # Use specified image or first available
-    if (is.null(image_id)) {
-      image_id <- available_images[1]
-      message("Using image: ", image_id)
-    }
-    
-    if (!image_id %in% available_images) {
-      stop("Image '", image_id, "' not found. Available images: ", 
-           paste(available_images, collapse = ", "))
-    }
-    
-    # Extract coordinates using Seurat function
-    coords <- Seurat::GetTissueCoordinates(x, image = image_id)
+.check_supported_object <- function(x) {
+  if (!is_spatial_experiment(x) && !is_seurat(x)) {
+    stop("Object must be a SpatialExperiment or Seurat object.")
+  }
+  invisible(TRUE)
+}
 
-    # Convert to matrix format matching spatialCoords output
-    # Handle different column naming conventions in Seurat spatial data
-    # Visium data typically has: imagerow, imagecol
-    # Other spatial data might have: x, y or row, col
-    coord_cols <- colnames(coords)
-
-    if (all(c("imagerow", "imagecol") %in% coord_cols)) {
-      coords_matrix <- as.matrix(coords[, c("imagerow", "imagecol")])
-    } else if (all(c("x", "y") %in% coord_cols)) {
-      coords_matrix <- as.matrix(coords[, c("x", "y")])
-    } else if (all(c("row", "col") %in% coord_cols)) {
-      coords_matrix <- as.matrix(coords[, c("row", "col")])
-    } else {
-      # Fall back to first two numeric columns
-      numeric_cols <- sapply(coords, is.numeric)
-      if (sum(numeric_cols) < 2) {
-        stop("Could not find two numeric coordinate columns. Available columns: ",
-             paste(coord_cols, collapse = ", "))
-      }
-      coords_matrix <- as.matrix(coords[, which(numeric_cols)[1:2]])
-    }
-
-    colnames(coords_matrix) <- c("x", "y")
-
-    return(coords_matrix)
-    
-  } else if (is_spatial_experiment(x)) {
-    if (!requireNamespace("SpatialExperiment", quietly = TRUE)) {
-      stop("Package 'SpatialExperiment' is required but not available.\n",
-           "Install with: BiocManager::install('SpatialExperiment')")
-    }
-    
-    return(SpatialExperiment::spatialCoords(x))
-    
-  } else {
-    stop("Object must be either a Seurat or SpatialExperiment object")
+.require_seurat_object <- function() {
+  if (!requireNamespace("SeuratObject", quietly = TRUE)) {
+    stop(
+      "Package 'SeuratObject' is required for Seurat inputs. ",
+      "Install it with install.packages('SeuratObject')."
+    )
   }
 }
 
-#' Get metadata from either SpatialExperiment or Seurat object
-#' 
-#' @param x SpatialExperiment or Seurat object
-#' @return Data.frame of metadata
+#' Get column metadata from a spatial object
+#'
+#' @param x A `SpatialExperiment` or `Seurat` object.
+#'
+#' @return A `data.frame` with one row per spot, in object order.
 #' @export
+#'
 #' @examples
-#' library(STexampleData)
-#' spe <- Visium_humanDLPFC()
+#' spe <- STexampleData::Visium_humanDLPFC()
 #' metadata <- getMetadata(spe)
-#' colnames(metadata)
+#' head(metadata)
 getMetadata <- function(x) {
-  if (is_seurat(x)) {
-    return(x@meta.data)
-    
-  } else if (is_spatial_experiment(x)) {
-    if (!requireNamespace("SummarizedExperiment", quietly = TRUE)) {
-      stop("Package 'SummarizedExperiment' is required but not available.\n",
-           "Install with: BiocManager::install('SummarizedExperiment')")
-    }
-    
-    # Convert S4 DataFrame to regular data.frame for consistency
+  .check_supported_object(x)
+
+  if (is_spatial_experiment(x)) {
     return(as.data.frame(SummarizedExperiment::colData(x)))
-    
-  } else {
-    stop("Object must be either a Seurat or SpatialExperiment object")
   }
+
+  .require_seurat_object()
+  x[[]]
 }
 
-#' Set metadata for either SpatialExperiment or Seurat object
-#' 
-#' @param x SpatialExperiment or Seurat object
-#' @param metadata Data.frame of metadata to set
-#' @return Modified object with updated metadata
+#' Replace column metadata in a spatial object
+#'
+#' @param x A `SpatialExperiment` or `Seurat` object.
+#' @param metadata A data-frame-like object with one row per spot. Named rows
+#'   are reordered to match the object before assignment.
+#'
+#' @return `x` with replaced column metadata.
 #' @importFrom S4Vectors DataFrame
 #' @export
+#'
 #' @examples
-#' library(STexampleData)
-#' spe <- Visium_humanDLPFC()
+#' spe <- STexampleData::Visium_humanDLPFC()
 #' metadata <- getMetadata(spe)
-#' metadata$new_column <- 1
-#' spe_updated <- setMetadata(spe, metadata)
-#' "new_column" %in% colnames(getMetadata(spe_updated))
+#' metadata$example_column <- seq_len(nrow(metadata))
+#' spe <- setMetadata(spe, metadata)
 setMetadata <- function(x, metadata) {
-  if (is_seurat(x)) {
-    x@meta.data <- metadata
-    return(x)
-    
-  } else if (is_spatial_experiment(x)) {
-    if (!requireNamespace("SummarizedExperiment", quietly = TRUE)) {
-      stop("Package 'SummarizedExperiment' is required but not available.\n",
-           "Install with: BiocManager::install('SummarizedExperiment')")
-    }
-    
-    # Convert data.frame to DataFrame for SpatialExperiment compatibility
-    if (is.data.frame(metadata)) {
-      metadata <- DataFrame(metadata)
-    }
-    SummarizedExperiment::colData(x) <- metadata
-    return(x)
-    
-  } else {
-    stop("Object must be either a Seurat or SpatialExperiment object")
+  .check_supported_object(x)
+  metadata <- as.data.frame(metadata)
+  spot_names <- colnames(x)
+
+  if (nrow(metadata) != length(spot_names)) {
+    stop("'metadata' must have one row for every spot in 'x'.")
   }
+
+  metadata_names <- rownames(metadata)
+  default_names <- as.character(seq_len(nrow(metadata)))
+  if (is.null(metadata_names) || identical(metadata_names, default_names)) {
+    rownames(metadata) <- spot_names
+  } else if (!identical(metadata_names, spot_names)) {
+    if (anyDuplicated(metadata_names) ||
+        !setequal(metadata_names, spot_names)) {
+      stop("The row names of 'metadata' must match the spot names in 'x'.")
+    }
+    metadata <- metadata[spot_names, , drop = FALSE]
+  }
+
+  if (is_spatial_experiment(x)) {
+    SummarizedExperiment::colData(x) <- S4Vectors::DataFrame(metadata)
+    return(x)
+  }
+
+  .require_seurat_object()
+  x[[]] <- metadata
+  x
 }
 
-#' Subset spatial object by cell/spot indices
-#' 
-#' @param x SpatialExperiment or Seurat object
-#' @param indices Logical or integer vector for subsetting
-#' @param column_name Column name for logical subsetting (for Seurat objects)
-#' @return Subsetted object
+#' Subset a spatial object by spots
+#'
+#' @param x A `SpatialExperiment` or `Seurat` object.
+#' @param indices Logical, integer, or character spot indices. If
+#'   `column_name` is supplied, these are values to retain from that column.
+#' @param column_name Optional metadata column used for value-based subsetting.
+#'
+#' @return A subset of `x` containing the selected spots.
 #' @export
+#'
 #' @examples
-#' library(STexampleData)
-#' spe <- Visium_humanDLPFC()
-#' # Subset first 100 spots
-#' spe_subset <- subsetSpatialObject(spe, 1:100)
-#' ncol(spe_subset)
+#' spe <- STexampleData::Visium_humanDLPFC()
+#' spe_subset <- subsetSpatialObject(spe, seq_len(100))
 subsetSpatialObject <- function(x, indices, column_name = NULL) {
-  if (is_seurat(x)) {
-    if (is.logical(indices) && !is.null(column_name)) {
-      # Subset by logical column
-      cells_to_keep <- rownames(x@meta.data)[x@meta.data[[column_name]] %in% indices]
-      return(subset(x, cells = cells_to_keep))
-    } else {
-      # Direct subsetting by indices
-      if (is.logical(indices)) {
-        cells_to_keep <- rownames(x@meta.data)[indices]
-      } else {
-        cells_to_keep <- rownames(x@meta.data)[indices]
-      }
-      return(subset(x, cells = cells_to_keep))
-    }
-    
-  } else if (is_spatial_experiment(x)) {
-    return(x[, indices])
-    
-  } else {
-    stop("Object must be either a Seurat or SpatialExperiment object")
+  .check_supported_object(x)
+
+  if (!is.null(column_name)) {
+    validateMetadataColumns(x, column_name)
+    indices <- getMetadata(x)[[column_name]] %in% indices
   }
+
+  x[, indices]
 }
 
-#' Validate that required columns exist in metadata
-#' 
-#' @param x SpatialExperiment or Seurat object
-#' @param required_columns Character vector of required column names
-#' @return Logical indicating if all columns exist
+#' Validate columns in spatial-object metadata
+#'
+#' @param x A `SpatialExperiment` or `Seurat` object.
+#' @param required_columns Character vector of required metadata column names.
+#'
+#' @return `TRUE`, invisibly. An error is raised if columns are missing.
 #' @export
+#'
 #' @examples
-#' library(STexampleData)
-#' spe <- Visium_humanDLPFC()
-#' # Check if required columns exist
+#' spe <- STexampleData::Visium_humanDLPFC()
 #' validateMetadataColumns(spe, c("sample_id", "in_tissue"))
 validateMetadataColumns <- function(x, required_columns) {
   metadata <- getMetadata(x)
-  missing_cols <- setdiff(required_columns, colnames(metadata))
-  
-  if (length(missing_cols) > 0) {
-    stop("Required columns missing from metadata: ", 
-         paste(missing_cols, collapse = ", "))
+  missing_columns <- setdiff(required_columns, colnames(metadata))
+
+  if (length(missing_columns) > 0L) {
+    stop(
+      "Required columns missing from metadata: ",
+      paste(missing_columns, collapse = ", ")
+    )
   }
-  
-  return(TRUE)
+
+  invisible(TRUE)
+}
+
+# Coordinate adapters -----------------------------------------------------
+
+#' Get spatial coordinates from a spatial object
+#'
+#' @param x A `SpatialExperiment` or `Seurat` object.
+#' @param image_id For a Seurat object, an optional image name. If omitted,
+#'   coordinates from all images are combined and returned in object order.
+#'
+#' @return A numeric matrix with spots as rows and spatial dimensions as
+#'   columns.
+#' @export
+#'
+#' @examples
+#' spe <- STexampleData::Visium_humanDLPFC()
+#' coordinates <- getSpatialCoords(spe)
+#' head(coordinates)
+getSpatialCoords <- function(x, image_id = NULL) {
+  .check_supported_object(x)
+
+  if (is_spatial_experiment(x)) {
+    return(SpatialExperiment::spatialCoords(x))
+  }
+
+  .require_seurat_object()
+  image_names <- SeuratObject::Images(x)
+  if (length(image_names) == 0L) {
+    stop(
+      "The Seurat object has no spatial images. Supply coordinates with ",
+      "the 'coords' argument."
+    )
+  }
+
+  if (!is.null(image_id)) {
+    if (length(image_id) != 1L || !image_id %in% image_names) {
+      stop(
+        "Unknown Seurat image. Available images: ",
+        paste(image_names, collapse = ", ")
+      )
+    }
+    image_names <- image_id
+  }
+
+  coordinate_list <- lapply(image_names, function(image_name) {
+    coordinates <- SeuratObject::GetTissueCoordinates(
+      x,
+      image = image_name
+    )
+    .coordinate_matrix(coordinates, image_name)
+  })
+  coordinates <- do.call(rbind, coordinate_list)
+
+  if (anyDuplicated(rownames(coordinates))) {
+    stop("A spot occurs in more than one Seurat spatial image.")
+  }
+
+  if (is.null(image_id)) {
+    spot_names <- colnames(x)
+    missing_spots <- setdiff(spot_names, rownames(coordinates))
+    if (length(missing_spots) > 0L) {
+      stop(
+        "Spatial images do not contain every spot in the Seurat object. ",
+        "Supply a complete matrix with the 'coords' argument."
+      )
+    }
+    coordinates <- coordinates[spot_names, , drop = FALSE]
+  }
+
+  coordinates
+}
+
+.coordinate_matrix <- function(coordinates, image_name) {
+  coordinates <- as.data.frame(coordinates)
+
+  if (is.null(rownames(coordinates)) && "cell" %in% colnames(coordinates)) {
+    rownames(coordinates) <- coordinates$cell
+  }
+  if (is.null(rownames(coordinates))) {
+    stop("Coordinates for Seurat image '", image_name, "' are not named.")
+  }
+
+  coordinate_pairs <- list(
+    c("x", "y"),
+    c("imagecol", "imagerow"),
+    c("col", "row")
+  )
+  selected <- NULL
+  for (pair in coordinate_pairs) {
+    if (all(pair %in% colnames(coordinates))) {
+      selected <- pair
+      break
+    }
+  }
+  if (is.null(selected)) {
+    stop(
+      "Could not identify spatial coordinate columns for Seurat image '",
+      image_name, "'."
+    )
+  }
+
+  result <- as.matrix(coordinates[, selected, drop = FALSE])
+  storage.mode(result) <- "double"
+  colnames(result) <- c("x", "y")
+  result
+}
+
+.get_seurat_array_coordinates <- function(x, image_id = NULL) {
+  .require_seurat_object()
+  image_names <- SeuratObject::Images(x)
+  if (length(image_names) == 0L) {
+    stop("The Seurat object has no spatial images with array coordinates.")
+  }
+
+  if (is.null(image_id)) {
+    image_id <- image_names[[1L]]
+  } else if (length(image_id) != 1L || !image_id %in% image_names) {
+    stop(
+      "Unknown Seurat image. Available images: ",
+      paste(image_names, collapse = ", ")
+    )
+  }
+
+  coordinates <- tryCatch(
+    SeuratObject::GetTissueCoordinates(
+      x,
+      image = image_id,
+      scale = NULL,
+      cols = c("row", "col")
+    ),
+    error = function(error) NULL
+  )
+  coordinates <- as.data.frame(coordinates)
+
+  coordinate_names <- if (all(c("row", "col") %in% colnames(coordinates))) {
+    c("row", "col")
+  } else if (all(c("array_row", "array_col") %in%
+                 colnames(coordinates))) {
+    c("array_row", "array_col")
+  } else {
+    stop(
+      "Seurat image '", image_id, "' does not expose Visium array row and ",
+      "column coordinates. Add 'array_row' and 'array_col' to the object's ",
+      "metadata or select a Visium image."
+    )
+  }
+
+  result <- coordinates[, coordinate_names, drop = FALSE]
+  colnames(result) <- c("array_row", "array_col")
+  result
 }

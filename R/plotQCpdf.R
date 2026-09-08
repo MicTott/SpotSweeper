@@ -79,7 +79,7 @@ plotQCpdf <- function(
     # initialize PDF and loop through plots
     pdf(width = width, height = height, fname)
     for (sample in unique_sample_ids) {
-        p <- plotQC(spe,
+        p <- plotQCmetrics(spe,
             sample_id = sample_id, sample = sample,
             metric = metric, outliers = outliers, colors = colors,
             stroke = stroke, point_size = point_size

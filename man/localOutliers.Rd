@@ -2,7 +2,7 @@
 % Please edit documentation in R/localOutliers.R
 \name{localOutliers}
 \alias{localOutliers}
-\title{localOutliers Function}
+\title{Detect local outliers in spatial transcriptomics data}
 \usage{
 localOutliers(
   spe,
@@ -17,85 +17,82 @@ localOutliers(
 )
 }
 \arguments{
-\item{spe}{SpatialExperiment, SingleCellExperiment, or Seurat object}
+\item{spe}{A \code{SpatialExperiment} or \code{Seurat} object.}
 
-\item{metric}{Metadata QC metric to use for outlier detection (colData for SpatialExperiment, meta.data for Seurat)}
+\item{metric}{A single column name in the object's column metadata containing
+a numeric QC metric.}
 
-\item{direction}{Direction of outlier detection (higher, lower, or both)}
+\item{direction}{Direction of outlier detection: \code{"higher"}, \code{"lower"}, or
+\code{"both"}.}
 
-\item{n_neighbors}{Number of nearest neighbors to use for outlier detection}
+\item{n_neighbors}{Number of nearest neighbors used as the local reference.}
 
-\item{samples}{Column name in metadata to use for sample IDs}
+\item{samples}{A single metadata column name containing sample identifiers.}
 
-\item{log}{Logical indicating whether to log1p transform the features
-(default is TRUE)}
+\item{log}{Whether to apply \code{log1p()} to \code{metric} before scoring.}
 
-\item{cutoff}{Cutoff for outlier detection (default is 3)}
+\item{cutoff}{Non-negative absolute robust z-score cutoff.}
 
-\item{workers}{Number of workers for parallel processing (default is 1)}
+\item{workers}{Number of workers passed to \code{BiocNeighbors::findKNN()}.}
 
-\item{coords}{Custom coordinates matrix for neighborhood detection (default is NULL, uses spatial coordinates).
-Can be PCA, UMAP, or any other coordinate system. Should be a numeric matrix with spots as rows and coordinates as columns.}
+\item{coords}{Optional numeric coordinate matrix with spots as rows. When
+\code{NULL}, spatial coordinates are obtained from \code{spe}.}
 }
 \value{
-SpatialExperiment, SingleCellExperiment, or Seurat object with updated metadata containing outputs
+The input object with \verb{<metric>_z} and \verb{<metric>_outliers} metadata
+columns. When \code{log = TRUE}, \verb{<metric>_log} is also added.
 }
 \description{
-This function detects local outliers in spatial transcriptomics data based on
-standard quality control metrics, such as library size, unique genes, and
-mitochondrial ratio. Local outliers are defined as spots with low/high
-quality metrics compared to their surrounding neighbors, based on a modified
-z-score statistic.
+\code{localOutliers()} compares each spot's quality-control metric with the same
+metric in its nearest neighbors. It supports \code{SpatialExperiment} and
+\code{Seurat} objects and stores the resulting robust z-scores and outlier calls
+in the object's column metadata.
+}
+\details{
+The robust z-score for spot i is
+\code{qnorm(0.75) * (x_i - median(x_neighbors)) / MAD_unscaled(x_neighbors)}.
+The focal spot is not included when estimating the neighborhood median or
+median absolute deviation. A score of zero is returned when the neighborhood
+MAD is zero or non-finite.
 }
 \examples{
 library(SpotSweeper)
 library(SpatialExperiment)
 
-# load example data
 spe <- STexampleData::Visium_humanDLPFC()
-
-# change from gene id to gene names
 rownames(spe) <- rowData(spe)$gene_name
-
-# drop out-of-tissue spots
 spe <- spe[, spe$in_tissue == 1]
 spe <- spe[, !is.na(spe$ground_truth)]
 
-# Identifying the mitochondrial transcripts in our SpatialExperiment.
-is.mito <- rownames(spe)[grepl("^MT-", rownames(spe))]
-
-# Calculating QC metrics for each spot using scuttle
-spe <- scuttle::addPerCellQCMetrics(spe, subsets = list(Mito = is.mito))
-colnames(colData(spe))
-
-# Identifying local outliers using SpotSweeper
-spe <- localOutliers(spe,
-                     metric = "sum",
-                     direction = "lower",
-                     log = TRUE
+is.mito <- grepl("^MT-", rownames(spe))
+spe <- scuttle::addPerCellQCMetrics(
+    spe,
+    subsets = list(Mito = is.mito)
 )
 
-# Example with Seurat object (if Seurat is available):
-# library(Seurat) 
-# # Assuming 'seurat_obj' is a Seurat object with spatial data
-# seurat_obj <- localOutliers(seurat_obj,
-#                             metric = "nCount_RNA",
-#                             direction = "lower", 
-#                             samples = "orig.ident")
+spe <- localOutliers(
+    spe,
+    metric = "sum",
+    direction = "lower",
+    log = TRUE
+)
 
-# Example with custom coordinates (PCA, UMAP, etc.):
-# # Use PCA coordinates for neighborhood detection instead of spatial
-# spe <- runPCA(spe, ncomponents = 50)
-# pca_coords <- reducedDim(spe, "PCA")[, 1:10]  # Use first 10 PCs
-# spe <- localOutliers(spe,
-#                      metric = "sum", 
-#                      coords = pca_coords)
-#
-# # Use UMAP coordinates for neighborhood detection
-# spe <- runUMAP(spe, dimred = "PCA")  
-# umap_coords <- reducedDim(spe, "UMAP")
-# spe <- localOutliers(spe,
-#                      metric = "detected",
-#                      coords = umap_coords)
-
+# Seurat objects use the same interface. Custom coordinates can also be
+# supplied for either object type.
+if (requireNamespace("SeuratObject", quietly = TRUE)) {
+    counts <- matrix(
+        seq_len(24),
+        nrow = 4,
+        dimnames = list(paste0("gene", 1:4), paste0("spot", 1:6))
+    )
+    seurat <- SeuratObject::CreateSeuratObject(counts)
+    seurat$sample_id <- "sample"
+    seurat$detected <- c(100, 10, 11, 9, 12, 10)
+    example_coords <- cbind(x = seq_len(6), y = 0)
+    seurat <- localOutliers(
+        seurat,
+        n_neighbors = 4,
+        coords = example_coords
+    )
+}
 }

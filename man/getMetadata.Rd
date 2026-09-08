@@ -2,22 +2,21 @@
 % Please edit documentation in R/seurat_compatibility.R
 \name{getMetadata}
 \alias{getMetadata}
-\title{Get metadata from either SpatialExperiment or Seurat object}
+\title{Get column metadata from a spatial object}
 \usage{
 getMetadata(x)
 }
 \arguments{
-\item{x}{SpatialExperiment or Seurat object}
+\item{x}{A \code{SpatialExperiment} or \code{Seurat} object.}
 }
 \value{
-Data.frame of metadata
+A \code{data.frame} with one row per spot, in object order.
 }
 \description{
-Get metadata from either SpatialExperiment or Seurat object
+Get column metadata from a spatial object
 }
 \examples{
-library(STexampleData)
-spe <- Visium_humanDLPFC()
+spe <- STexampleData::Visium_humanDLPFC()
 metadata <- getMetadata(spe)
-colnames(metadata)
+head(metadata)
 }
