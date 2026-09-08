@@ -360,7 +360,7 @@ utils::sessionInfo()
     ## [13] matrixStats_1.5.0           ExperimentHub_3.2.2        
     ## [15] AnnotationHub_4.2.2         BiocFileCache_3.2.0        
     ## [17] dbplyr_2.6.0                BiocGenerics_0.58.1        
-    ## [19] generics_0.1.4              SpotSweeper_1.9.1          
+    ## [19] generics_0.1.4              SpotSweeper_1.9.2          
     ## [21] BiocStyle_2.40.0           
     ## 
     ## loaded via a namespace (and not attached):

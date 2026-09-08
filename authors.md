@@ -18,14 +18,14 @@ Totty M (2026). *SpotSweeper: spatially-aware quality control for
 spatial transcriptomics*.
 [doi:10.18129/B9.bioc.SpotSweeper](https://doi.org/10.18129/B9.bioc.SpotSweeper).
 https://github.com/MicTott/SpotSweeper/SpotSweeper - R package version
-1.9.1, <http://www.bioconductor.org/packages/SpotSweeper>.
+1.9.2, <http://www.bioconductor.org/packages/SpotSweeper>.
 
     @Manual{,
       title = {SpotSweeper: spatially-aware quality control for spatial transcriptomics},
       author = {Michael Totty},
       year = {2026},
       url = {http://www.bioconductor.org/packages/SpotSweeper},
-      note = {https://github.com/MicTott/SpotSweeper/SpotSweeper - R package version 1.9.1},
+      note = {https://github.com/MicTott/SpotSweeper/SpotSweeper - R package version 1.9.2},
       doi = {10.18129/B9.bioc.SpotSweeper},
     }
 

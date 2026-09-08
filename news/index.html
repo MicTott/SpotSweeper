@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">SpotSweeper</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.9.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.9.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,14 +37,14 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.9.1" id="version-191">Version 1.9.1<a class="anchor" aria-label="anchor" href="#version-191"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.9.2" id="version-192">Version 1.9.2<a class="anchor" aria-label="anchor" href="#version-192"></a></h2>
 <div class="section level3">
-<h3 id="bug-fixes-1-9-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-9-1"></a></h3>
+<h3 id="bug-fixes-1-9-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-9-2"></a></h3>
 <ul><li>Corrected the robust local z-score calculation in <code><a href="../reference/localOutliers.html">localOutliers()</a></code>. Scores now use the focal spot value and the unscaled median absolute deviation of neighboring spots, matching the published method. Previous versions applied the normal-consistency scaling twice and could associate a neighbor’s score with the focal spot.</li>
 <li>Removed the <code>spatialEco</code> dependency, which is no longer needed for local z-score calculation.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="seurat-compatibility-1-9-1">Seurat compatibility<a class="anchor" aria-label="anchor" href="#seurat-compatibility-1-9-1"></a></h3>
+<h3 id="seurat-compatibility-1-9-2">Seurat compatibility<a class="anchor" aria-label="anchor" href="#seurat-compatibility-1-9-2"></a></h3>
 <ul><li>Reworked Seurat support around small, tested object adapters that preserve spot names and ordering and use public <code>SeuratObject</code> accessors.</li>
 <li>Added integration tests for <code><a href="../reference/localOutliers.html">localOutliers()</a></code>, spatial-coordinate extraction, metadata replacement, subsetting, and <code><a href="../reference/flagVisiumOutliers.html">flagVisiumOutliers()</a></code> with real Seurat objects.</li>
 <li>Added explicit guidance when <code><a href="../reference/findArtifacts.html">findArtifacts()</a></code> is used with data lacking mitochondrial signal, including Visium FFPE probe-panel data.</li>
