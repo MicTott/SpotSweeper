@@ -1,6 +1,6 @@
 # SpotSweeper Package News
 
-# Version 1.9.1
+# Version 1.9.2
 
 ## Bug fixes
 
