@@ -36,9 +36,11 @@ name: R-CMD-check-bioc
 env:
   has_testthat: 'true'
   run_covr: 'true'
-  run_pkgdown: 'true'
+  ## pkgdown is built and deployed by the dedicated pkgdown workflow
+  ## (pgkdown.yaml); deploying from both workflows races on gh-pages.
+  run_pkgdown: 'false'
   has_RUnit: 'false'
-  cache-version: 'cache-v1'
+  cache-version: 'cache-v2'
   run_docker: 'false'
 
 jobs:
@@ -242,6 +244,11 @@ jobs:
         env:
           DISPLAY: 99.0
         run: |
+          ## BiocCheck is normally installed in dependencies pass 1, but that
+          ## step is continue-on-error; make sure it is actually available.
+          if (!requireNamespace("BiocCheck", quietly = TRUE)) {
+              install.packages("BiocCheck", repos = BiocManager::repositories())
+          }
           BiocCheck::BiocCheck(
               dir('check', 'tar.gz$', full.names = TRUE),
               `quit-with-status` = TRUE,
