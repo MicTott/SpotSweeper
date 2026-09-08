@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Getting started with 'SpotSweeper' • SpotSweeper</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Getting started with 'SpotSweeper'">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">SpotSweeper</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.9.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@ USA<br><h4 data-toc-skip class="author">Stephanie
 Hicks</h4>
             <address class="author_afil">
       Johns Hopkins Bloomberg School of Public Health, Baltimore, MD,
-USA<br><h4 data-toc-skip class="date">2025-10-22</h4>
+USA<br><h4 data-toc-skip class="date">2026-09-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/MicTott/SpotSweeper/blob/devel/vignettes/getting_started.Rmd" class="external-link"><code>vignettes/getting_started.Rmd</code></a></small>
       <div class="d-none name"><code>getting_started.Rmd</code></div>
@@ -99,25 +99,41 @@ data quality control (QC). It provides functions for detecting and
 visualizing spot-level local outliers and artifacts using
 spatially-aware methods. The package is designed to work with <a href="https://github.com/drighelli/SpatialExperiment" class="external-link">SpatialExperiment</a>
 objects, and is compatible with data from 10X Genomics Visium and other
-spatial transcriptomics platforms.</p>
+spatial transcriptomics platforms. Spot-level outlier detection and
+systematic Visium position flagging also accept <code>Seurat</code>
+objects without conversion.</p>
+<div class="section level3">
+<h3 id="assay-and-chemistry-support">Assay and chemistry support<a class="anchor" aria-label="anchor" href="#assay-and-chemistry-support"></a>
+</h3>
+<p><code><a href="../reference/localOutliers.html">localOutliers()</a></code> can use any numeric spot-level QC
+metric. Library size and the number of detected genes are therefore
+suitable for both fresh-frozen and FFPE data. Mitochondrial metrics
+should only be used when the assay measures mitochondrial genes.</p>
+<p><code><a href="../reference/findArtifacts.html">findArtifacts()</a></code> detects hangnail-like regional artifacts
+using mitochondrial signal and is not suitable for Visium FFPE probe
+panels that omit mitochondrial genes. For those assays, use
+<code><a href="../reference/localOutliers.html">localOutliers()</a></code> with library size or detected genes.
+Spatially contiguous dry-edge regions require a region-level method and
+should not be interpreted as failures of local outlier detection.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Currently, the only way to install <code>SpotSweeper</code> is by
-downloading the development version which can be installed from <a href="https://github.com/MicTott/SpotSweeper" class="external-link">GitHub</a> using the
-following:</p>
+<p>Install the current release from <a href="https://bioconductor.org/packages/SpotSweeper/" class="external-link">Bioconductor</a>
+with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://devtools.r-lib.org/" class="external-link">"devtools"</a></span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"MicTott/SpotSweeper"</span><span class="op">)</span></span></code></pre></div>
-<p>Once accepted in <a href="http://bioconductor.org/" class="external-link">Bioconductor</a>,
-<code>SpotSweeper</code> will be installable using:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"SpotSweeper"</span><span class="op">)</span></span></code></pre></div>
+<p>The GitHub development version can be installed with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"remotes"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"MicTott/SpotSweeper"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="spot-level-local-outlier-detection">Spot-level local outlier detection<a class="anchor" aria-label="anchor" href="#spot-level-local-outlier-detection"></a>
@@ -166,8 +182,16 @@ calculate QC metrics for each spot using
 <span><span class="va">is.mito</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"^MT-"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co"># calculating QC metrics for each spot using scuttle</span></span>
-<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu">scuttle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/addPerCellQCMetrics.html" class="external-link">addPerCellQCMetrics</a></span><span class="op">(</span><span class="va">spe</span>, subsets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Mito <span class="op">=</span> <span class="va">is.mito</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu">scuttle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/addPerCellQCMetrics.html" class="external-link">addPerCellQCMetrics</a></span><span class="op">(</span><span class="va">spe</span>, subsets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Mito <span class="op">=</span> <span class="va">is.mito</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in scuttle::addPerCellQCMetrics(spe, subsets = list(Mito = is.mito)): 'scuttle::addPerCellQCMetrics' is deprecated.</span></span>
+<span><span class="co">## Use 'scrapper::quickRnaQc.se' instead.</span></span>
+<span><span class="co">## See help("Deprecated")</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in .per_cell_qc_metrics(assay(x, assay.type), subsets = subsets, : 'perCellQCMetrics' is deprecated.</span></span>
+<span><span class="co">## Use 'scrapper::computeRnaQcMetrics' instead.</span></span>
+<span><span class="co">## See help("Deprecated")</span></span></code></pre>
+<pre><code><span><span class="co">## using unknown matrix fallback for 'dgTMatrix'</span></span></code></pre>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "barcode_id"            "sample_id"             "in_tissue"            </span></span>
 <span><span class="co">##  [4] "array_row"             "array_col"             "ground_truth"         </span></span>
 <span><span class="co">##  [7] "reference"             "cell_count"            "sum"                  </span></span>
@@ -185,7 +209,7 @@ reads that are mitochondrial. These methods assume a normal
 distribution, so we’ll use the log-transformed sum of the counts and the
 log-transformed number of detected genes. For mitochondrial percent,
 we’ll use the raw mitochondrial percentage.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># library size</span></span>
 <span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"sum"</span>,</span>
@@ -212,11 +236,30 @@ results to the <code>colData</code> with the naming convention
 <code>colData</code>. We can then combine all outliers into a single
 column called <code>local_outliers</code> in the <code>colData</code> of
 the <code>SpatialExperiment</code> object.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># combine all outliers into "local_outliers" column</span></span>
 <span><span class="va">spe</span><span class="op">$</span><span class="va">local_outliers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">sum_outliers</span><span class="op">)</span> <span class="op">|</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">detected_outliers</span><span class="op">)</span> <span class="op">|</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">spe</span><span class="op">$</span><span class="va">subsets_Mito_percent_outliers</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="using-a-seurat-object">Using a Seurat object<a class="anchor" aria-label="anchor" href="#using-a-seurat-object"></a>
+</h3>
+<p>The same <code><a href="../reference/localOutliers.html">localOutliers()</a></code> call works with a Seurat
+object. Metrics are read from and results are written to the object’s
+metadata. Coordinates are obtained from its spatial image;
+alternatively, provide a numeric matrix through <code>coords</code>.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/localOutliers.html">localOutliers</a></span><span class="op">(</span></span>
+<span>    <span class="va">seurat</span>,</span>
+<span>    metric <span class="op">=</span> <span class="st">"nCount_Spatial"</span>,</span>
+<span>    direction <span class="op">=</span> <span class="st">"lower"</span>,</span>
+<span>    samples <span class="op">=</span> <span class="st">"orig.ident"</span>,</span>
+<span>    log <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">$</span><span class="va">nCount_Spatial_z</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">$</span><span class="va">nCount_Spatial_outliers</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="visualizing-local-outliers">Visualizing local outliers<a class="anchor" aria-label="anchor" href="#visualizing-local-outliers"></a>
@@ -228,15 +271,15 @@ using the <code>escheR</code> package. Here, we’ll visualize local
 outliers of library size, unique genes, mitochondrial percent, and
 finally, all local outliers. We’ll then arrange these plots in a grid
 using <code>ggpubr::arrange</code>.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/boyiguo1/escheR" class="external-link">escheR</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: ggplot2</span></span></code></pre>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># all local outliers</span></span>
 <span><span class="fu"><a href="../reference/plotQCmetrics.html">plotQCmetrics</a></span><span class="op">(</span><span class="va">spe</span>, metric <span class="op">=</span> <span class="st">"sum_log"</span>, outliers <span class="op">=</span> <span class="st">"local_outliers"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span>, </span>
 <span>       stroke <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span> <span class="op">+</span></span>
 <span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"All Local Outliers"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/local_outlier_plot-1.png" width="300"></p>
+<p><img src="getting_started_files/figure-html/local_outlier_plot-1.png" class="r-plt" alt="" width="300"></p>
 </div>
 </div>
 <div class="section level2">
@@ -245,7 +288,7 @@ using <code>ggpubr::arrange</code>.</p>
 <div class="section level3">
 <h3 id="loading-example-data-1">Loading example data<a class="anchor" aria-label="anchor" href="#loading-example-data-1"></a>
 </h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load in DLPFC sample with hangnail artifact</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">DLPFC_artifact</span><span class="op">)</span></span>
 <span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="va">DLPFC_artifact</span></span>
@@ -268,13 +311,13 @@ percentage. We can first visualize the technical artifacts using the
 <code>plotQCmetrics</code> function. In this sample, we can clearly see
 a hangnail artifact on the right side of the tissue section in the
 mitochondrial ratio plot.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotQCmetrics.html">plotQCmetrics</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="cn">NULL</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Mitochondrial Percent"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/artifact_QC_plots-1.png" width="400"></p>
+<p><img src="getting_started_files/figure-html/artifact_QC_plots-1.png" class="r-plt" alt="" width="400"></p>
 </div>
 <div class="section level3">
 <h3 id="identifying-artifacts-using-spotsweeper">Identifying artifacts using <code>SpotSweeper</code><a class="anchor" aria-label="anchor" href="#identifying-artifacts-using-spotsweeper"></a>
@@ -288,7 +331,7 @@ numerous neighorhood sizes (<code>n_order=5</code>). Currently,
 vs high-quality Visium spots. Similar to <code>localOutliers</code>, the
 <code>findArtifacts</code> function then outputs the results to the
 <code>colData</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># find artifacts using SpotSweeper</span></span>
 <span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/findArtifacts.html">findArtifacts</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    mito_percent <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span>
@@ -315,19 +358,19 @@ vs high-quality Visium spots. Similar to <code>localOutliers</code>, the
 <p>We can visualize the artifacts using the <code>escheR</code> package.
 Here, we’ll visualize the artifacts using the <code>plotQCmetrics</code>
 function and arrange these plots using <code>ggpubr::arrange</code>.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotQCmetrics.html">plotQCmetrics</a></span><span class="op">(</span><span class="va">spe</span>,</span>
 <span>    metric <span class="op">=</span> <span class="st">"expr_chrM_ratio"</span>,</span>
 <span>    outliers <span class="op">=</span> <span class="st">"artifact"</span>, point_size <span class="op">=</span> <span class="fl">1.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Hangnail artifact"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/artifact_visualization-1.png" width="400">
+<p><img src="getting_started_files/figure-html/artifact_visualization-1.png" class="r-plt" alt="" width="400">
 # Session information</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## R version 4.5.1 (2025-06-13)</span></span>
+<pre><code><span><span class="co">## R version 4.6.1 (2026-06-24)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 24.04.3 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 24.04.4 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -347,47 +390,46 @@ function and arrange these plots using <code>ggpubr::arrange</code>.</p>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] escheR_1.8.0                ggplot2_4.0.0              </span></span>
-<span><span class="co">##  [3] STexampleData_1.16.0        SpatialExperiment_1.18.1   </span></span>
-<span><span class="co">##  [5] SingleCellExperiment_1.30.1 SummarizedExperiment_1.38.1</span></span>
-<span><span class="co">##  [7] Biobase_2.68.0              GenomicRanges_1.60.0       </span></span>
-<span><span class="co">##  [9] GenomeInfoDb_1.44.3         IRanges_2.42.0             </span></span>
-<span><span class="co">## [11] S4Vectors_0.46.0            MatrixGenerics_1.20.0      </span></span>
-<span><span class="co">## [13] matrixStats_1.5.0           ExperimentHub_2.16.1       </span></span>
-<span><span class="co">## [15] AnnotationHub_3.16.1        BiocFileCache_2.16.2       </span></span>
-<span><span class="co">## [17] dbplyr_2.5.1                BiocGenerics_0.54.1        </span></span>
-<span><span class="co">## [19] generics_0.1.4              SpotSweeper_1.5.0          </span></span>
-<span><span class="co">## [21] BiocStyle_2.36.0           </span></span>
+<span><span class="co">##  [1] escheR_1.12.0               ggplot2_4.0.3              </span></span>
+<span><span class="co">##  [3] STexampleData_1.20.1        SpatialExperiment_1.22.0   </span></span>
+<span><span class="co">##  [5] SingleCellExperiment_1.34.0 SummarizedExperiment_1.42.0</span></span>
+<span><span class="co">##  [7] Biobase_2.72.0              GenomicRanges_1.64.0       </span></span>
+<span><span class="co">##  [9] Seqinfo_1.2.0               IRanges_2.46.0             </span></span>
+<span><span class="co">## [11] S4Vectors_0.50.2            MatrixGenerics_1.24.0      </span></span>
+<span><span class="co">## [13] matrixStats_1.5.0           ExperimentHub_3.2.2        </span></span>
+<span><span class="co">## [15] AnnotationHub_4.2.2         BiocFileCache_3.2.0        </span></span>
+<span><span class="co">## [17] dbplyr_2.6.0                BiocGenerics_0.58.1        </span></span>
+<span><span class="co">## [19] generics_0.1.4              SpotSweeper_1.9.1          </span></span>
+<span><span class="co">## [21] BiocStyle_2.40.0           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] DBI_1.2.3               rlang_1.1.6             magrittr_2.0.4         </span></span>
-<span><span class="co">##  [4] spatialEco_2.0-3        compiler_4.5.1          RSQLite_2.4.3          </span></span>
-<span><span class="co">##  [7] png_0.1-8               systemfonts_1.3.1       vctrs_0.6.5            </span></span>
-<span><span class="co">## [10] pkgconfig_2.0.3         crayon_1.5.3            fastmap_1.2.0          </span></span>
-<span><span class="co">## [13] magick_2.9.0            XVector_0.48.0          labeling_0.4.3         </span></span>
-<span><span class="co">## [16] scuttle_1.18.0          rmarkdown_2.30          UCSC.utils_1.4.0       </span></span>
-<span><span class="co">## [19] ragg_1.5.0              purrr_1.1.0             bit_4.6.0              </span></span>
-<span><span class="co">## [22] xfun_0.53               cachem_1.1.0            beachmat_2.24.0        </span></span>
-<span><span class="co">## [25] jsonlite_2.0.0          blob_1.2.4              DelayedArray_0.34.1    </span></span>
-<span><span class="co">## [28] BiocParallel_1.42.2     terra_1.8-70            parallel_4.5.1         </span></span>
-<span><span class="co">## [31] R6_2.6.1                bslib_0.9.0             RColorBrewer_1.1-3     </span></span>
-<span><span class="co">## [34] jquerylib_0.1.4         Rcpp_1.1.0              bookdown_0.45          </span></span>
-<span><span class="co">## [37] knitr_1.50              Matrix_1.7-3            tidyselect_1.2.1       </span></span>
-<span><span class="co">## [40] abind_1.4-8             yaml_2.3.10             codetools_0.2-20       </span></span>
-<span><span class="co">## [43] curl_7.0.0              lattice_0.22-7          tibble_3.3.0           </span></span>
-<span><span class="co">## [46] withr_3.0.2             KEGGREST_1.48.1         S7_0.2.0               </span></span>
-<span><span class="co">## [49] evaluate_1.0.5          desc_1.4.3              Biostrings_2.76.0      </span></span>
-<span><span class="co">## [52] pillar_1.11.1           BiocManager_1.30.26     filelock_1.0.3         </span></span>
-<span><span class="co">## [55] BiocVersion_3.21.1      scales_1.4.0            glue_1.8.0             </span></span>
-<span><span class="co">## [58] tools_4.5.1             BiocNeighbors_2.2.0     fs_1.6.6               </span></span>
-<span><span class="co">## [61] grid_4.5.1              AnnotationDbi_1.70.0    GenomeInfoDbData_1.2.14</span></span>
-<span><span class="co">## [64] cli_3.6.5               rappdirs_0.3.3          textshaping_1.0.4      </span></span>
-<span><span class="co">## [67] S4Arrays_1.8.1          viridisLite_0.4.2       dplyr_1.1.4            </span></span>
-<span><span class="co">## [70] gtable_0.3.6            sass_0.4.10             digest_0.6.37          </span></span>
-<span><span class="co">## [73] SparseArray_1.8.1       rjson_0.2.23            htmlwidgets_1.6.4      </span></span>
-<span><span class="co">## [76] farver_2.1.2            memoise_2.0.1           htmltools_0.5.8.1      </span></span>
-<span><span class="co">## [79] pkgdown_2.1.3           lifecycle_1.0.4         httr_1.4.7             </span></span>
-<span><span class="co">## [82] mime_0.13               bit64_4.6.0-1           MASS_7.3-65</span></span></code></pre>
+<span><span class="co">##  [1] tidyselect_1.2.1     viridisLite_0.4.3    dplyr_1.2.1         </span></span>
+<span><span class="co">##  [4] farver_2.1.2         blob_1.3.0           Biostrings_2.80.2   </span></span>
+<span><span class="co">##  [7] filelock_1.0.3       S7_0.2.2             fastmap_1.2.0       </span></span>
+<span><span class="co">## [10] digest_0.6.39        lifecycle_1.0.5      KEGGREST_1.52.2     </span></span>
+<span><span class="co">## [13] RSQLite_3.53.3       magrittr_2.0.5       compiler_4.6.1      </span></span>
+<span><span class="co">## [16] rlang_1.3.0          sass_0.4.10          tools_4.6.1         </span></span>
+<span><span class="co">## [19] yaml_2.3.12          knitr_1.52           labeling_0.4.3      </span></span>
+<span><span class="co">## [22] S4Arrays_1.12.0      htmlwidgets_1.6.4    curl_8.0.0          </span></span>
+<span><span class="co">## [25] bit_4.6.0            DelayedArray_0.38.2  RColorBrewer_1.1-3  </span></span>
+<span><span class="co">## [28] abind_1.4-8          BiocParallel_1.46.0  withr_3.0.3         </span></span>
+<span><span class="co">## [31] purrr_1.2.2          desc_1.4.3           grid_4.6.1          </span></span>
+<span><span class="co">## [34] beachmat_2.28.0      scales_1.4.0         MASS_7.3-65         </span></span>
+<span><span class="co">## [37] cli_3.6.6            crayon_1.5.3         rmarkdown_2.32      </span></span>
+<span><span class="co">## [40] ragg_1.5.2           otel_0.2.0           httr_1.4.9          </span></span>
+<span><span class="co">## [43] rjson_0.2.23         scuttle_1.22.0       DBI_1.3.0           </span></span>
+<span><span class="co">## [46] cachem_1.1.0         parallel_4.6.1       AnnotationDbi_1.74.0</span></span>
+<span><span class="co">## [49] BiocManager_1.30.27  XVector_0.52.0       vctrs_0.7.3         </span></span>
+<span><span class="co">## [52] Matrix_1.7-5         jsonlite_2.0.0       bookdown_0.48       </span></span>
+<span><span class="co">## [55] BiocNeighbors_2.6.0  bit64_4.8.6          systemfonts_1.3.2   </span></span>
+<span><span class="co">## [58] magick_2.9.1         jquerylib_0.1.4      glue_1.8.1          </span></span>
+<span><span class="co">## [61] pkgdown_2.2.1        codetools_0.2-20     gtable_0.3.6        </span></span>
+<span><span class="co">## [64] BiocVersion_3.23.1   tibble_3.3.1         pillar_1.11.1       </span></span>
+<span><span class="co">## [67] rappdirs_0.3.4       htmltools_0.5.9      R6_2.6.1            </span></span>
+<span><span class="co">## [70] httr2_1.3.0          textshaping_1.0.5    evaluate_1.0.5      </span></span>
+<span><span class="co">## [73] lattice_0.22-9       png_0.1-9            memoise_2.0.1       </span></span>
+<span><span class="co">## [76] bslib_0.12.0         Rcpp_1.1.2           SparseArray_1.12.2  </span></span>
+<span><span class="co">## [79] xfun_0.60            fs_2.1.0             pkgconfig_2.0.3</span></span></code></pre>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -401,7 +443,7 @@ function and arrange these plots using <code>ggpubr::arrange</code>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

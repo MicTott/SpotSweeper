@@ -1,0 +1,97 @@
+# SpotSweeper ![](reference/figures/hexsticker.png)
+
+`SpotSweeper` is a package developed for spatially-aware quality control
+(QC) methods for the detection, visualization, and removal of both local
+outliers and regional artifacts in spot-based spatial transcriptomics
+data, such as 10x Genomics `Visium`, using standard QC metrics.
+
+If you experience any issues using the package or would like to make a
+suggestion, please open an issue on the [GitHub
+repository](https://github.com/MicTott/SpotSweeper/issues).
+
+To find more information, please visit the [documentation
+website](http://MicTott.github.io/SpotSweeper).
+
+![](./reference/figures/schematic.png)
+
+## Installation instructions
+
+You can install the latest version of `SpotSweeper` from Bioconductor
+with the following code:
+
+``` r
+
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+}
+
+BiocManager::install("SpotSweeper")
+```
+
+The latest development version can be installed from
+[GitHub](https://github.com/MicTott/SpotSweeper) using the following:
+
+``` r
+
+if (!require("devtools")) install.packages("devtools")
+remotes::install_github("MicTott/SpotSweeper")
+```
+
+## Tutorials
+
+A detailed tutorial is available in the package vignette from
+Bioconductor. A direct link to the tutorial / package vignette is
+available
+[here](https://mictott.github.io/SpotSweeper/articles/getting_started.html).
+
+## Development tools
+
+- Continuous code testing is possible thanks to [GitHub
+  actions](https://www.tidyverse.org/blog/2020/04/usethis-1-6-0/)
+  through `BiocStyle::Biocpkg('biocthis')`.
+- The [documentation website](http://MicTott.github.io/SpotSweeper) is
+  automatically updated thanks to `BiocStyle::CRANpkg('pkgdown')`.
+- The code is styled automatically thanks to
+  `BiocStyle::CRANpkg('styler')`.
+- The documentation is formatted thanks to
+  `BiocStyle::CRANpkg('devtools')` and `BiocStyle::CRANpkg('roxygen2')`.
+
+This package was developed using `BiocStyle::Biocpkg('biocthis')`.
+
+# Package index
+
+## All functions
+
+- [`DLPFC_artifact`](https://mictott.github.io/SpotSweeper/reference/DLPFC_artifact.md)
+  : human DLPFC dataset with a technical artifact (hangnail).
+- [`biased_spots`](https://mictott.github.io/SpotSweeper/reference/biased_spots.md)
+  : Biased Spots Data
+- [`findArtifacts()`](https://mictott.github.io/SpotSweeper/reference/findArtifacts.md)
+  : Identify and annotate artifacts in spatial transcriptomics data
+- [`flagVisiumOutliers()`](https://mictott.github.io/SpotSweeper/reference/flagVisiumOutliers.md)
+  : Flag systematic Visium outlier positions
+- [`getMetadata()`](https://mictott.github.io/SpotSweeper/reference/getMetadata.md)
+  : Get column metadata from a spatial object
+- [`getSpatialCoords()`](https://mictott.github.io/SpotSweeper/reference/getSpatialCoords.md)
+  : Get spatial coordinates from a spatial object
+- [`localOutliers()`](https://mictott.github.io/SpotSweeper/reference/localOutliers.md)
+  : Detect local outliers in spatial transcriptomics data
+- [`localVariance()`](https://mictott.github.io/SpotSweeper/reference/localVariance.md)
+  : localVariance Function
+- [`plotQCmetrics()`](https://mictott.github.io/SpotSweeper/reference/plotQCmetrics.md)
+  : Plot QC metrics for a Single Sample in a SpatialExperiment object
+- [`plotQCpdf()`](https://mictott.github.io/SpotSweeper/reference/plotQCpdf.md)
+  : Plot Outlier Metrics to PDF
+- [`setMetadata()`](https://mictott.github.io/SpotSweeper/reference/setMetadata.md)
+  : Replace column metadata in a spatial object
+- [`subsetSpatialObject()`](https://mictott.github.io/SpotSweeper/reference/subsetSpatialObject.md)
+  : Subset a spatial object by spots
+- [`validateMetadataColumns()`](https://mictott.github.io/SpotSweeper/reference/validateMetadataColumns.md)
+  : Validate columns in spatial-object metadata
+
+# Articles
+
+### All vignettes
+
+- [Getting started with
+  'SpotSweeper'](https://mictott.github.io/SpotSweeper/articles/getting_started.md):
