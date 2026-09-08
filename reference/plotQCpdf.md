@@ -127,6 +127,6 @@ plotQCpdf(spe,
           metric="sum",
           outliers="sum_outliers",
           fname=tempFilePath)
-#> agg_record_2904a7bb26d 
-#>                      2 
+#> agg_record_1bd815af232f 
+#>                       2 
 ```
