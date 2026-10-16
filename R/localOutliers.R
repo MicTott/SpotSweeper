@@ -20,7 +20,9 @@
 #' @param samples A single metadata column name containing sample identifiers.
 #' @param log Whether to apply `log1p()` to `metric` before scoring.
 #' @param cutoff Non-negative absolute robust z-score cutoff.
-#' @param workers Number of workers passed to `BiocNeighbors::findKNN()`.
+#' @param workers Number of workers for nearest-neighbor search. Uses serial
+#'   execution for one worker, socket workers on Windows, and multicore workers
+#'   on macOS/Linux. Per-spot scoring remains serial.
 #' @param coords Optional numeric coordinate matrix with spots as rows. When
 #'   `NULL`, spatial coordinates are obtained from `spe`.
 #'
@@ -28,7 +30,6 @@
 #'   columns. When `log = TRUE`, `<metric>_log` is also added.
 #'
 #' @importFrom BiocNeighbors findKNN
-#' @importFrom BiocParallel MulticoreParam
 #' @export
 #'
 #' @examples
@@ -140,11 +141,7 @@ localOutliers <- function(
 
     sample_coords <- coords[sample_indices, , drop = FALSE]
     sample_values <- metadata[[metric_to_use]][sample_indices]
-    parallel_param <- if (workers == 1L) {
-      BiocParallel::SerialParam()
-    } else {
-      BiocParallel::MulticoreParam(workers = workers)
-    }
+    parallel_param <- .parallel_param(workers)
     neighbors <- BiocNeighbors::findKNN(
       sample_coords,
       k = n_neighbors,

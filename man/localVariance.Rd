@@ -29,7 +29,9 @@ calculation}
 
 \item{name}{Name of the new column to add to colData}
 
-\item{workers}{Number of workers to use for parallel computation}
+\item{workers}{Number of workers for nearest-neighbor search. Uses serial
+execution for one worker, socket workers on Windows, and multicore workers
+on macOS/Linux. Subsequent variance calculations remain serial.}
 }
 \value{
 SpatialExperiment object with metric variance added to colData

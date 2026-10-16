@@ -33,7 +33,9 @@ a numeric QC metric.}
 
 \item{cutoff}{Non-negative absolute robust z-score cutoff.}
 
-\item{workers}{Number of workers passed to \code{BiocNeighbors::findKNN()}.}
+\item{workers}{Number of workers for nearest-neighbor search. Uses serial
+execution for one worker, socket workers on Windows, and multicore workers
+on macOS/Linux. Per-spot scoring remains serial.}
 
 \item{coords}{Optional numeric coordinate matrix with spots as rows. When
 \code{NULL}, spatial coordinates are obtained from \code{spe}.}

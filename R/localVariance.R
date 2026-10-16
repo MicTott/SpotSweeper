@@ -10,13 +10,14 @@
 #' @param samples Column in colData to use for sample ID
 #' @param log Whether to log1p transform the metric
 #' @param name Name of the new column to add to colData
-#' @param workers Number of workers to use for parallel computation
+#' @param workers Number of workers for nearest-neighbor search. Uses serial
+#'   execution for one worker, socket workers on Windows, and multicore workers
+#'   on macOS/Linux. Subsequent variance calculations remain serial.
 #'
 #' @return SpatialExperiment object with metric variance added to colData
 #'
 #' @importFrom SummarizedExperiment colData
 #' @importFrom BiocNeighbors findKNN
-#' @importFrom BiocParallel MulticoreParam
 #' @importFrom MASS rlm
 #'
 #' @export localVariance
@@ -123,11 +124,7 @@ localVariance <- function(spe, n_neighbors = 36,
     columnData$coords <- spatialCoords(spe_subset)
 
     # Find nearest neighbors
-    parallel_param <- if (workers == 1L) {
-      BiocParallel::SerialParam()
-    } else {
-      BiocParallel::MulticoreParam(workers = workers)
-    }
+    parallel_param <- .parallel_param(workers)
     dnn <- BiocNeighbors::findKNN(spatialCoords(spe_subset),
                                   k = n_neighbors,
                                   BPPARAM = parallel_param,
