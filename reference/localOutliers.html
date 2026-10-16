@@ -13,7 +13,7 @@ in the object's column metadata."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">SpotSweeper</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.9.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.9.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,7 +100,9 @@ a numeric QC metric.</p></dd>
 
 
 <dt id="arg-workers">workers<a class="anchor" aria-label="anchor" href="#arg-workers"></a></dt>
-<dd><p>Number of workers passed to <code><a href="https://rdrr.io/pkg/BiocNeighbors/man/findKNN.html" class="external-link">BiocNeighbors::findKNN()</a></code>.</p></dd>
+<dd><p>Number of workers for nearest-neighbor search. Uses serial
+execution for one worker, socket workers on Windows, and multicore workers
+on macOS/Linux. Per-spot scoring remains serial.</p></dd>
 
 
 <dt id="arg-coords">coords<a class="anchor" aria-label="anchor" href="#arg-coords"></a></dt>

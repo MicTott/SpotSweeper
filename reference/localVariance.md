@@ -45,7 +45,9 @@ localVariance(
 
 - workers:
 
-  Number of workers to use for parallel computation
+  Number of workers for nearest-neighbor search. Uses serial execution
+  for one worker, socket workers on Windows, and multicore workers on
+  macOS/Linux. Subsequent variance calculations remain serial.
 
 ## Value
 

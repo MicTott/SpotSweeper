@@ -331,7 +331,7 @@ utils::sessionInfo()
 
     ## R version 4.6.1 (2026-06-24)
     ## Platform: x86_64-pc-linux-gnu
-    ## Running under: Ubuntu 24.04.4 LTS
+    ## Running under: Ubuntu 24.04.5 LTS
     ## 
     ## Matrix products: default
     ## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -356,11 +356,11 @@ utils::sessionInfo()
     ##  [5] SingleCellExperiment_1.34.0 SummarizedExperiment_1.42.0
     ##  [7] Biobase_2.72.0              GenomicRanges_1.64.0       
     ##  [9] Seqinfo_1.2.0               IRanges_2.46.0             
-    ## [11] S4Vectors_0.50.2            MatrixGenerics_1.24.0      
+    ## [11] S4Vectors_0.50.3            MatrixGenerics_1.24.0      
     ## [13] matrixStats_1.5.0           ExperimentHub_3.2.2        
     ## [15] AnnotationHub_4.2.2         BiocFileCache_3.2.0        
     ## [17] dbplyr_2.6.0                BiocGenerics_0.58.1        
-    ## [19] generics_0.1.4              SpotSweeper_1.9.2          
+    ## [19] generics_0.1.4              SpotSweeper_1.9.3          
     ## [21] BiocStyle_2.40.0           
     ## 
     ## loaded via a namespace (and not attached):
@@ -371,9 +371,9 @@ utils::sessionInfo()
     ## [13] RSQLite_3.53.3       magrittr_2.0.5       compiler_4.6.1      
     ## [16] rlang_1.3.0          sass_0.4.10          tools_4.6.1         
     ## [19] yaml_2.3.12          knitr_1.52           labeling_0.4.3      
-    ## [22] S4Arrays_1.12.0      htmlwidgets_1.6.4    curl_8.0.0          
-    ## [25] bit_4.6.0            DelayedArray_0.38.2  RColorBrewer_1.1-3  
-    ## [28] abind_1.4-8          BiocParallel_1.46.0  withr_3.0.3         
+    ## [22] S4Arrays_1.12.1      htmlwidgets_1.6.4    bit_4.6.0           
+    ## [25] curl_8.1.0           DelayedArray_0.38.2  RColorBrewer_1.1-3  
+    ## [28] BiocParallel_1.46.0  abind_1.4-8          withr_3.0.3         
     ## [31] purrr_1.2.2          desc_1.4.3           grid_4.6.1          
     ## [34] beachmat_2.28.0      scales_1.4.0         MASS_7.3-65         
     ## [37] cli_3.6.6            crayon_1.5.3         rmarkdown_2.32      
@@ -389,5 +389,5 @@ utils::sessionInfo()
     ## [67] rappdirs_0.3.4       htmltools_0.5.9      R6_2.6.1            
     ## [70] httr2_1.3.0          textshaping_1.0.5    evaluate_1.0.5      
     ## [73] lattice_0.22-9       png_0.1-9            memoise_2.0.1       
-    ## [76] bslib_0.12.0         Rcpp_1.1.2           SparseArray_1.12.2  
-    ## [79] xfun_0.60            fs_2.1.0             pkgconfig_2.0.3
+    ## [76] bslib_0.12.0         Rcpp_1.1.2           SparseArray_1.12.3  
+    ## [79] xfun_0.61            fs_2.1.0             pkgconfig_2.0.3

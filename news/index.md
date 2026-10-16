@@ -1,5 +1,18 @@
 # Changelog
 
+## Version 1.9.3
+
+### Bug fixes
+
+- Fixed Windows parallel nearest-neighbor search in
+  [`localOutliers()`](https://mictott.github.io/SpotSweeper/reference/localOutliers.md)
+  and
+  [`localVariance()`](https://mictott.github.io/SpotSweeper/reference/localVariance.md)
+  ([\#27](https://github.com/MicTott/SpotSweeper/issues/27)). The
+  existing `workers` argument automatically selects socket workers on
+  Windows and multicore workers on macOS/Linux; one worker continues to
+  use serial execution. No new arguments are needed.
+
 ## Version 1.9.2
 
 ### Bug fixes

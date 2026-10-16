@@ -55,8 +55,9 @@ localOutliers(
 
 - workers:
 
-  Number of workers passed to
-  [`BiocNeighbors::findKNN()`](https://rdrr.io/pkg/BiocNeighbors/man/findKNN.html).
+  Number of workers for nearest-neighbor search. Uses serial execution
+  for one worker, socket workers on Windows, and multicore workers on
+  macOS/Linux. Per-spot scoring remains serial.
 
 - coords:
 
